@@ -1,0 +1,67 @@
+
+[17. 9. 18 오후 11:22] Log File Opened for Vuze 5.7.5.0
+[23:22:36] DEBUG::Mon Sep 18 23:22:36 KST 2017  데이터 잃어버림 /pri/var/fol/4j/75d/T/swt.zip
+[23:22:36] DEBUG::Mon Sep 18 23:22:36 KST 2017  데이터 잃어버림 /pri/var/fol/4j/75d/T/azu.zip
+[23:22:38] [GUI] SWT update aborted due to previously reported issues regarding its install location
+[23:22:39] [stderr] DEBUG::Mon Sep 18 23:22:39 KST 2017::org.gudy.azureus2.pluginsimpl.local.utils.resourcedownloader.ResourceDownloaderBaseImpl::addListener::560:
+[23:22:39] [stderr]   [http://cf1.vuze.com/torrent/torrents/azplatform2-osx_1.09.zip.torrent: torrent,http://plugins.vuze.com/plugins/azplatform2-osx_1.09.zip] failed
+[23:22:39] [stderr]     PlatformManagerUpdateChecker::checkForUpdate::230, UpdateCheckInstanceImpl$3::run::313, AEThread2$threadWrapper::run::294
+[23:22:39] [stderr] org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloaderCancelledException: [http://cf1.vuze.com/torrent/torrents/azplatform2-osx_1.09.zip.torrent: torrent,http://plugins.vuze.com/plugins/azplatform2-osx_1.09.zip]: Download cancelled
+[23:22:39] [stderr] 	at org.gudy.azureus2.pluginsimpl.local.utils.resourcedownloader.ResourceDownloaderAlternateImpl.cancel(ResourceDownloaderAlternateImpl.java:274)
+[23:22:39] [stderr] 	at org.gudy.azureus2.pluginsimpl.local.update.UpdateImpl.cancel(UpdateImpl.java:211)
+[23:22:39] [stderr] 	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckInstanceImpl.addUpdate(UpdateCheckInstanceImpl.java:488)
+[23:22:39] [stderr] 	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckerImpl.addUpdate(UpdateCheckerImpl.java:97)
+[23:22:39] [stderr] 	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckerImpl.addUpdate(UpdateCheckerImpl.java:80)
+[23:22:39] [stderr] 	at org.gudy.azureus2.platform.macosx.PlatformManagerUpdateChecker.checkForUpdate(PlatformManagerUpdateChecker.java:220)
+[23:22:39] [stderr] 	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckInstanceImpl$3.run(UpdateCheckInstanceImpl.java:313)
+[23:22:39] [stderr] 	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:294)
+[23:22:39] org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloaderCancelledException: [http://cf1.vuze.com/torrent/torrents/azplatform2-osx_1.09.zip.torrent: torrent,http://plugins.vuze.com/plugins/azplatform2-osx_1.09.zip]: Download cancelled
+	at org.gudy.azureus2.pluginsimpl.local.utils.resourcedownloader.ResourceDownloaderAlternateImpl.cancel(ResourceDownloaderAlternateImpl.java:274)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateImpl.cancel(UpdateImpl.java:211)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckInstanceImpl.addUpdate(UpdateCheckInstanceImpl.java:488)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckerImpl.addUpdate(UpdateCheckerImpl.java:97)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckerImpl.addUpdate(UpdateCheckerImpl.java:80)
+	at org.gudy.azureus2.platform.macosx.PlatformManagerUpdateChecker.checkForUpdate(PlatformManagerUpdateChecker.java:220)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckInstanceImpl$3.run(UpdateCheckInstanceImpl.java:313)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:294)
+
+[23:23:15] [plug] [UPnP] Mapping 들어오는 피어 데이터 포트 (TCP/59294) failed to delete
+[23:23:15] [stderr] DEBUG::Mon Sep 18 23:23:15 KST 2017::com.aelitis.azureus.plugins.upnp.UPnPPluginService::removeMapping::408:
+[23:23:15] [stderr]   com.aelitis.net.upnp.UPnPException: Invoke of 'urn:schemas-upnp-org:service:WANIPConnection:1#DeletePortMapping' on '[http://192.168.0.1:55748/etc/linuxigd/gateconnSCPD.ctl]' failed: Connection refused
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.services.UPnPActionInvocationImpl.invoke(UPnPActionInvocationImpl.java:169)
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.services.UPnPSSWANConnectionImpl.deletePortMapping(UPnPSSWANConnectionImpl.java:429)
+[23:23:15] [stderr] 	at com.aelitis.azureus.plugins.upnp.UPnPPluginService.removeMapping(UPnPPluginService.java:401)
+[23:23:15] [stderr] 	at com.aelitis.azureus.plugins.upnp.UPnPPluginService.removeMapping(UPnPPluginService.java:321)
+[23:23:15] [stderr] 	at com.aelitis.azureus.plugins.upnp.UPnPPlugin$13.run(UPnPPlugin.java:709)
+[23:23:15] [stderr] 	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:294)
+[23:23:15] [stderr] Caused by: java.net.ConnectException: Connection refused
+[23:23:15] [stderr] 	at java.net.PlainSocketImpl.socketConnect(Native Method)
+[23:23:15] [stderr] 	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+[23:23:15] [stderr] 	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+[23:23:15] [stderr] 	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+[23:23:15] [stderr] 	at java.net.Socket.connect(Socket.java:579)
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.UPnPImpl.performSOAPRequest(UPnPImpl.java:886)
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.UPnPImpl.performSOAPRequest(UPnPImpl.java:747)
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.services.UPnPActionInvocationImpl.invoke(UPnPActionInvocationImpl.java:96)
+[23:23:15] [stderr] 	... 5 more
+[23:23:15] [stderr] 
+[23:23:15] [plug] [UPnP] Mapping Distributed DB (UDP/59294) failed to delete
+[23:23:15] [stderr] DEBUG::Mon Sep 18 23:23:15 KST 2017::com.aelitis.azureus.plugins.upnp.UPnPPluginService::removeMapping::408:
+[23:23:15] [stderr]   com.aelitis.net.upnp.UPnPException: Invoke of 'urn:schemas-upnp-org:service:WANIPConnection:1#DeletePortMapping' on '[http://192.168.0.1:55748/etc/linuxigd/gateconnSCPD.ctl]' failed: Connection refused
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.services.UPnPActionInvocationImpl.invoke(UPnPActionInvocationImpl.java:169)
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.services.UPnPSSWANConnectionImpl.deletePortMapping(UPnPSSWANConnectionImpl.java:429)
+[23:23:15] [stderr] 	at com.aelitis.azureus.plugins.upnp.UPnPPluginService.removeMapping(UPnPPluginService.java:401)
+[23:23:15] [stderr] 	at com.aelitis.azureus.plugins.upnp.UPnPPluginService.removeMapping(UPnPPluginService.java:321)
+[23:23:15] [stderr] 	at com.aelitis.azureus.plugins.upnp.UPnPPlugin$13.run(UPnPPlugin.java:709)
+[23:23:15] [stderr] 	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:294)
+[23:23:15] [stderr] Caused by: java.net.ConnectException: Connection refused
+[23:23:15] [stderr] 	at java.net.PlainSocketImpl.socketConnect(Native Method)
+[23:23:15] [stderr] 	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+[23:23:15] [stderr] 	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+[23:23:15] [stderr] 	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+[23:23:15] [stderr] 	at java.net.Socket.connect(Socket.java:579)
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.UPnPImpl.performSOAPRequest(UPnPImpl.java:886)
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.UPnPImpl.performSOAPRequest(UPnPImpl.java:747)
+[23:23:15] [stderr] 	at com.aelitis.net.upnp.impl.services.UPnPActionInvocationImpl.invoke(UPnPActionInvocationImpl.java:96)
+[23:23:15] [stderr] 	... 5 more
+[23:23:15] [stderr] 

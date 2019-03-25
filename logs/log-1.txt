@@ -1,0 +1,12 @@
+19. 2. 14 오후 4:08:11 ERROR [: RouterInit] eaming.I2PSocketManagerFactory: Error creating session for socket manager
+net.i2p.client.I2PSessionException: [CLOSED I2PSessionMuxedImpl]: Failed to build tunnels
+	at net.i2p.client.impl.I2PSessionImpl.connect(I2PSessionImpl.java:723)
+	at net.i2p.client.streaming.I2PSocketManagerFactory.createManager(I2PSocketManagerFactory.java:247)
+	at net.i2p.client.streaming.I2PSocketManagerFactory.createManager(I2PSocketManagerFactory.java:167)
+	at org.parg.azureus.plugins.networks.i2p.router.I2PHelperRouterDHT.initialiseDHT(I2PHelperRouterDHT.java:208)
+	at org.parg.azureus.plugins.networks.i2p.router.I2PHelperRouter.initialiseDHTs(I2PHelperRouter.java:859)
+	at org.parg.azureus.plugins.networks.i2p.I2PHelperPlugin$14.run(I2PHelperPlugin.java:1394)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+Caused by: java.io.IOException: Disconnected from router while waiting for tunnels
+	at net.i2p.client.impl.I2PSessionImpl.connect(I2PSessionImpl.java:686)
+	... 6 more

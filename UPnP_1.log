@@ -1,0 +1,67 @@
+
+[17. 9. 18 오후 11:22] Log File Opened for Vuze 5.7.5.0
+[23:22:37] Device 'http://192.168.0.1:55748/etc/linuxigd/gatedesc.xml' is ok: discover=0,found=0,read_ok=0,read_bad=0,map_ok=0,map_bad=0
+[23:22:37] UPnP: root discovered: usn=uuid:fc4ec57e-b051-11db-88f8-0060085db3f6::upnp:rootdevice, location=http://192.168.0.1:55748/etc/linuxigd/gatedesc.xml, ni=en0,local=/192.168.0.4
+[23:22:37]   Downloading: http://192.168.0.1:55748/etc/linuxigd/gatedesc.xml
+[23:22:37] Relative URL base is unspecified
+[23:22:37] EFM Networks ipTIME A1004NS
+[23:22:37]   urn:schemas-dummy-com:service:Dummy:1:desc=http://192.168.0.1:55748/etc/linuxigd/dummy.xml, control=http://192.168.0.1:55748/dummy
+[23:22:37]   WANDevice
+[23:22:37]     urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1:desc=http://192.168.0.1:55748/etc/linuxigd/gateicfgSCPD.xml, control=http://192.168.0.1:55748/etc/linuxigd/gateicfgSCPD.ctl
+[23:22:37]     WANConnectionDevice *
+[23:22:37]       urn:schemas-upnp-org:service:WANIPConnection:1:desc=http://192.168.0.1:55748/etc/linuxigd/gateconnSCPD.xml, control=http://192.168.0.1:55748/etc/linuxigd/gateconnSCPD.ctl
+[23:22:37]     Found WANIPConnection
+[23:22:37]   Downloading: http://192.168.0.1:55748/etc/linuxigd/gateconnSCPD.xml
+[23:22:37] Mapping request: 들어오는 피어 데이터 포트 (UDP/59294), enabled = true
+[23:22:37] Mapping request: UDP 트래커 클라이언트 포트 (UDP/59294), enabled = true
+[23:22:37] Mapping request: 들어오는 피어 데이터 포트 (TCP/59294), enabled = true
+[23:22:37] Mapping request: 들어오는 피어 데이터 포트 (TCP/8080), enabled = false
+[23:22:37] Mapping request: TCP 트래커 포트 (TCP/6969), enabled = false
+[23:22:37] Mapping request: TCP SSL 트래커 포트 (TCP/7000), enabled = false
+[23:22:37] Mapping request: UDP 트래커 포트 (UDP/6969), enabled = false
+[23:22:37] Mapping request: Distributed DB (UDP/59294), enabled = true
+[23:22:37] Invocation via http connection failed (SOAP RPC failed: 500 Internal Server Error - <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><s:Fault><faultcode>s:Client</faultcode><faultstring>UPnPError</faultstring><detail><UPnPError xmlns="urn:schemas-upnp-org:control-1-0"><errorCode>713</errorCode><errorDescription>SpecifiedArrayIndexInvalid</errorDescription></UPnPError></detail></s:Fault></s:Body></s:Envelope>) but socket connection succeeded
+[23:22:37] UPnP: '들어오는 피어 데이터 포트 (UDP/59294)' 맵핑 확립됨
+[23:22:37] Mapping UDP 트래커 클라이언트 포트 (UDP/59294) already established
+[23:22:37] UPnP: '들어오는 피어 데이터 포트 (TCP/59294)' 맵핑 확립됨
+[23:22:37] Mapping Distributed DB (UDP/59294) already established
+[23:23:15] Mapping UDP 트래커 클라이언트 포트 (UDP/59294),Distributed DB (UDP/59294) not removed as interest remains
+[23:23:15] Mapping Distributed DB (UDP/59294) not removed as interest remains
+[23:23:15] Mapping 들어오는 피어 데이터 포트 (TCP/59294) failed to delete
+com.aelitis.net.upnp.UPnPException: Invoke of 'urn:schemas-upnp-org:service:WANIPConnection:1#DeletePortMapping' on '[http://192.168.0.1:55748/etc/linuxigd/gateconnSCPD.ctl]' failed: Connection refused
+	at com.aelitis.net.upnp.impl.services.UPnPActionInvocationImpl.invoke(UPnPActionInvocationImpl.java:169)
+	at com.aelitis.net.upnp.impl.services.UPnPSSWANConnectionImpl.deletePortMapping(UPnPSSWANConnectionImpl.java:429)
+	at com.aelitis.azureus.plugins.upnp.UPnPPluginService.removeMapping(UPnPPluginService.java:401)
+	at com.aelitis.azureus.plugins.upnp.UPnPPluginService.removeMapping(UPnPPluginService.java:321)
+	at com.aelitis.azureus.plugins.upnp.UPnPPlugin$13.run(UPnPPlugin.java:709)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:294)
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+	at java.net.Socket.connect(Socket.java:579)
+	at com.aelitis.net.upnp.impl.UPnPImpl.performSOAPRequest(UPnPImpl.java:886)
+	at com.aelitis.net.upnp.impl.UPnPImpl.performSOAPRequest(UPnPImpl.java:747)
+	at com.aelitis.net.upnp.impl.services.UPnPActionInvocationImpl.invoke(UPnPActionInvocationImpl.java:96)
+	... 5 more
+
+[23:23:15] Mapping Distributed DB (UDP/59294) failed to delete
+com.aelitis.net.upnp.UPnPException: Invoke of 'urn:schemas-upnp-org:service:WANIPConnection:1#DeletePortMapping' on '[http://192.168.0.1:55748/etc/linuxigd/gateconnSCPD.ctl]' failed: Connection refused
+	at com.aelitis.net.upnp.impl.services.UPnPActionInvocationImpl.invoke(UPnPActionInvocationImpl.java:169)
+	at com.aelitis.net.upnp.impl.services.UPnPSSWANConnectionImpl.deletePortMapping(UPnPSSWANConnectionImpl.java:429)
+	at com.aelitis.azureus.plugins.upnp.UPnPPluginService.removeMapping(UPnPPluginService.java:401)
+	at com.aelitis.azureus.plugins.upnp.UPnPPluginService.removeMapping(UPnPPluginService.java:321)
+	at com.aelitis.azureus.plugins.upnp.UPnPPlugin$13.run(UPnPPlugin.java:709)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:294)
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+	at java.net.Socket.connect(Socket.java:579)
+	at com.aelitis.net.upnp.impl.UPnPImpl.performSOAPRequest(UPnPImpl.java:886)
+	at com.aelitis.net.upnp.impl.UPnPImpl.performSOAPRequest(UPnPImpl.java:747)
+	at com.aelitis.net.upnp.impl.services.UPnPActionInvocationImpl.invoke(UPnPActionInvocationImpl.java:96)
+	... 5 more
+

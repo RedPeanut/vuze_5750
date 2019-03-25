@@ -1,0 +1,49 @@
+
+[17. 9. 18 오후 11:22] Log File Opened for Vuze 5.7.5.0
+[23:22:38] **** Update check starts ****
+[23:22:38] **** Update check starts ****
+[23:22:38] -Vuze Feature Manager, id = aefeatman_v, version = 0.0, loc = /Users/jkkim/Library/Application Support/Azureus/plugins/aefeatman_v
+[23:22:38] -UPnP Media Server, id = azupnpav, version = 0.0, loc = /Users/jkkim/Library/Application Support/Azureus/plugins/azupnpav
+[23:22:38] *Azureus Update Support, id = azupdater, version = 1.9.2, loc = /Users/jkkim/workspace/java/vuze_5750/Azureus.app/Contents/plugins/azupdater
+[23:22:38] -Azureus Updater Support Patcher, id = azupdaterpatcher, version = 1.9.2, loc = /Users/jkkim/workspace/java/vuze_5750/Azureus.app/Contents/plugins/azupdater
+[23:22:38] -Download Remove Rules, id = azbpremovalrules, version = 1.0, loc = 
+[23:22:38] -Share Hoster, id = azbpsharehoster, version = 1.0, loc = 
+[23:22:38] -Plugin Updater, id = azbppluginupdate, version = 1.0, loc = 
+[23:22:38] -Start/Stop Rules, id = azbpstartstoprules, version = 1.0, loc = 
+[23:22:38] -Distributed DB, id = azbpdht, version = 1.0, loc = 
+[23:22:38] -Universal Plug and Play (UPnP), id = azbpupnp, version = 1.0, loc = 
+[23:22:38] -Distributed Tracker, id = azbpdhdtracker, version = 1.0, loc = 
+[23:22:38] -Core Updater, id = azbpcoreupdater, version = 5.7.5.0, loc = 
+[23:22:38] -Core Patcher (level=4), id = azbpcorepatcher, version = 1.0, loc = 
+[23:22:38] -Platform-Specific Support, id = azplatform2, version = 1.0, loc = 
+[23:22:38] -Magnet URI Handler, id = azbpmagnet, version = 1.0, loc = 
+[23:22:38] -External Seed, id = azextseed, version = 1.0, loc = 
+[23:22:38] -LAN Peer Finder, id = azlocaltracker, version = 1.0, loc = 
+[23:22:38] -네트워크 상태, id = aznetstat, version = 1.0, loc = 
+[23:22:38] -Local RSS etc., id = azintrss, version = 1.0, loc = 
+[23:22:38] -친구, id = azbuddy, version = 1.0, loc = 
+[23:22:38] Downloaded plugin info = xml_http_if=1.1.7/1.1.7_CVS,mlDHT=1.5.9/1.5.9_CVS,azpeerinjector=0.4.1/0.4.1_CVS,azupdater=1.9.2/1.9.2_CVS,hvi=600/600_CVS,torrentnameutils=1.0/1.0_CVS,safepeer=unsupported/unsupported_CVS,azofflinedownloader=0.2.2/0.2.2_CVS,ono=2.3/2.3_CVS,azexec=1.3.2/1.3.2_CVS,seedingcolumns1=1.3.4/1.3.4_CVS,azconfigbackup=1.1.3/1.1.3_CVS,snarl=/,CountryLocator=1.8.9/1.8.9_CVS,azplugins=2.1.4/2.1.10_CVS,vpnpia=5.0/5.0_CVS,i18nAZ=1.4.8/1.4.8_CVS,3DView=0.4.2/0.4.2_CVS,xmwebui=0.6.5/0.6.5_CVS,aercm=0.5.19/0.5.19_CVS,uploadshaper=1.0.2/1.0.2_CVS,azbosskey=/,firefrog=1.0.2/1.0.2_CVS,atelnetui=0.0.3/0.0.3_CVS,azdowndel=1.5/1.5_CVS,azcatdest=0.0.2/0.0.2_CVS,mlab=0.2/0.2_CVS,scanerss=0.9.9.20161117/0.9.9.20161117_CVS,azlockr=0.12/0.12_CVS,azburn_v=1.3.12/1.3.12_CVS,dopal=/,aesudoku=0.5.1/0.5.1_CVS,azcategorychanger=0.2.2/0.2.2_CVS,azjabber=1.0.4/1.0.4_CVS,azteamseeder=0.1.3/0.1.3_CVS,azwikiservicedemo=0.2/0.2_CVS,dasu=5.31/5.31_CVS,azautoseeder=0.1.2/0.1.2_CVS,TimedAutoStart=1.7.1/1.7.1_CVS,azantithrottle=0.3.3/0.3.3_CVS,azautorelocate=0.3.2/0.3.2_CVS,statusicon=1.2/1.2_CVS,autopilot=0.5.2/0.5.2_CVS,autostop=2.0.4/2.0.4_CVS,ConsoleScheduler=0.2.4/0.2.4_CVS,azcvsupdater=3.1.4/3.1.4_CVS,autopriority=1.0.2/1.0.2_CVS,Example=1.0/,aeantivirus_v=0.3.8/0.3.8_CVS,azrating=1.5.19/1.5.19_CVS,azmsgsync=0.7.8/0.7.8_CVS,hyperspace=0.35/0.35_CVS,izureus=0.1/0.1_CVS,azhtmlwebui2=1.0.2/1.0.2_CVS,aznettor=0.9.2/0.9.2_CVS,azjython=0.6.5/0.6.5_CVS,azhighchartsstats=0.1/0.1_CVS,azrssgen=0.1.2/0.1.2_CVS,p4p=0.3.2/0.3.2_CVS,azdhtfeed=0.4.3/0.4.3_CVS,azstatusmailer=0.18/0.18_CVS,azemp=4.0.2/4.0.2_CVS,winstartstop=/,vpnpp=1.0/,twitter=0.3.1/0.3.1_CVS,ColumnExample2=1.2/1.2_CVS,ColumnExample1=1.1/,azrsstochat=0.4.1/0.4.1_CVS,azlocprov=0.1.7.7/0.1.7.7_CVS,rssfeed=1.5.3/1.5.3_CVS,autocat=1.2.3/1.2.3_CVS,azcron=0.5.4/0.5.4_CVS,azdhtscraper=0.1.1/0.1.1_CVS,RSSImport=2.2.2/2.2.2_CVS,azmarkedup=0.1.3/0.1.3_CVS,test=/0.1.2_CVS,webui=1.7.4/1.7.4_CVS,p4p_package=/,vuzexcode=0.8.7/0.8.7_CVS,azitunes=0.2.8/0.3.3_CVS,swarmscreen=0.5/0.5_CVS,aznetmon=0.4/0.4_CVS,azupnpav=0.5.7/0.5.7_CVS,aizen=/0.2_CVS,azplatform2=1.09/1.11_CVS,azneti2p=0.3.3/0.3.3_CVS,SpeedScheduler=1.6.2/1.6.2_CVS,azsmrc=1.0.0/1.0.0_CVS,SampleMainView2=1.0/,azsavepath=1.2.2/1.2.2_CVS,SampleMainView1=1.0/,azfocus=0.3.1/0.3.1_CVS,azhtmlwebui=0.7.7/0.7.7_CVS,azblog=1.0/1.0_CVS,phpcontrollayer=/,multi-ports=1.0/,azjscripter=0.2.2/0.2.2_CVS,aztrackerurladder=0.1.1/0.1.1_CVS,aztorrentmaker=0.1.1/0.1.1_CVS,azlanpeerscanner=0.86/0.86_CVS,news=2.0.1/2.0.1_CVS,yaleinstrumentation=0.5/0.5_CVS,advancedstatistics=2.0.3/2.0.3_CVS,azutp=0.5.6/0.5.6_CVS,bdcc=2.2.3/2.2.3_CVS,vpn_helper=5.2/5.2_CVS,monitoringplugin=0.4.2/0.4.2_CVS,azpromo=2.2/2.2_CVS,VuzeLegendasBaixator=0.3/0.3_CVS,TorrentGuard=1.1.2/1.1.2_CVS,autospeed=0.9.1/0.9.1_CVS,azwebtorrent=1.1/1.1_CVS,ietorrentbar=0.1.4/0.1.4_CVS,aznettorbrowser=6.5.2/6.5.2_CVS,azshareexporter=0.4.1/0.4.1_CVS,aefeatman_v=1.3/1.3.2_CVS,GlobalInformationStatusEntry=1.6/1.6_CVS,azneti2phelper=0.9.29.1.1/0.9.29.1.1_CVS,progressbar=0.2.4/0.2.4_CVS,azump=1.5/1.5_CVS,chat=1.9.1/1.9.1_CVS,azzeroconf=0.2/0.2_CVS
+[23:22:44] -mlab, id = mlab, version = 0.0, loc = /Users/jkkim/Library/Application Support/Azureus/plugins/mlab
+[23:22:44] Checking mlab
+[23:22:44]     Current: 0.0, Latest: 0.2
+[23:22:44] [  Downloading: http://plugins.vuze.com/update/pluginlist3.php]
+[23:22:44]     Description:
+[23:22:44]         Internet measurement tools from M-Lab.
+[23:22:44]         Measurement Lab (M-Lab) is an open platform for researchers to deploy Internet measurement tools. By enhancing Internet transparency, we aim to help sustain a healthy, innovative Internet - <a href="http://measurementlab.net/about">Learn more...</a>
+[23:22:44]     Comment:
+[23:22:44]         0.2: Shaper Probe no longer supported.
+[23:22:44]         0.1.9.2: Update to fix server issue.
+[23:22:44]         0.1.9: Change progress indicator.
+[23:22:44]         0.1.8: Reworked ShaperProbe logic.
+[23:22:44]         0.1.6: Fixed dialog button order.
+[23:22:44]         0.1.4: Updated wizard.
+[23:22:44]         0.1.3: Added ShaperProbe to wizard.
+[23:22:44]         0.1.2: Reworked to support wizard mode.
+[23:22:44]         0.1.1: Initial release.
+[23:22:44]         
+[23:22:44] 
+[23:22:44]         A newer version (version 0.2) of plugin 'mlab' (Measurement Lab (M-Lab)) is available. Download from http://plugins.vuze.com/plugins/mlab_0.2.zip
+[23:22:48] Installing plugin 'mlab/Measurement Lab (M-Lab)', version 0.2
+[23:22:48]     Data verification stage complete
+[23:22:48] Plugin initialising, please wait... 
+[23:22:48] ... initialisation complete.

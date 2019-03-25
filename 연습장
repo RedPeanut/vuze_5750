@@ -1,0 +1,147 @@
+INTERNET technology allows the interconnect of every device to every other device, in principle. In practice, this is not the case and for many reasons devices tend to be behind routers that allow them to go unnoticed or at least act as a proxy device. This helps connect multiple devices to a single publicly addressable IP location. The devices behind the router may have private or classified private addresses and number in thousands all connected to the Internet and appearing as one single identity. The router will proxy requests and response in many cases to hide the devices. NAT is a good solution for the lack of publicly available IP addresses with the current incumbent scheme of IP version 4, IP version 6 will allow more than enough public addresses to exist and in fact provide several addresses for every square meter of the planet. Even with IP6, however there will still be NAT devices around and NAT traversal will still be required. Several methods exist for traversing NAT devices, including Session Traversal Utilities for NAT (STUN) [1] which is extended to form Interactive Connectivity Establishment (ICE): A Protocol for Network Address Translator (NAT) Traversal for Offer/Answer Protocols [2]. This paper will present a mechanism to exploit these technologies without the requirement for any servers to exist. This is therefore a solution for distributed protocols that in fact requires a distributed protocol to exist (a good fit).
+
+keep querying successively closer nodes until we have got responses from the K closest nodes that we've seen. We might get a bunch of closer nodes that then fail to respond, which means we have reconsider further away nodes.
+ we keep a list of nodes that we have queried to avoid re-querying them.
+ we keep a list of nodes discovered that we have yet to query we have a parallel search limit of A. For each A we effectively loop grabbing the currently closest unqueried node, querying it and adding the results to the yet-to-query-set (unless already queried) we terminate when we have received responses from the K closest nodes we know about (excluding failed ones) Note that we never widen the root of our search beyond the initial K closest that we know about - this could be relaxed contacts remaining to query closest at front
+
+2DC91D1C71F04D224187D438324C173741FB03A8
+
+
+
+4102E0E0C941F2A9A72499A663105D0F4DB775DA
+
+
+All values have
+	1) a key
+	2) a value
+	3) an originator (the contact who originally published it)
+	4) a sender  (the contact who sent it, could be diff for caches)
+
+rethink time :P
+a) for a value where sender + originator are the same we store a single value
+b) where sender + originator differ we store an entry per originator/value pair as the
+   send can legitimately forward multiple values but their originator should differ
+
+c) the code that adds values is responsible for not accepting values that are either
+   to "far away" from our ID, or that are cache-forwards from a contact "too far"
+   away.
+
+
+for a given key
+		c) we only allow up to 8 entries per sending IP address (excluding port)
+		d) if multiple entries have the same value the value is only returned once
+		e) only the originator can delete an entry
+
+a) prevents a single sender from filling up the mapping with garbage
+b) prevents the same key->value mapping being held multiple times when sent by different caches
+c) prevents multiple senders from same IP filling up, but supports multiple machines behind NAT
+d) optimises responses.
+
+Note that we can't trust the originator value in cache forwards, we therefore
+need to prevent someone from overwriting a valid originator->value1 mapping
+with an invalid originator->value2 mapping - that is we can't use uniqueness of
+originator
+
+a value can be "volatile" - this means that the cacher can ping the originator
+periodically and delete the value if it is dead
+
+
+the aim here is to
+	1) 	reduce ability for single contacts to spam the key while supporting up to 8
+		contacts on a given IP (assuming NAT is being used)
+	2)	stop one contact deleting or overwriting another contact's entry
+	3)	support garbage collection for contacts that don't delete entries on exit
+
+TODO: we should enforce a max-values-per-sender restriction to stop a sender from spamming
+lots of keys - however, for a small DHT we need to be careful	
+
+
+
+the smallest-subtree bit is to ensure that we remember all of our closest neighbours as ultimately they are the ones responsible for returning our identity to queries (due to binary choppery in general the query will home in on our neighbours before hitting us. It is therefore important that we keep ourselves live in their tree by refreshing. If we blindly chopped at K entries (down to B levels) then a highly unbalanced tree would result in us dropping some of them and therefore not refreshing them and therefore dropping out of their trees. There are also other benefits of maintaining this tree regarding stored value refresh Note that it is rare for such an unbalanced tree. However, a possible DOS here would be for a rogue node to deliberately try and create such a tree with a large number of entries.
+
+
+
+
+
+/Users/jkkim/Library/Application Support/Azureus/dht
+
+
+only set the incoming request handler if one has been specified. This is important when the port is shared (e.g. default udp tracker and dht) and only one usage has need to handle unsolicited inbound requests as we don't want the tracker null handler to erase the dht's one
+
+
+
+
+
+HACK alert. Due to the form of the tracker UDP protocol (no common header for requests and replies) we enforce a rule. All connection ids must have their MSB set. As requests always start with the action, which always has the MSB clear, we can use this to differentiate.
+
+
+only set the incoming request handler if one has been specified. This is important when the port is shared (e.g. default udp tracker and dht) and only one usage has need to handle unsolicited inbound requests as we don't want the tracker null handler to erase the dht's one
+
+
+
+Daemon Thread [PRUDPPacketHandler:receiver] (Suspended (breakpoint at line 1098 in PRUDPPacketHandlerImpl))	
+	PRUDPPacketHandlerImpl.send(PRUDPPacket, InetSocketAddress) line: 1098	
+	DHTUDPPacketHandler.send(DHTUDPPacketReply, InetSocketAddress) line: 224	
+	DHTTransportUDPImpl.process(DHTUDPPacketHandlerStub, DHTUDPPacketRequest, boolean) line: 2317	
+	DHTTransportUDPImpl.process(DHTUDPPacketRequest, boolean) line: 2094	
+	DHTUDPPacketHandler.receive(DHTUDPPacketRequest) line: 250	
+	DHTUDPPacketHandlerFactory.process(int, DHTUDPPacketRequest) line: 135	
+	DHTUDPPacketNetworkHandler.process(PRUDPPacketRequest) line: 55	
+	PRUDPPacketHandlerImpl$6.runSupport() line: 736	
+	PRUDPPacketHandlerImpl$6(AEThread).run() line: 66	
+
+
+Daemon Thread [AsyncDispatcher: UTPConnectionManager.java:82] (Suspended (breakpoint at line 1213 in PRUDPPacketHandlerImpl))	
+	owns: AEThread2$JoinLock  (id=172)	
+	PRUDPPacketHandlerImpl.primordialSend(byte[], InetSocketAddress) line: 1213	
+	UTPPlugin.send(InetSocketAddress, byte[], int) line: 305	
+	UTPConnectionManager$2.send(InetSocketAddress, byte[], int) line: 248	
+	UTPProviderLocal.send_to_proc(Object, byte[], InetSocketAddress) line: 131	
+	UTPTranslatedV2$1.callback(UTPTranslatedV2$_utp_callback_arguments) line: 613	
+	UTPTranslatedV2.utp_call_sendto(UTPTranslatedV2$utp_context, UTPTranslatedV2$UTPSocketImpl, byte[], int, InetSocketAddress, int) line: 511	
+	UTPTranslatedV2.send_to_addr(UTPTranslatedV2$utp_context, byte[], InetSocketAddress, int) line: 3368	
+	UTPTranslatedV2$UTPSocketImpl.send_data(UTPTranslatedV2$PacketFormatBase, byte[], int, int) line: 2318	
+	UTPTranslatedV2$UTPSocketImpl.send_packet(UTPTranslatedV2$OutgoingPacket) line: 2461	
+	UTPTranslatedV2.utp_connect(UTPTranslatedV2$UTPSocketImpl, InetSocketAddress) line: 4483	
+	UTPTranslatedV2.UTP_Connect(UTPSocket, InetSocketAddress) line: 5254	
+	UTPProviderLocal.connect(String, int) line: 323	
+	UTPConnectionManager$3.runSupport() line: 526	
+	AsyncDispatcher$1.run() line: 152	
+	AEThread2$threadWrapper.run() line: 237	
+
+
+kinda hard to do this system property setting early enough as we musn't load the config until after checking the "pass to existing process" code and this loads the class InetAddress that caches the current system prop
+
+this is nasty but I can't see an easy way around it. Unfortunately while reading the config we hit other code (logging for example) that needs access to the config data. Things are cunningly (?) arranged so that a recursive call here *won't* result in a further (looping) recursive call if we attempt to load the config again. Hence this disgusting code that goes for a second load attempt
+
+
+// only apply group rates to non-lan local connections
+// ******* READ ME *******
+If you ever come here looking for an explanation as to why on torrent startup some peers appear to be ignoring rate limits for the first few pieces of a download REMEMBER that fast-start extension pieces are downloaded while be peer is choking us and hence in a non-upgraded state WHICH MEANS that rate limits are NOT APPLIED
+
+
+
+Waiting until we've received the initiating-end's full handshake, before sending back our own, really should be the "proper" behavior.  However, classic BT trackers running NAT checking will only send the first 48 bytes (up to infohash) of the peer handshake, skipping peerid, which means we'll never get their complete handshake, and thus never reply, which causes the NAT check to fail.
+So, we need to send our handshake earlier, after we've verified the infohash.
+NOTE:
+This code makes the assumption that the inbound infohash has already been validated, as we don't check their handshake fully before sending our own.
+
+public
+private
+protected
+
+protected void
+protected int
+protected boolean
+
+private void
+private int
+private boolean
+
+public void
+public int
+public boolean
+
+Waiting until we've received the initiating-end's full handshake, before sending back our own, really should be the "proper" behavior.	However, classic BT trackers running NAT checking will only send the first 48 bytes (up to infohash) of the peer handshake, skipping peerid, which means we'll never get their complete handshake, and thus never reply, which causes the NAT check to fail. So, we need to send our handshake earlier, after we've verified the infohash. 
+
+NOTE: This code makes the assumption that the inbound infohash has already been validated, as we don't check their handshake fully before sending our own.

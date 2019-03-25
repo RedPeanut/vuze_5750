@@ -1,0 +1,514 @@
+Could not find libOSXAccess_10.5.jnilib; java.lang.UnsatisfiedLinkError: no OSXAccess_10.5 in java.library.path
+Could not find libOSXAccess.jnilib; java.lang.UnsatisfiedLinkError: no OSXAccess in java.library.path
+[NetworkManager] numRead = 1
+[NetworkManager] numWrite = 1
+Enabling broken select detection: diablo=false, freebsd 7+=false, osx 10.6+=true
+2018-10-10 22:41:11.577 java[5788:61056] *** WARNING: Method userSpaceScaleFactor in class NSView is deprecated on 10.7 and later. It should not be used in new applications. Use convertRectToBacking: instead. 
+UIFunctions/ImageLoad took 0ms
+2018-10-10 22:41:11.749 java[5788:61056] *** WARNING: Method userSpaceScaleFactor in class NSWindow is deprecated on 10.7 and later. It should not be used in new applications. Use convertRectToBacking: instead. 
+new shell took 60ms
+new shell setup took 81ms
+skin init took 83ms
+MainMenu init took 51ms
+createWindow init took 0ms
+pre skin widgets init took 26ms
+skin widgets (1/2) init took 152ms
+skin widgets (2/2) init took 79ms
+pre SWTInstance init took 0ms
+Init Core Columns took 77ms
+SWTInstance init took 26ms
+shell.layout took 51ms
+---------SHOWN AT 1539178872376;2632ms
+---------DONE DISPATCH AT 1539178872692;2948ms
+---------READY AT 1539178872718;2974ms
+shell.open took 342ms
+processStartupDMS took 0ms
+postPluginSetup init took 0ms
+Locale Initializing took 0ms
+com.vuze.plugins.azlocprov.internat.Messages: no default resource bundle
+[alert] Alert:3:/Users/jkkim/Library/Application Support/Azureus/plugins/azpromo에서 'Promo View' 플러그인 가져오는 중 오류.
+
+이 플러그인을 실행하려면 더 새로운 버전의 Java가 필요합니다.
+/Users/jkkim/Library/Application Support/Azureus/plugins/azpromoìì 'Promo View' íë¬ê·¸ì¸ ê°ì ¸ì¤ë ì¤ ì¤ë¥: java.lang.UnsupportedClassVersionError: com/vuze/azureus/plugin/azpromo/PromoPlugin : Unsupported major.minor version 52.0
+[PRUDPTrackerCodecs] registerCodecs() is called...
+[LocalTrackerPlugin] initialize() is called...
+Core Initializing took 599ms
+psDMS 0ms
+[DHTView] UISWTViewEvent.TYPE_CREATE is occured...
+[PRUDPPacketHandlerFactoryImpl] receiverMap.put(59294) is called...
+{
+    59294 = null
+}
+[PRUDPTrackerCodecs] registerCodecs() is called...
+Starting idle sleep preventer: /usr/bin/caffeinate
+[GUI] SWT update aborted due to previously reported issues regarding its install location
+[DHTUDPPacketHandlerFactory] portMap.put(59294) is called...
+{
+    59294 = null
+}
+type 1 is called...
+[DHTRouterImpl] ctor() is called...
+[DHTRouterImpl] _routerNodeId = 4102E0E0C941F2A9A72499A663105D0F4DB775DA
+java.lang.Throwable
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.<init>(DHTRouterImpl.java:127)
+	at com.aelitis.azureus.core.dht.router.DHTRouterFactory.create(DHTRouterFactory.java:48)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.createRouter(DHTControlImpl.java:496)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.<init>(DHTControlImpl.java:283)
+	at com.aelitis.azureus.core.dht.control.DHTControlFactory.create(DHTControlFactory.java:51)
+	at com.aelitis.azureus.core.dht.impl.DHTImpl.<init>(DHTImpl.java:93)
+	at com.aelitis.azureus.core.dht.DHTFactory.create(DHTFactory.java:43)
+	at com.aelitis.azureus.plugins.dht.impl.DHTPluginImpl.<init>(DHTPluginImpl.java:215)
+	at com.aelitis.azureus.plugins.dht.DHTPlugin$12$1$1.run(DHTPlugin.java:611)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[DHTRouterNodeImpl] : buckets = 1{4102E0E0...[hba=Y,bad=0,OK=0]}, replacements = null * tsll=1539178874918
+[DHTControlImpl] contactsToQuery.size() = 1
+[DHTControlImpl] contact[0].getAddress() = /1.244.159.36:59294
+[DHTPluginImpl] >>> 3
+[DHTControlImpl] contactsToQuery.size() = 2
+[DHTControlImpl] contact[0].getAddress() = /1.244.159.36:59294
+[DHTControlImpl] contact[1].getAddress() = dht.vuze.com/174.129.43.152:6881
+[StartStopRulesDefaultPlugin] stateChanged is called()...
+[StartStopRulesDefaultPlugin] oldState = Download.ST_WAITING, newState = Download.ST_PREPARING
+[StartStopRulesDefaultPlugin] stateChanged is called()...
+[StartStopRulesDefaultPlugin] oldState = Download.ST_PREPARING, newState = Download.ST_READY
+[DownloadManagerImpl] startDownload() is called...
+[StartStopRulesDefaultPlugin] stateChanged is called()...
+[StartStopRulesDefaultPlugin] oldState = Download.ST_READY, newState = Download.ST_DOWNLOADING
+DEBUG::Wed Oct 10 22:41:16 KST 2018::org.gudy.azureus2.pluginsimpl.local.utils.resourcedownloader.ResourceDownloaderBaseImpl::addListener::497:
+	[http://cf1.vuze.com/torrent/torrents/azplatform2-osx_1.09.zip.torrent: torrent,http://plugins.vuze.com/plugins/azplatform2-osx_1.09.zip] failed
+		PlatformManagerUpdateChecker::checkForUpdate::222, UpdateCheckInstanceImpl$3::run::280, AEThread2$threadWrapper::run::230
+org.gudy.azureus2.plugins.utils.resourcedownloader.ResourceDownloaderCancelledException: [http://cf1.vuze.com/torrent/torrents/azplatform2-osx_1.09.zip.torrent: torrent,http://plugins.vuze.com/plugins/azplatform2-osx_1.09.zip]: Download cancelled
+	at org.gudy.azureus2.pluginsimpl.local.utils.resourcedownloader.ResourceDownloaderAlternateImpl.cancel(ResourceDownloaderAlternateImpl.java:261)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateImpl.cancel(UpdateImpl.java:179)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckInstanceImpl.addUpdate(UpdateCheckInstanceImpl.java:446)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckerImpl.addUpdate(UpdateCheckerImpl.java:92)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckerImpl.addUpdate(UpdateCheckerImpl.java:76)
+	at org.gudy.azureus2.platform.macosx.PlatformManagerUpdateChecker.checkForUpdate(PlatformManagerUpdateChecker.java:212)
+	at org.gudy.azureus2.pluginsimpl.local.update.UpdateCheckInstanceImpl$3.run(UpdateCheckInstanceImpl.java:280)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[DHTRouterNodeImpl] : *
+[DHTRouterNodeImpl]   1: buckets = 6{B046879A...[hba=Y,bad=0,OK=0], CAB808A1...[hba=Y,bad=0,OK=0], F2096D89...[hba=Y,bad=0,OK=0], FCDC47CE...[hba=Y,bad=0,OK=0], 871F879D...[hba=Y,bad=0,OK=0], FE47A735...[hba=Y,bad=0,OK=0]}, replacements = null  tsll=1539178889956
+[DHTRouterNodeImpl]   0: *
+[DHTRouterNodeImpl]     01: *
+[DHTRouterNodeImpl]       011: buckets = 3{62ACF156...[hba=Y,bad=0,OK=14380], 6907A646...[hba=Y,bad=0,OK=13525], 6ED95A50...[hba=Y,bad=0,OK=10358]}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]       010: *
+[DHTRouterNodeImpl]         0101: buckets = 1{57B60BA9...[hba=Y,bad=0,OK=0]}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]         0100: *
+[DHTRouterNodeImpl]           01001: buckets = 2{4D5D9081...[hba=Y,bad=0,OK=14700], 49E6DE60...[hba=Y,bad=0,OK=0]}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]           01000: *
+[DHTRouterNodeImpl]             010001: buckets = 3{4696CB33...[hba=Y,bad=0,OK=14542], 4449B24C...[hba=Y,bad=0,OK=0], 47273C0E...[hba=Y,bad=0,OK=0]}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]             010000: *
+[DHTRouterNodeImpl]               0100001: buckets = 0{}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]               0100000: *
+[DHTRouterNodeImpl]                 01000001: *
+[DHTRouterNodeImpl]                   010000011: buckets = 0{}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]                   010000010: *
+[DHTRouterNodeImpl]                     0100000101: buckets = 0{}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]                     0100000100: *
+[DHTRouterNodeImpl]                       01000001001: buckets = 0{}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]                       01000001000: *
+[DHTRouterNodeImpl]                         010000010001: buckets = 2{4116CB47...[hba=Y,bad=0,OK=14198], 411ED0A0...[hba=Y,bad=0,OK=14516]}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]                         010000010000: *
+[DHTRouterNodeImpl]                           0100000100001: buckets = 5{410A6553...[hba=Y,bad=1,OK=0], 4109C751...[hba=Y,bad=0,OK=14249], 410C459D...[hba=Y,bad=0,OK=12512], 410C5F44...[hba=Y,bad=0,OK=12512], 410FA055...[hba=Y,bad=0,OK=12136]}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]                           0100000100000: *
+[DHTRouterNodeImpl]                             01000001000001: buckets = 10{41062E39...[hba=Y,bad=0,OK=14249], 4105FA30...[hba=Y,bad=0,OK=14460], 410630A6...[hba=Y,bad=0,OK=14223], 4106CB64...[hba=Y,bad=0,OK=12925], 4105E4DA...[hba=Y,bad=0,OK=0], 4105159A...[hba=Y,bad=0,OK=12797], 4106AC1A...[hba=Y,bad=0,OK=12771], 41048563...[hba=N,bad=0,OK=0], 41058E8F...[hba=Y,bad=0,OK=12541], 410733A2...[hba=Y,bad=0,OK=219]}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]                             01000001000000: *
+[DHTRouterNodeImpl]                               010000010000001: buckets = 6{4102E0E0...[hba=Y,bad=0,OK=0], 41021702...[hba=Y,bad=0,OK=13295], 410392A5...[hba=Y,bad=0,OK=12771], 41028A4E...[hba=N,bad=0,OK=0], 41029978...[hba=N,bad=0,OK=0], 41037517...[hba=N,bad=0,OK=0]}, replacements = null * tsll=643
+[DHTRouterNodeImpl]                               010000010000000: buckets = 4{41008F59...[hba=Y,bad=0,OK=13058], 4101D7E3...[hba=Y,bad=0,OK=12953], 4100284F...[hba=Y,bad=0,OK=12925], 4100702A...[hba=N,bad=0,OK=0]}, replacements = null SST tsll=1539178889960
+[DHTRouterNodeImpl]                 01000000: buckets = 1{403F8C0B...[hba=Y,bad=0,OK=3857]}, replacements = null  tsll=1539178889960
+[DHTRouterNodeImpl]     00: buckets = 4{297B80A1...[hba=Y,bad=0,OK=14460], 29B6C84F...[hba=Y,bad=0,OK=14331], 02314635...[hba=Y,bad=0,OK=0], 141426D6...[hba=Y,bad=0,OK=0]}, replacements = null  tsll=1539178889960
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$2.setState(UTPConnectionManager.java:310)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.on_state(UTPProviderLocal.java:167)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2$1.callback(UTPTranslatedV2.java:491)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_call_on_state_change(UTPTranslatedV2.java:336)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:3111)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:2783)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_udp(UTPTranslatedV2.java:3689)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.UTP_IsIncomingUTP(UTPTranslatedV2.java:4212)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.receive(UTPProviderLocal.java:254)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$4.runSupport(UTPConnectionManager.java:522)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$2.setState(UTPConnectionManager.java:310)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.on_state(UTPProviderLocal.java:167)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2$1.callback(UTPTranslatedV2.java:491)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_call_on_state_change(UTPTranslatedV2.java:336)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:3111)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:2783)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_udp(UTPTranslatedV2.java:3689)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.UTP_IsIncomingUTP(UTPTranslatedV2.java:4212)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.receive(UTPProviderLocal.java:254)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$4.runSupport(UTPConnectionManager.java:522)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$3.connectSuccess(PEPeerTransportProtocol.java:763)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl$1.connectSuccess(NetworkConnectionImpl.java:158)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$2.connectSuccess(ConnectionEndpoint.java:164)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$ConnectListenerEx.connectSuccess(ConnectionEndpoint.java:308)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport.connectedOutbound(UTPTransport.java:306)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport$2.runSupport(UTPTransport.java:259)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$3.connectSuccess(PEPeerTransportProtocol.java:763)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl$1.connectSuccess(NetworkConnectionImpl.java:158)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$2.connectSuccess(ConnectionEndpoint.java:164)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$ConnectListenerEx.connectSuccess(ConnectionEndpoint.java:308)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport.connectedOutbound(UTPTransport.java:306)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport$2.runSupport(UTPTransport.java:259)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+[BTHandshake] deserialize() is called...
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$2.connectSuccess(PEPeerTransportProtocol.java:551)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.connect(NetworkConnectionImpl.java:130)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.connect(NetworkConnectionImpl.java:123)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.start(PEPeerTransportProtocol.java:526)
+	at com.aelitis.azureus.core.peermanager.PeerManager$PeerManagerRegistrationImpl.route(PeerManager.java:797)
+	at com.aelitis.azureus.core.peermanager.PeerManager$PeerManagerRegistrationImpl.route(PeerManager.java:691)
+	at com.aelitis.azureus.core.peermanager.PeerManager$3.connectionRouted(PeerManager.java:361)
+	at com.aelitis.azureus.core.networkmanager.NetworkManager$7.connectionMatched(NetworkManager.java:377)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager$SelectorListener.selectSuccess(IncomingConnectionManager.java:441)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager.addConnection(IncomingConnectionManager.java:276)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$5.handshakeSuccess(UTPConnectionManager.java:561)
+	at com.aelitis.azureus.core.networkmanager.impl.TransportCryptoManager$1.decodeComplete(TransportCryptoManager.java:61)
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial.complete(ProtocolDecoderInitial.java:241)
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial$1.selectSuccess(ProtocolDecoderInitial.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPSelector$1.run(UTPSelector.java:86)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.deserialize(BTHandshake.java:152)
+	at com.aelitis.azureus.core.peermanager.messaging.MessageManager.createMessage(MessageManager.java:112)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.postReadProcess(BTMessageDecoder.java:227)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.performStreamDecode(BTMessageDecoder.java:79)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingMessageQueueImpl.receiveFromTransport(IncomingMessageQueueImpl.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.MultiPeerDownloader2.doProcessing(MultiPeerDownloader2.java:247)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doRead(ReadController.java:279)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doHighPriorityRead(ReadController.java:256)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.readProcessorLoop(ReadController.java:209)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.access$2(ReadController.java:201)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController$2.runSupport(ReadController.java:84)
+	at org.gudy.azureus2.core3.util.AEThread.run(AEThread.java:63)
+[BTHandshake] deserialize() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.deserialize(BTHandshake.java:152)
+	at com.aelitis.azureus.core.peermanager.messaging.MessageManager.createMessage(MessageManager.java:112)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.postReadProcess(BTMessageDecoder.java:227)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.performStreamDecode(BTMessageDecoder.java:79)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingMessageQueueImpl.receiveFromTransport(IncomingMessageQueueImpl.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.MultiPeerDownloader2.doProcessing(MultiPeerDownloader2.java:247)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doRead(ReadController.java:279)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doHighPriorityRead(ReadController.java:256)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.readProcessorLoop(ReadController.java:219)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.access$2(ReadController.java:201)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController$2.runSupport(ReadController.java:84)
+	at org.gudy.azureus2.core3.util.AEThread.run(AEThread.java:63)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$3.connectSuccess(PEPeerTransportProtocol.java:763)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl$1.connectSuccess(NetworkConnectionImpl.java:158)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPTransportImpl.connectedOutbound(TCPTransportImpl.java:443)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPTransportImpl.handleCrypto(TCPTransportImpl.java:380)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPTransportImpl$1.connectSuccess(TCPTransportImpl.java:293)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager.finishConnect(TCPConnectionManager.java:456)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager.access$17(TCPConnectionManager.java:431)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager$8.selectSuccess(TCPConnectionManager.java:373)
+	at com.aelitis.azureus.core.networkmanager.VirtualChannelSelector.selectSuccess(VirtualChannelSelector.java:342)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.VirtualChannelSelectorImpl.select(VirtualChannelSelectorImpl.java:723)
+	at com.aelitis.azureus.core.networkmanager.VirtualChannelSelector.select(VirtualChannelSelector.java:307)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager.runSelect(TCPConnectionManager.java:516)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager.access$14(TCPConnectionManager.java:480)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager$7.run(TCPConnectionManager.java:247)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+java.lang.Throwable
+[BTHandshake] deserialize() is called...
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.deserialize(BTHandshake.java:152)
+	at com.aelitis.azureus.core.peermanager.messaging.MessageManager.createMessage(MessageManager.java:112)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.postReadProcess(BTMessageDecoder.java:227)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.performStreamDecode(BTMessageDecoder.java:79)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingMessageQueueImpl.receiveFromTransport(IncomingMessageQueueImpl.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.MultiPeerDownloader2.doProcessing(MultiPeerDownloader2.java:247)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doRead(ReadController.java:279)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doHighPriorityRead(ReadController.java:256)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.readProcessorLoop(ReadController.java:219)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.access$2(ReadController.java:201)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController$2.runSupport(ReadController.java:84)
+	at org.gudy.azureus2.core3.util.AEThread.run(AEThread.java:63)
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$2.setState(UTPConnectionManager.java:310)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.on_state(UTPProviderLocal.java:167)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2$1.callback(UTPTranslatedV2.java:491)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_call_on_state_change(UTPTranslatedV2.java:336)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:3111)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:2783)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_udp(UTPTranslatedV2.java:3689)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.UTP_IsIncomingUTP(UTPTranslatedV2.java:4212)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.receive(UTPProviderLocal.java:254)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$4.runSupport(UTPConnectionManager.java:522)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$3.connectSuccess(PEPeerTransportProtocol.java:763)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl$1.connectSuccess(NetworkConnectionImpl.java:158)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$2.connectSuccess(ConnectionEndpoint.java:164)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$ConnectListenerEx.connectSuccess(ConnectionEndpoint.java:308)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport.connectedOutbound(UTPTransport.java:306)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport$2.runSupport(UTPTransport.java:259)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+[BTHandshake] deserialize() is called...
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$2.connectSuccess(PEPeerTransportProtocol.java:551)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.connect(NetworkConnectionImpl.java:130)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.connect(NetworkConnectionImpl.java:123)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.start(PEPeerTransportProtocol.java:526)
+	at com.aelitis.azureus.core.peermanager.PeerManager$PeerManagerRegistrationImpl.route(PeerManager.java:797)
+	at com.aelitis.azureus.core.peermanager.PeerManager$PeerManagerRegistrationImpl.route(PeerManager.java:691)
+	at com.aelitis.azureus.core.peermanager.PeerManager$3.connectionRouted(PeerManager.java:361)
+	at com.aelitis.azureus.core.networkmanager.NetworkManager$7.connectionMatched(NetworkManager.java:377)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager$SelectorListener.selectSuccess(IncomingConnectionManager.java:441)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager.addConnection(IncomingConnectionManager.java:276)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$5.handshakeSuccess(UTPConnectionManager.java:561)
+	at com.aelitis.azureus.core.networkmanager.impl.TransportCryptoManager$1.decodeComplete(TransportCryptoManager.java:61)
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial.complete(ProtocolDecoderInitial.java:241)
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial$1.selectSuccess(ProtocolDecoderInitial.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPSelector$1.run(UTPSelector.java:86)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.deserialize(BTHandshake.java:152)
+	at com.aelitis.azureus.core.peermanager.messaging.MessageManager.createMessage(MessageManager.java:112)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.postReadProcess(BTMessageDecoder.java:227)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.performStreamDecode(BTMessageDecoder.java:79)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingMessageQueueImpl.receiveFromTransport(IncomingMessageQueueImpl.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.MultiPeerDownloader2.doProcessing(MultiPeerDownloader2.java:247)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doRead(ReadController.java:279)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doHighPriorityRead(ReadController.java:256)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.readProcessorLoop(ReadController.java:219)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.access$2(ReadController.java:201)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController$2.runSupport(ReadController.java:84)
+	at org.gudy.azureus2.core3.util.AEThread.run(AEThread.java:63)
+[PeersView] tableViewInitialized() is called...
+Loaded /Users/jkkim/Library/Application Support/Azureus/plugins/azlocprov/GeoIP_0.1.7.7.dat
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$2.setState(UTPConnectionManager.java:310)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.on_state(UTPProviderLocal.java:167)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2$1.callback(UTPTranslatedV2.java:491)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_call_on_state_change(UTPTranslatedV2.java:336)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:3111)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:2783)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_udp(UTPTranslatedV2.java:3689)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.UTP_IsIncomingUTP(UTPTranslatedV2.java:4212)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.receive(UTPProviderLocal.java:254)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$4.runSupport(UTPConnectionManager.java:522)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$3.connectSuccess(PEPeerTransportProtocol.java:763)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl$1.connectSuccess(NetworkConnectionImpl.java:158)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$2.connectSuccess(ConnectionEndpoint.java:164)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$ConnectListenerEx.connectSuccess(ConnectionEndpoint.java:308)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport.connectedOutbound(UTPTransport.java:306)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport$2.runSupport(UTPTransport.java:259)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] deserialize() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.deserialize(BTHandshake.java:152)
+	at com.aelitis.azureus.core.peermanager.messaging.MessageManager.createMessage(MessageManager.java:112)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.postReadProcess(BTMessageDecoder.java:227)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.performStreamDecode(BTMessageDecoder.java:79)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingMessageQueueImpl.receiveFromTransport(IncomingMessageQueueImpl.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.MultiPeerDownloader2.doProcessing(MultiPeerDownloader2.java:247)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doRead(ReadController.java:279)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doHighPriorityRead(ReadController.java:256)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.readProcessorLoop(ReadController.java:209)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.access$2(ReadController.java:201)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController$2.runSupport(ReadController.java:84)
+	at org.gudy.azureus2.core3.util.AEThread.run(AEThread.java:63)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$2.connectSuccess(PEPeerTransportProtocol.java:551)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.connect(NetworkConnectionImpl.java:130)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.connect(NetworkConnectionImpl.java:123)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.start(PEPeerTransportProtocol.java:526)
+	at com.aelitis.azureus.core.peermanager.PeerManager$PeerManagerRegistrationImpl.route(PeerManager.java:797)
+	at com.aelitis.azureus.core.peermanager.PeerManager$PeerManagerRegistrationImpl.route(PeerManager.java:691)
+	at com.aelitis.azureus.core.peermanager.PeerManager$3.connectionRouted(PeerManager.java:361)
+	at com.aelitis.azureus.core.networkmanager.NetworkManager$7.connectionMatched(NetworkManager.java:377)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager$SelectorListener.selectSuccess(IncomingConnectionManager.java:441)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager.addConnection(IncomingConnectionManager.java:276)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$5.handshakeSuccess(UTPConnectionManager.java:561)
+	at com.aelitis.azureus.core.networkmanager.impl.TransportCryptoManager$1.decodeComplete(TransportCryptoManager.java:61)
+[BTHandshake] deserialize() is called...
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial.complete(ProtocolDecoderInitial.java:241)
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial$1.selectSuccess(ProtocolDecoderInitial.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPSelector$1.run(UTPSelector.java:86)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.deserialize(BTHandshake.java:152)
+	at com.aelitis.azureus.core.peermanager.messaging.MessageManager.createMessage(MessageManager.java:112)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.postReadProcess(BTMessageDecoder.java:227)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.performStreamDecode(BTMessageDecoder.java:79)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingMessageQueueImpl.receiveFromTransport(IncomingMessageQueueImpl.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.MultiPeerDownloader2.doProcessing(MultiPeerDownloader2.java:247)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doRead(ReadController.java:279)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doHighPriorityRead(ReadController.java:256)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.readProcessorLoop(ReadController.java:219)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.access$2(ReadController.java:201)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController$2.runSupport(ReadController.java:84)
+	at org.gudy.azureus2.core3.util.AEThread.run(AEThread.java:63)
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$2.setState(UTPConnectionManager.java:310)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.on_state(UTPProviderLocal.java:167)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2$1.callback(UTPTranslatedV2.java:491)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_call_on_state_change(UTPTranslatedV2.java:336)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:3111)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:2783)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_udp(UTPTranslatedV2.java:3689)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.UTP_IsIncomingUTP(UTPTranslatedV2.java:4212)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.receive(UTPProviderLocal.java:254)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$4.runSupport(UTPConnectionManager.java:522)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$3.connectSuccess(PEPeerTransportProtocol.java:763)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl$1.connectSuccess(NetworkConnectionImpl.java:158)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$2.connectSuccess(ConnectionEndpoint.java:164)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$ConnectListenerEx.connectSuccess(ConnectionEndpoint.java:308)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport.connectedOutbound(UTPTransport.java:306)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport$2.runSupport(UTPTransport.java:259)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] deserialize() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.deserialize(BTHandshake.java:152)
+	at com.aelitis.azureus.core.peermanager.messaging.MessageManager.createMessage(MessageManager.java:112)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.postReadProcess(BTMessageDecoder.java:227)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.performStreamDecode(BTMessageDecoder.java:79)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingMessageQueueImpl.receiveFromTransport(IncomingMessageQueueImpl.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.MultiPeerDownloader2.doProcessing(MultiPeerDownloader2.java:247)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doRead(ReadController.java:279)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doHighPriorityRead(ReadController.java:256)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.readProcessorLoop(ReadController.java:209)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.access$2(ReadController.java:201)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController$2.runSupport(ReadController.java:84)
+	at org.gudy.azureus2.core3.util.AEThread.run(AEThread.java:63)
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$2.setState(UTPConnectionManager.java:310)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.on_state(UTPProviderLocal.java:167)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2$1.callback(UTPTranslatedV2.java:491)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_call_on_state_change(UTPTranslatedV2.java:336)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:3111)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:2783)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_udp(UTPTranslatedV2.java:3689)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.UTP_IsIncomingUTP(UTPTranslatedV2.java:4212)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.receive(UTPProviderLocal.java:254)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$4.runSupport(UTPConnectionManager.java:522)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$3.connectSuccess(PEPeerTransportProtocol.java:763)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl$1.connectSuccess(NetworkConnectionImpl.java:158)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$2.connectSuccess(ConnectionEndpoint.java:164)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$ConnectListenerEx.connectSuccess(ConnectionEndpoint.java:308)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport.connectedOutbound(UTPTransport.java:306)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport$2.runSupport(UTPTransport.java:259)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+[BTHandshake] constructBuffer() is called...
+java.lang.Throwable
+[BTHandshake] deserialize() is called...
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.constructBuffer(BTHandshake.java:111)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.getRawData(BTHandshake.java:197)
+	at com.aelitis.azureus.core.networkmanager.impl.OutgoingMessageQueueImpl.addMessage(OutgoingMessageQueueImpl.java:228)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.sendBTHandshake(PEPeerTransportProtocol.java:1058)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol$2.connectSuccess(PEPeerTransportProtocol.java:551)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.connect(NetworkConnectionImpl.java:130)
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.connect(NetworkConnectionImpl.java:123)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.start(PEPeerTransportProtocol.java:526)
+	at com.aelitis.azureus.core.peermanager.PeerManager$PeerManagerRegistrationImpl.route(PeerManager.java:797)
+	at com.aelitis.azureus.core.peermanager.PeerManager$PeerManagerRegistrationImpl.route(PeerManager.java:691)
+	at com.aelitis.azureus.core.peermanager.PeerManager$3.connectionRouted(PeerManager.java:361)
+	at com.aelitis.azureus.core.networkmanager.NetworkManager$7.connectionMatched(NetworkManager.java:377)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager$SelectorListener.selectSuccess(IncomingConnectionManager.java:441)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager.addConnection(IncomingConnectionManager.java:276)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.IncomingSocketChannelManager.process(IncomingSocketChannelManager.java:402)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.IncomingSocketChannelManager$TcpSelectListener$1.handshakeSuccess(IncomingSocketChannelManager.java:263)
+	at com.aelitis.azureus.core.networkmanager.impl.TransportCryptoManager$1.decodeComplete(TransportCryptoManager.java:61)
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial.complete(ProtocolDecoderInitial.java:241)
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial$1.selectSuccess(ProtocolDecoderInitial.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPTransportHelper$1.selectSuccess(TCPTransportHelper.java:337)
+	at com.aelitis.azureus.core.networkmanager.VirtualChannelSelector.selectSuccess(VirtualChannelSelector.java:342)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.VirtualChannelSelectorImpl.select(VirtualChannelSelectorImpl.java:723)
+	at com.aelitis.azureus.core.networkmanager.VirtualChannelSelector.select(VirtualChannelSelector.java:307)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPNetworkManager$4.run(TCPNetworkManager.java:156)
+	at org.gudy.azureus2.core3.util.AEThread2$threadWrapper.run(AEThread2.java:230)
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTHandshake.deserialize(BTHandshake.java:152)
+	at com.aelitis.azureus.core.peermanager.messaging.MessageManager.createMessage(MessageManager.java:112)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.postReadProcess(BTMessageDecoder.java:227)
+	at com.aelitis.azureus.core.peermanager.messaging.bittorrent.BTMessageDecoder.performStreamDecode(BTMessageDecoder.java:79)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingMessageQueueImpl.receiveFromTransport(IncomingMessageQueueImpl.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.MultiPeerDownloader2.doProcessing(MultiPeerDownloader2.java:247)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doRead(ReadController.java:279)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.doHighPriorityRead(ReadController.java:256)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.readProcessorLoop(ReadController.java:219)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController.access$2(ReadController.java:201)
+	at com.aelitis.azureus.core.networkmanager.impl.ReadController$2.runSupport(ReadController.java:84)
+	at org.gudy.azureus2.core3.util.AEThread.run(AEThread.java:63)
+core.stop
+Stopping idle sleep preventer
+[StartStopRulesDefaultPlugin] stateChanged is called()...
+[StartStopRulesDefaultPlugin] oldState = Download.ST_DOWNLOADING, newState = Download.ST_STOPPED
+core.stop done in 2825

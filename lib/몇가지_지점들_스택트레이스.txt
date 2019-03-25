@@ -1,0 +1,160 @@
+In case UTP
+
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl$1.connectSuccess(NetworkConnectionImpl.java:157)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$2.connectSuccess(ConnectionEndpoint.java:164)
+	at com.aelitis.azureus.core.networkmanager.ConnectionEndpoint$ConnectListenerEx.connectSuccess(ConnectionEndpoint.java:308)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport.connectedOutbound(UTPTransport.java:306)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport$2.runSupport(UTPTransport.java:259)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+
+In case TCP
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl$1.connectSuccess(NetworkConnectionImpl.java:157)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPTransportImpl.connectedOutbound(TCPTransportImpl.java:465)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPTransportImpl.handleCrypto(TCPTransportImpl.java:402)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPTransportImpl$1.connectSuccess(TCPTransportImpl.java:307)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager.finishConnect(TCPConnectionManager.java:467)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager.access$17(TCPConnectionManager.java:442)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager$8.selectSuccess(TCPConnectionManager.java:382)
+	at com.aelitis.azureus.core.networkmanager.VirtualChannelSelector.selectSuccess(VirtualChannelSelector.java:347)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.VirtualChannelSelectorImpl.select(VirtualChannelSelectorImpl.java:716)
+	at com.aelitis.azureus.core.networkmanager.VirtualChannelSelector.select(VirtualChannelSelector.java:312)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager.runSelect(TCPConnectionManager.java:527)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager.access$14(TCPConnectionManager.java:491)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPConnectionManager$7.run(TCPConnectionManager.java:246)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+
+----------
+
+
+[NetworkConnectionImpl] OUTbound <init>()...
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.<init>(NetworkConnectionImpl.java:88)
+	at com.aelitis.azureus.core.networkmanager.NetworkConnectionFactory.create(NetworkConnectionFactory.java:45)
+	at com.aelitis.azureus.core.networkmanager.NetworkManager.createConnection(NetworkManager.java:355)
+	at org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol.<init>(PEPeerTransportProtocol.java:598)
+	at org.gudy.azureus2.core3.peer.impl.PEPeerTransportFactory.createTransport(PEPeerTransportFactory.java:59)
+	at org.gudy.azureus2.core3.peer.impl.control.PEPeerControlImpl.makeNewOutgoingConnection(PEPeerControlImpl.java:1119)
+	at org.gudy.azureus2.core3.peer.impl.control.PEPeerControlImpl.doConnectionChecks(PEPeerControlImpl.java:4206)
+	at org.gudy.azureus2.core3.peer.impl.control.PEPeerControlImpl.schedule(PEPeerControlImpl.java:577)
+	at com.aelitis.azureus.core.peermanager.control.impl.PeerControlSchedulerPrioritised$instanceWrapper.schedule(PeerControlSchedulerPrioritised.java:271)
+	at com.aelitis.azureus.core.peermanager.control.impl.PeerControlSchedulerPrioritised.schedule(PeerControlSchedulerPrioritised.java:118)
+	at com.aelitis.azureus.core.peermanager.control.impl.PeerControlSchedulerImpl$1.run(PeerControlSchedulerImpl.java:109)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+[PeerControlSchedulerPrioritised] register() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.peermanager.control.impl.PeerControlSchedulerPrioritised.register(PeerControlSchedulerPrioritised.java:160)
+	at org.gudy.azureus2.core3.peer.impl.control.PEPeerControlImpl.start(PEPeerControlImpl.java:465)
+	at org.gudy.azureus2.core3.download.impl.DownloadManagerController.startDownload(DownloadManagerController.java:312)
+	at org.gudy.azureus2.core3.download.impl.DownloadManagerImpl.startDownload(DownloadManagerImpl.java:1851)
+	at org.gudy.azureus2.pluginsimpl.local.download.DownloadImpl.start(DownloadImpl.java:291)
+	at com.aelitis.azureus.plugins.startstoprules.defaultplugin.StartStopRulesDefaultPlugin.process(StartStopRulesDefaultPlugin.java:1533)
+	at com.aelitis.azureus.plugins.startstoprules.defaultplugin.StartStopRulesDefaultPlugin$StartStopDownloadListener$1.run(StartStopRulesDefaultPlugin.java:665)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+
+
+
+
+
+
+
+
+
+
+
+
+[NetworkConnectionImpl] INbound <init>()...
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.NetworkConnectionImpl.<init>(NetworkConnectionImpl.java:117)
+	at com.aelitis.azureus.core.networkmanager.NetworkConnectionFactory.create(NetworkConnectionFactory.java:66)
+	at com.aelitis.azureus.core.networkmanager.NetworkManager$7.connectionMatched(NetworkManager.java:376)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager$SelectorListener.selectSuccess(IncomingConnectionManager.java:396)
+	at com.aelitis.azureus.core.networkmanager.impl.IncomingConnectionManager.addConnection(IncomingConnectionManager.java:245)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.IncomingSocketChannelManager.process(IncomingSocketChannelManager.java:396)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.IncomingSocketChannelManager$TcpSelectListener$1.handshakeSuccess(IncomingSocketChannelManager.java:263)
+	at com.aelitis.azureus.core.networkmanager.impl.TransportCryptoManager$1.decodeComplete(TransportCryptoManager.java:61)
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial.complete(ProtocolDecoderInitial.java:241)
+	at com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderInitial$1.selectSuccess(ProtocolDecoderInitial.java:119)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPTransportHelper$1.selectSuccess(TCPTransportHelper.java:337)
+	at com.aelitis.azureus.core.networkmanager.VirtualChannelSelector.selectSuccess(VirtualChannelSelector.java:347)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.VirtualChannelSelectorImpl.select(VirtualChannelSelectorImpl.java:716)
+	at com.aelitis.azureus.core.networkmanager.VirtualChannelSelector.select(VirtualChannelSelector.java:312)
+	at com.aelitis.azureus.core.networkmanager.impl.tcp.TCPNetworkManager$4.run(TCPNetworkManager.java:156)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+
+
+
+==================================================
+
+
+[UTPSelector] ready() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPSelector.ready(UTPSelector.java:120)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransportHelper.fireWriteSelect(UTPTransportHelper.java:433)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransportHelper.resumeWriteSelects(UTPTransportHelper.java:369)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransportHelper.registerForWriteSelects(UTPTransportHelper.java:389)
+	at com.aelitis.azureus.core.networkmanager.impl.TransportImpl.registerSelectHandling(TransportImpl.java:364)
+	at com.aelitis.azureus.core.networkmanager.impl.TransportImpl.connectedOutbound(TransportImpl.java:326)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport.connectedOutbound(UTPTransport.java:305)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport$2.runSupport(UTPTransport.java:259)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+
+[UTPTransport] connected() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransport.connected(UTPTransport.java:247)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPTransportHelper.setConnected(UTPTransportHelper.java:158)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnection.setConnected(UTPConnection.java:112)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$2.setState(UTPConnectionManager.java:311)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.on_state(UTPProviderLocal.java:167)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2$1.callback(UTPTranslatedV2.java:491)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_call_on_state_change(UTPTranslatedV2.java:336)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:3124)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_incoming(UTPTranslatedV2.java:2789)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.utp_process_udp(UTPTranslatedV2.java:3705)
+	at com.vuze.client.plugins.utp.loc.v2.UTPTranslatedV2.UTP_IsIncomingUTP(UTPTranslatedV2.java:4228)
+	at com.vuze.client.plugins.utp.loc.UTPProviderLocal.receive(UTPProviderLocal.java:254)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager$4.runSupport(UTPConnectionManager.java:518)
+	at org.gudy.azureus2.core3.util.AsyncDispatcher$1.run(AsyncDispatcher.java:111)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+
+[UTPConnectionManager] doReceive() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager.doReceive(UTPConnectionManager.java:501)
+	at com.aelitis.azureus.core.networkmanager.impl.utp.UTPConnectionManager.receive(UTPConnectionManager.java:483)
+	at com.vuze.client.plugins.utp.UTPPlugin.packetReceived(UTPPlugin.java:192)
+	at com.aelitis.net.udp.uc.impl.PRUDPPacketHandlerImpl.receiveLoop(PRUDPPacketHandlerImpl.java:521)
+	at com.aelitis.net.udp.uc.impl.PRUDPPacketHandlerImpl$3.run(PRUDPPacketHandlerImpl.java:205)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+
+[PRUDPPacketHandlerImpl] <init>() is called...
+java.lang.Throwable
+	at com.aelitis.net.udp.uc.impl.PRUDPPacketHandlerImpl.<init>(PRUDPPacketHandlerImpl.java:199)
+	at com.aelitis.net.udp.uc.impl.PRUDPPacketHandlerFactoryImpl.getHandler(PRUDPPacketHandlerFactoryImpl.java:78)
+	at com.aelitis.net.udp.uc.PRUDPPacketHandlerFactory.getHandler(PRUDPPacketHandlerFactory.java:44)
+	at com.aelitis.net.udp.uc.PRUDPPacketHandlerFactory.getHandler(PRUDPPacketHandlerFactory.java:38)
+	at com.vuze.client.plugins.utp.UTPPlugin.checkEnabledState(UTPPlugin.java:173)
+	at com.vuze.client.plugins.utp.UTPPlugin.access$0(UTPPlugin.java:148)
+	at com.vuze.client.plugins.utp.UTPPlugin$6$1.parameterChanged(UTPPlugin.java:130)
+	at org.gudy.azureus2.core3.config.COConfigurationManager.addAndFireParameterListeners(COConfigurationManager.java:434)
+	at com.vuze.client.plugins.utp.UTPPlugin$6.initializationComplete(UTPPlugin.java:125)
+	at org.gudy.azureus2.pluginsimpl.local.PluginInterfaceImpl.fireInitComplete(PluginInterfaceImpl.java:575)
+	at org.gudy.azureus2.pluginsimpl.local.PluginInterfaceImpl.initialisationComplete(PluginInterfaceImpl.java:548)
+	at org.gudy.azureus2.pluginsimpl.local.PluginInitializer.initialisationComplete(PluginInitializer.java:1755)
+	at com.aelitis.azureus.core.impl.AzureusCoreImpl$10.run(AzureusCoreImpl.java:891)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+
+
+
+
