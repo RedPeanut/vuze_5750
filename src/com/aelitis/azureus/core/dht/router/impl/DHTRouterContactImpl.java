@@ -19,11 +19,16 @@
 
 package com.aelitis.azureus.core.dht.router.impl;
 
+import hello.util.Util;
+
 import org.gudy.azureus2.core3.util.SystemTime;
 
+import com.aelitis.azureus.core.dht.control.DHTControlContact;
 import com.aelitis.azureus.core.dht.impl.DHTLog;
 import com.aelitis.azureus.core.dht.router.DHTRouterContact;
 import com.aelitis.azureus.core.dht.router.DHTRouterContactAttachment;
+import com.aelitis.azureus.core.dht.transport.DHTTransportContact;
+import com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPContactImpl;
 
 /**
  * @author parg
@@ -44,6 +49,21 @@ public class DHTRouterContactImpl implements DHTRouterContact {
 
 	private boolean		isBucketEntry;
 
+	public String toString() {
+		String nodeId = Util.toHexString(this.nodeId);
+		if (nodeId.length() > 8)
+			nodeId = nodeId.substring(0,8)+"...";
+		String address = "";
+		int nodeStatus = -1;
+		if (attachment != null) {
+			DHTTransportContact t_contact = ((DHTControlContact) this.attachment).getTransportContact();
+			address = t_contact.getAddress().toString();
+			if (t_contact instanceof DHTTransportUDPContactImpl)
+				nodeStatus = ((DHTTransportUDPContactImpl) t_contact).getNodeStatus();
+		}
+		return String.format("nodeId= %s,addr=%s,sttus=%d", nodeId, address, nodeStatus);
+	}
+	
 	protected DHTRouterContactImpl(
 		byte[]							_node_id,
 		DHTRouterContactAttachment		_attachment,

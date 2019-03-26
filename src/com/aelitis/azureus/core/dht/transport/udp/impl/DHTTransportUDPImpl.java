@@ -1942,37 +1942,26 @@ outer:
 		}
 	}
 
-	protected DHTTransportFullStats
-	getFullStats(
-		DHTTransportUDPContactImpl	contact) {
+	protected DHTTransportFullStats getFullStats(DHTTransportUDPContactImpl contact) {
 		if (contact == localContact) {
-
-			return (requestHandler.statsRequest( contact));
+			return (requestHandler.statsRequest(contact));
 		}
 
 		final DHTTransportFullStats[] res = { null };
 
-		final AESemaphore	sem = new AESemaphore("DHTTransportUDP:getFullStats");
+		final AESemaphore sem = new AESemaphore("DHTTransportUDP:getFullStats");
 
-		sendStats(	contact,
-				new DHTTransportReplyHandlerAdapter() {
-			
-					public void statsReply(
-						DHTTransportContact 	_contact,
-						DHTTransportFullStats	_stats) {
-						res[0]	= _stats;
-		
-						sem.release();
-					}
-		
-					public void failed(
-						DHTTransportContact 	_contact,
-						Throwable				_error) {
-						sem.release();
-					}
-		
-				}
-		);
+		sendStats(contact, new DHTTransportReplyHandlerAdapter() {
+			public void statsReply(DHTTransportContact _contact, DHTTransportFullStats _stats) {
+				res[0] = _stats;
+				sem.release();
+			}
+
+			public void failed(DHTTransportContact _contact, Throwable _error) {
+				sem.release();
+			}
+
+		});
 
 		sem.reserve();
 

@@ -130,12 +130,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 
 	final DHTControlAdapter		adapter;
-	private final DHTTransport			transport;
-	DHTTransportContact		localContact;
+	private final DHTTransport	transport;
+	DHTTransportContact			localContact;
 
-	private DHTRouter		router;
+	private DHTRouter			router;
 
-	final DHTDB			database;
+	final DHTDB					database;
 
 	private final DHTControlStatsImpl	stats;
 

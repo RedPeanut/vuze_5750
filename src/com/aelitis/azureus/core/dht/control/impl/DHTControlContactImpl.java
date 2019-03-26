@@ -29,16 +29,14 @@ import com.aelitis.azureus.core.dht.transport.DHTTransportContact;
  *
  */
 
-public class
-DHTControlContactImpl
+public class DHTControlContactImpl
 	implements DHTControlContact, DHTRouterContactAttachment
 {
-	private final DHTTransportContact		t_contact;
-	private DHTRouterContact		r_contact;
+	private final DHTTransportContact	t_contact;
+	private DHTRouterContact			r_contact;
 
-	protected DHTControlContactImpl(
-		DHTTransportContact		_t_contact) {
-		t_contact	= _t_contact;
+	protected DHTControlContactImpl(DHTTransportContact _t_contact) {
+		t_contact = _t_contact;
 	}
 
 	public DHTControlContactImpl(
@@ -48,34 +46,31 @@ DHTControlContactImpl
 		r_contact	= _r_contact;
 	}
 
-	public void setRouterContact(
-		DHTRouterContact		_r_contact) {
-		r_contact	= _r_contact;
+	public void setRouterContact(DHTRouterContact _r_contact) {
+		r_contact = _r_contact;
 	}
 
 	public int getMaxFailForLiveCount() {
-		return ( t_contact.getMaxFailForLiveCount());
+		return (t_contact.getMaxFailForLiveCount());
 	}
 
 	public int getMaxFailForUnknownCount() {
-		return ( t_contact.getMaxFailForUnknownCount());
+		return (t_contact.getMaxFailForUnknownCount());
 	}
 
 	public int getInstanceID() {
-		return ( t_contact.getInstanceID());
+		return (t_contact.getInstanceID());
 	}
 
-	public DHTTransportContact
-	getTransportContact() {
+	public DHTTransportContact getTransportContact() {
 		return (t_contact);
 	}
 
-	public DHTRouterContact
-	getRouterContact() {
+	public DHTRouterContact getRouterContact() {
 		return (r_contact);
 	}
 
 	public boolean isSleeping() {
-		return ( t_contact.isSleeping());
+		return (t_contact.isSleeping());
 	}
 }

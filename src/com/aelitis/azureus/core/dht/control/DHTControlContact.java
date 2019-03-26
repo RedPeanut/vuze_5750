@@ -22,12 +22,7 @@ package com.aelitis.azureus.core.dht.control;
 import com.aelitis.azureus.core.dht.router.DHTRouterContact;
 import com.aelitis.azureus.core.dht.transport.DHTTransportContact;
 
-public interface
-DHTControlContact
-{
-	public DHTRouterContact
-	getRouterContact();
-
-	public DHTTransportContact
-	getTransportContact();
+public interface DHTControlContact {
+	public DHTRouterContact getRouterContact();
+	public DHTTransportContact getTransportContact();
 }

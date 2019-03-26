@@ -64,15 +64,15 @@ public class DHTRouterImpl implements DHTRouter {
 	
 	private static final int	SMALLEST_SUBTREE_MAX_EXCESS	= 10*1024;
 
-	private boolean		is_bootstrap_proxy;
+	private boolean		isBootstrapProxy;
 
 	private int		K;
 	private int		B;
-	private int		max_rep_per_node;
+	private int		maxRepPerNode;
 
 	private DHTLogger		logger;
 
-	private int		smallest_subtree_max;
+	private int		smallestSubtreeMax;
 
 	private DHTRouterAdapter		adapter;
 
@@ -80,20 +80,20 @@ public class DHTRouterImpl implements DHTRouter {
 	private byte[]					routerNodeId;
 
 	private DHTRouterNodeImpl		root;
-	private DHTRouterNodeImpl		smallest_subtree;
+	private DHTRouterNodeImpl		smallestSubtree;
 
-	private int						consecutive_dead;
+	private int						consecutiveDead;
 
-	private static long				random_seed	= SystemTime.getCurrentTime();
+	private static long				randomSeed	= SystemTime.getCurrentTime();
 	private Random					random;
 
-	private List<DHTRouterContactImpl>					outstanding_pings	= new ArrayList<DHTRouterContactImpl>();
-	private List<DHTRouterContactImpl>					outstanding_adds	= new ArrayList<DHTRouterContactImpl>();
+	private List<DHTRouterContactImpl>	outstandingPings	= new ArrayList<DHTRouterContactImpl>();
+	private List<DHTRouterContactImpl>	outstandingAdds		= new ArrayList<DHTRouterContactImpl>();
 
-	private final DHTRouterStatsImpl		stats	= new DHTRouterStatsImpl(this);
+	private final DHTRouterStatsImpl	stats		= new DHTRouterStatsImpl(this);
 
-	private final AEMonitor	monitor = new AEMonitor("DHTRouter");
-	private static final AEMonitor	classMonitor = new AEMonitor("DHTRouter:class");
+	private final AEMonitor			monitor			= new AEMonitor("DHTRouter");
+	private static final AEMonitor	classMonitor	= new AEMonitor("DHTRouter:class");
 
 	private final CopyOnWriteList<DHTRouterObserver>	observers = new CopyOnWriteList<DHTRouterObserver>();
 
@@ -115,12 +115,12 @@ public class DHTRouterImpl implements DHTRouter {
 
 
 	public DHTRouterImpl(
-		int										_K,
-		int										_B,
-		int										_max_rep_per_node,
-		byte[]									_routerNodeId,
-		DHTRouterContactAttachment				_attachment,
-		DHTLogger								_logger) {
+		int							_K,
+		int							_B,
+		int							_maxRepPerNode,
+		byte[]						_routerNodeId,
+		DHTRouterContactAttachment	_attachment,
+		DHTLogger					_logger) {
 
 		/*Log.d(TAG, "<init>() is called...");
 		Log.d(TAG, "_routerNodeId = " + Util.toHexString(_routerNodeId));
@@ -129,23 +129,23 @@ public class DHTRouterImpl implements DHTRouter {
 		try {
 			// only needed for in-process multi-router testing :P
 			classMonitor.enter();
-			random = new Random(random_seed++);
+			random = new Random(randomSeed++);
 		} finally {
 			classMonitor.exit();
 		}
 
-		is_bootstrap_proxy = COConfigurationManager.getBooleanParameter("dht.bootstrap.is.proxy", false);
+		isBootstrapProxy	= COConfigurationManager.getBooleanParameter("dht.bootstrap.is.proxy", false);
 		K					= _K;
 		B					= _B;
-		max_rep_per_node	= _max_rep_per_node;
+		maxRepPerNode	= _maxRepPerNode;
 		logger				= _logger;
 
-		smallest_subtree_max	= 1;
+		smallestSubtreeMax	= 1;
 		for (int i=0;i<B;i++) {
-			smallest_subtree_max *= 2;
+			smallestSubtreeMax *= 2;
 		}
 
-		smallest_subtree_max += SMALLEST_SUBTREE_MAX_EXCESS;
+		smallestSubtreeMax += SMALLEST_SUBTREE_MAX_EXCESS;
 		routerNodeId = _routerNodeId;
 		List<DHTRouterContactImpl> buckets = new ArrayList<>();
 		localContact = new DHTRouterContactImpl(routerNodeId, _attachment, true);
@@ -349,7 +349,7 @@ public class DHTRouterImpl implements DHTRouter {
 		try {
 			try {
 				monitor.enter();
-				consecutive_dead++;
+				consecutiveDead++;
 				/*
 				if (consecutive_dead != 0 && consecutive_dead % 10 == 0) {
 					System.out.println("consecutive_dead: " + consecutive_dead);
@@ -361,7 +361,7 @@ public class DHTRouterImpl implements DHTRouter {
 				if (contact != null) {
 					// some protection against network drop outs - start ignoring dead
 					// notifications if we're getting significant continous fails
-					if (consecutive_dead < 100 || force) {
+					if (consecutiveDead < 100 || force) {
 						contactDeadSupport(node, contact, force);
 					}
 				}
@@ -381,7 +381,7 @@ public class DHTRouterImpl implements DHTRouter {
 		boolean					force) {
 		// bootstrap proxy has no network so we can't detect liveness of contacts. simply allow replacement of bucket
 		// entries when possible to rotate somewhat
-		if (is_bootstrap_proxy) {
+		if (isBootstrapProxy) {
 			List<DHTRouterContactImpl> replacements = node.getReplacements();
 			if (replacements == null || replacements.size() == 0) {
 				return;
@@ -423,7 +423,7 @@ public class DHTRouterImpl implements DHTRouter {
 			try {
 				monitor.enter();
 				if (knownToBeAlive) {
-					consecutive_dead	= 0;
+					consecutiveDead	= 0;
 				}
 				addContactSupport(nodeId, attachment, knownToBeAlive);
 			} finally {
@@ -456,7 +456,7 @@ public class DHTRouterImpl implements DHTRouter {
 			byte	b = nodeId[i];
 			int	j = 7;
 			while (j >= 0) {
-				if (currentNode == smallest_subtree) {
+				if (currentNode == smallestSubtree) {
 					partOfSmallestSubtree	= true;
 				}
 				boolean	bit = ((b>>j)&0x01)==1?true:false;
@@ -508,7 +508,7 @@ public class DHTRouterImpl implements DHTRouter {
 							if (	partOfSmallestSubtree &&
 									too_deep_to_split &&
 									(!contains_router_node_id) &&
-									getContactCount(smallest_subtree ) > smallest_subtree_max) {
+									getContactCount(smallestSubtree ) > smallestSubtreeMax) {
 								Debug.out("DHTRouter: smallest subtree max size violation");
 								return (null);
 							}
@@ -537,16 +537,16 @@ public class DHTRouterImpl implements DHTRouter {
 							if (rightContainsRid) {
 								// we've created a new smallest subtree
 								// TODO: tidy up old smallest subtree - remember to factor in B...
-								smallest_subtree = newLeft;
+								smallestSubtree = newLeft;
 							} else if (leftContainsRid) {
 								// TODO: tidy up old smallest subtree - remember to factor in B...
-								smallest_subtree = newRight;
+								smallestSubtree = newRight;
 							}
 							// not complete, retry addition
 						} else {
 							// split not appropriate, add as a replacemnet
 							DHTRouterContactImpl newContact = new DHTRouterContactImpl(nodeId, attachment, knownToBeAlive);
-							return (currentNode.addReplacement(newContact, sleeping?1:max_rep_per_node));
+							return (currentNode.addReplacement(newContact, sleeping?1:maxRepPerNode));
 						}
 					} else {
 						// bucket space free, just add it
@@ -620,7 +620,10 @@ public class DHTRouterImpl implements DHTRouter {
 		List<DHTRouterContactImpl> buckets = currentNode.getBuckets();
 		
 		if (contains) {
-			Log.d(TAG, "buckets = " + buckets);
+			if (buckets != null)
+				Log.d(TAG, String.format("buckets = %d%s", buckets.size(), buckets));
+			else
+				Log.d(TAG, String.format("buckets = null"));
 		}
 		
 		if (buckets != null) {
@@ -651,20 +654,14 @@ public class DHTRouterImpl implements DHTRouter {
 		}
 	}
 
-	public DHTRouterContact
-	findContact(
-		byte[]		node_id) {
-		Object[]	res = findContactSupport(node_id);
-
-		return ((DHTRouterContact)res[1]);
+	public DHTRouterContact findContact(byte[] nodeId) {
+		Object[] res = findContactSupport(nodeId);
+		return ((DHTRouterContact) res[1]);
 	}
 
-	protected DHTRouterNodeImpl
-	findNode(
-		byte[]	node_id) {
-		Object[]	res = findContactSupport(node_id);
-
-		return ((DHTRouterNodeImpl)res[0]);
+	protected DHTRouterNodeImpl findNode(byte[] nodeId) {
+		Object[] res = findContactSupport(nodeId);
+		return ((DHTRouterNodeImpl) res[0]);
 	}
 
 	protected Object[] findContactSupport(byte[] nodeId) {
@@ -859,18 +856,18 @@ public class DHTRouterImpl implements DHTRouter {
 	}
 
 	protected void refreshNodes(
-		List				nodes_to_refresh,
+		List				nodesToRefresh,
 		DHTRouterNodeImpl	node,
 		byte[]				path,
 		boolean				seeding,
-		long				max_permitted_idle )	// 0 -> don't check
+		long				maxPermittedIdle)	// 0 -> don't check
 	{
 		// when seeding we don't do the smallest subtree
-		if (seeding && node == smallest_subtree) {
+		if (seeding && node == smallestSubtree) {
 			return;
 		}
-		if (max_permitted_idle != 0) {
-			if (node.getTimeSinceLastLookup() <= max_permitted_idle) {
+		if (maxPermittedIdle != 0) {
+			if (node.getTimeSinceLastLookup() <= maxPermittedIdle) {
 				return;
 			}
 		}
@@ -879,7 +876,7 @@ public class DHTRouterImpl implements DHTRouter {
 			if (seeding && node.containsRouterNodeID()) {
 				return;
 			}
-			refreshNode(nodes_to_refresh, node, path);
+			refreshNode(nodesToRefresh, node, path);
 		}
 		// synchronous refresh may result in this bucket being split
 		// so we retest here to refresh sub-buckets as required
@@ -887,9 +884,9 @@ public class DHTRouterImpl implements DHTRouter {
 			int	depth = node.getDepth();
 			byte	mask = (byte)( 0x01<<(7-(depth%8)));
 			path[depth/8] = (byte)(path[depth/8] | mask);
-			refreshNodes(nodes_to_refresh, node.getLeft(), path,seeding, max_permitted_idle);
+			refreshNodes(nodesToRefresh, node.getLeft(), path,seeding, maxPermittedIdle);
 			path[depth/8] = (byte)(path[depth/8] & ~mask);
-			refreshNodes(nodes_to_refresh, node.getRight(), path,seeding, max_permitted_idle);
+			refreshNodes(nodesToRefresh, node.getRight(), path,seeding, maxPermittedIdle);
 		}
 	}
 
@@ -898,35 +895,23 @@ public class DHTRouterImpl implements DHTRouter {
 		DHTRouterNodeImpl	node,
 		byte[]				path) {
 			// pick a random id in the node's range.
-
 		byte[]	id = new byte[routerNodeId.length];
-
 		random.nextBytes(id);
-
 		int	depth = node.getDepth();
-
 		for (int i=0;i<depth;i++) {
-
 			byte	mask = (byte)( 0x01<<(7-(i%8)));
-
 			boolean bit = ((path[i/8]>>(7-(i%8)))&0x01 ) == 1;
-
 			if (bit) {
-
 				id[i/8] = (byte)(id[i/8] | mask);
-
 			} else {
-
 				id[i/8] = (byte)(id[i/8] & ~mask);
 			}
 		}
-
 		nodes_to_refresh.add(id);
 	}
 
-	protected DHTRouterNodeImpl
-	getSmallestSubtree() {
-		return (smallest_subtree);
+	protected DHTRouterNodeImpl getSmallestSubtree() {
+		return (smallestSubtree);
 	}
 
 	public void recordLookup(byte[] nodeId) {
@@ -936,8 +921,7 @@ public class DHTRouterImpl implements DHTRouter {
 	public void	refreshIdleLeaves(long	idle_max) {
 		
 		Log.d(TAG, "refreshIdleLeaves() is called...");
-		Throwable t = new Throwable();
-		t.printStackTrace();
+		new Throwable().printStackTrace();
 		
 		// while we are synchronously refreshing the smallest subtree the tree can mutate underneath us
 		// as new contacts are discovered. We NEVER merge things back together
@@ -954,60 +938,44 @@ public class DHTRouterImpl implements DHTRouter {
 		}
 	}
 
-	public boolean requestPing(
-		byte[]		node_id) {
+	public boolean requestPing(byte[] node_id) {
 		Object[] res = findContactSupport(node_id);
-
-		DHTRouterContactImpl	contact = (DHTRouterContactImpl)res[1];
-
+		DHTRouterContactImpl contact = (DHTRouterContactImpl) res[1];
 		if (contact != null) {
-
 			adapter.requestPing(contact);
-
 			return (true);
 		}
-
 		return (false);
 	}
 
-	protected void requestPing(
-		DHTRouterContactImpl	contact) {
+	protected void requestPing(DHTRouterContactImpl contact) {
 		if (suspended) {
-
 			return;
 		}
-
-			// make sure we don't do the ping when synchronised
-
-		DHTLog.log("DHTRouter: requestPing:" + DHTLog.getString( contact.getID()));
-
+		// make sure we don't do the ping when synchronised
+		DHTLog.log("DHTRouter: requestPing:" + DHTLog.getString(contact.getID()));
 		if (contact == localContact) {
-
 			Debug.out("pinging local contact");
 		}
-
 		try {
 			monitor.enter();
-
-			if (!outstanding_pings.contains( contact)) {
-
-				outstanding_pings.add(contact);
+			if (!outstandingPings.contains(contact)) {
+				outstandingPings.add(contact);
 			}
 		} finally {
-
 			monitor.exit();
 		}
 	}
 
 	protected void dispatchPings() {
-		if (outstanding_pings.size() == 0) {
+		if (outstandingPings.size() == 0) {
 			return;
 		}
 		List	pings;
 		try {
 			monitor.enter();
-			pings	= outstanding_pings;
-			outstanding_pings = new ArrayList();
+			pings	= outstandingPings;
+			outstandingPings = new ArrayList();
 		} finally {
 			monitor.exit();
 		}
@@ -1035,21 +1003,21 @@ public class DHTRouterImpl implements DHTRouter {
 						node = node.getRight();
 					}
 				} else {
-					int 					max_fails 			= 0;
-					DHTRouterContactImpl	max_fails_contact	= null;
+					int 					maxFails 		= 0;
+					DHTRouterContactImpl	maxFailsContact	= null;
 					for (int i=0;i<buckets.size();i++) {
 						DHTRouterContactImpl contact = (DHTRouterContactImpl)buckets.get(i);
 						if (!contact.getPingOutstanding()) {
 							int	fails = contact.getFailCount();
-							if (fails > max_fails) {
-								max_fails			= fails;
-								max_fails_contact	= contact;
+							if (fails > maxFails) {
+								maxFails			= fails;
+								maxFailsContact	= contact;
 							}
 						}
 					}
 					
-					if (max_fails_contact != null) {
-						requestPing(max_fails_contact);
+					if (maxFailsContact != null) {
+						requestPing(maxFailsContact);
 						return;
 					}
 					
@@ -1078,8 +1046,8 @@ public class DHTRouterImpl implements DHTRouter {
 
 		try {
 			monitor.enter();
-			if (!outstanding_adds.contains( contact)) {
-				outstanding_adds.add(contact);
+			if (!outstandingAdds.contains( contact)) {
+				outstandingAdds.add(contact);
 			}
 		} finally {
 			monitor.exit();
@@ -1087,14 +1055,14 @@ public class DHTRouterImpl implements DHTRouter {
 	}
 
 	protected void dispatchNodeAdds() {
-		if (outstanding_adds.size() == 0) {
+		if (outstandingAdds.size() == 0) {
 			return;
 		}
 		List	adds;
 		try {
 			monitor.enter();
-			adds	= outstanding_adds;
-			outstanding_adds = new ArrayList();
+			adds	= outstandingAdds;
+			outstandingAdds = new ArrayList();
 		} finally {
 			monitor.exit();
 		}

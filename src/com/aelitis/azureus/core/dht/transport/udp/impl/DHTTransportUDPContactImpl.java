@@ -166,13 +166,12 @@ public class DHTTransportUDPContactImpl implements DHTTransportUDPContact {
 		return (null);
 	}
 
-	protected int getNodeStatus() {
+	public int getNodeStatus() {
 		return (nodeStatus);
 	}
 
-	protected void setNodeStatus(
-		int		ns) {
-		nodeStatus	= ns;
+	protected void setNodeStatus(int ns) {
+		nodeStatus = ns;
 	}
 
 	public boolean isValid() {
@@ -213,7 +212,7 @@ public class DHTTransportUDPContactImpl implements DHTTransportUDPContact {
 	}
 
 	public InetSocketAddress getAddress() {
-		return ( getExternalAddress());
+		return (getExternalAddress());
 	}
 
 	public int getMaxFailForLiveCount() {
@@ -345,7 +344,7 @@ public class DHTTransportUDPContactImpl implements DHTTransportUDPContact {
 	}
 
 	public DHTTransportFullStats getStats() {
-		return (transport.getFullStats( this));
+		return (transport.getFullStats(this));
 	}
 
 	public byte[] getID() {
