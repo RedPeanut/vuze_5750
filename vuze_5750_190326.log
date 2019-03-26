@@ -1,0 +1,328 @@
+file:/C:/Users/강원도청/Desktop/유지보수/workspace/torrent/vuze_5750/target/classes/ ; file:/C:/Users/강원도청/Desktop/유지보수/workspace/torrent/vuze_5750/lib/azutp_0.5.6.jar ; file:/C:/Users/강원도청/Desktop/유지보수/workspace/torrent/swt-3.8.2-win32-win32-x86/ ; file:/C:/Users/강원도청/Desktop/유지보수/workspace/torrent/swt-3.8.2-win32-win32-x86/swt.jar ; file:/C:/Users/강원도청/.m2/repository/org/springframework/spring-context/3.2.3.RELEASE/spring-context-3.2.3.RELEASE.jar ; file:/C:/Users/강원도청/.m2/repository/org/springframework/spring-aop/3.2.3.RELEASE/spring-aop-3.2.3.RELEASE.jar ; file:/C:/Users/강원도청/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar ; file:/C:/Users/강원도청/.m2/repository/org/springframework/spring-beans/3.2.3.RELEASE/spring-beans-3.2.3.RELEASE.jar ; file:/C:/Users/강원도청/.m2/repository/org/springframework/spring-core/3.2.3.RELEASE/spring-core-3.2.3.RELEASE.jar ; file:/C:/Users/강원도청/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar ; file:/C:/Users/강원도청/.m2/repository/org/springframework/spring-expression/3.2.3.RELEASE/spring-expression-3.2.3.RELEASE.jar ; file:/C:/Users/강원도청/.m2/repository/org/aspectj/aspectjweaver/1.7.4/aspectjweaver-1.7.4.jar ; file:/C:/Users/강원도청/.m2/repository/log4j/log4j/1.2.17/log4j-1.2.17.jar ; file:/C:/Users/강원도청/.m2/repository/commons-cli/commons-cli/1.2/commons-cli-1.2.jar ; file:/C:/Users/강원도청/Desktop/유지보수/workspace/torrent/vuze_5750/
+java.lang.UnsatisfiedLinkError: no aereg in java.library.path
+	at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1867)
+	at java.lang.Runtime.loadLibrary0(Runtime.java:870)
+	at java.lang.System.loadLibrary(System.java:1122)
+	at org.gudy.azureus2.platform.win32.access.impl.AEWin32AccessInterface.<clinit>(AEWin32AccessInterface.java:65)
+	at org.gudy.azureus2.platform.win32.access.impl.AEWin32AccessImpl.isEnabled(AEWin32AccessImpl.java:76)
+	at org.gudy.azureus2.platform.win32.access.impl.AEWin32AccessImpl.<init>(AEWin32AccessImpl.java:69)
+	at org.gudy.azureus2.platform.win32.access.impl.AEWin32AccessImpl.getSingleton(AEWin32AccessImpl.java:53)
+	at org.gudy.azureus2.platform.win32.access.AEWin32Manager.getAccessor(AEWin32Manager.java:35)
+	at org.gudy.azureus2.platform.win32.PlatformManagerImpl.<init>(PlatformManagerImpl.java:160)
+	at org.gudy.azureus2.platform.win32.PlatformManagerImpl.getSingleton(PlatformManagerImpl.java:112)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.gudy.azureus2.platform.PlatformManagerFactory.getPlatformManager(PlatformManagerFactory.java:72)
+	at org.gudy.azureus2.core3.util.SystemProperties.getUserPath(SystemProperties.java:253)
+	at org.gudy.azureus2.core3.util.FileUtil.readResilientConfigFile(FileUtil.java:578)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.load(ConfigurationManager.java:138)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.load(ConfigurationManager.java:185)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.getInstance(ConfigurationManager.java:85)
+	at org.gudy.azureus2.core3.logging.impl.LoggerImpl.init(LoggerImpl.java:77)
+	at org.gudy.azureus2.core3.logging.Logger.<clinit>(Logger.java:45)
+	at org.gudy.azureus2.ui.swt.StartServer.<init>(StartServer.java:68)
+	at org.gudy.azureus2.ui.swt.Main.<init>(Main.java:74)
+	at org.gudy.azureus2.ui.swt.Main.main(Main.java:297)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at com.aelitis.azureus.launcher.MainExecutor$1.run(MainExecutor.java:32)
+	at java.lang.Thread.run(Thread.java:748)
+DEBUG::Tue Mar 26 13:07:21 KST 2019::org.gudy.azureus2.platform.PlatformManagerFactory::getPlatformManager::86:
+  java.lang.IllegalAccessException: Class org.gudy.azureus2.platform.PlatformManagerFactory can not access a member of class org.gudy.azureus2.platform.win32.PlatformManagerImpl with modifiers "protected"
+	at sun.reflect.Reflection.ensureMemberAccess(Reflection.java:102)
+	at java.lang.Class.newInstance(Class.java:436)
+	at org.gudy.azureus2.platform.PlatformManagerFactory.getPlatformManager(PlatformManagerFactory.java:81)
+	at org.gudy.azureus2.core3.util.SystemProperties.getUserPath(SystemProperties.java:253)
+	at org.gudy.azureus2.core3.util.FileUtil.getUserFile(FileUtil.java:109)
+	at org.gudy.azureus2.core3.util.AEDiagnostics.startup(AEDiagnostics.java:151)
+	at org.gudy.azureus2.core3.util.AEDiagnostics.getLogger(AEDiagnostics.java:319)
+	at org.gudy.azureus2.core3.util.Debug.<clinit>(Debug.java:39)
+	at org.gudy.azureus2.platform.PlatformManagerFactory.getPlatformManager(PlatformManagerFactory.java:86)
+	at org.gudy.azureus2.core3.util.SystemProperties.getUserPath(SystemProperties.java:253)
+	at org.gudy.azureus2.core3.util.FileUtil.readResilientConfigFile(FileUtil.java:578)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.load(ConfigurationManager.java:138)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.load(ConfigurationManager.java:185)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.getInstance(ConfigurationManager.java:85)
+	at org.gudy.azureus2.core3.logging.impl.LoggerImpl.init(LoggerImpl.java:77)
+	at org.gudy.azureus2.core3.logging.Logger.<clinit>(Logger.java:45)
+	at org.gudy.azureus2.ui.swt.StartServer.<init>(StartServer.java:68)
+	at org.gudy.azureus2.ui.swt.Main.<init>(Main.java:74)
+	at org.gudy.azureus2.ui.swt.Main.main(Main.java:297)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at com.aelitis.azureus.launcher.MainExecutor$1.run(MainExecutor.java:32)
+	at java.lang.Thread.run(Thread.java:748)
+
+This is BAD - fix me!
+java.lang.Throwable
+	at org.gudy.azureus2.core3.util.SystemProperties.getDocPath(SystemProperties.java:447)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationDefaults.<init>(ConfigurationDefaults.java:236)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationDefaults.getInstance(ConfigurationDefaults.java:96)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.getBooleanParameter(ConfigurationManager.java:268)
+	at org.gudy.azureus2.core3.config.COConfigurationManager.getBooleanParameter(COConfigurationManager.java:227)
+	at org.gudy.azureus2.core3.util.AEDiagnostics$1.parameterChanged(AEDiagnostics.java:163)
+	at org.gudy.azureus2.core3.config.COConfigurationManager.addAndFireParameterListeners(COConfigurationManager.java:434)
+	at org.gudy.azureus2.core3.util.AEDiagnostics.startup(AEDiagnostics.java:155)
+	at org.gudy.azureus2.core3.util.AEDiagnostics.getLogger(AEDiagnostics.java:319)
+	at org.gudy.azureus2.core3.util.Debug.<clinit>(Debug.java:39)
+	at org.gudy.azureus2.platform.PlatformManagerFactory.getPlatformManager(PlatformManagerFactory.java:86)
+	at org.gudy.azureus2.core3.util.SystemProperties.getUserPath(SystemProperties.java:253)
+	at org.gudy.azureus2.core3.util.FileUtil.readResilientConfigFile(FileUtil.java:578)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.load(ConfigurationManager.java:138)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.load(ConfigurationManager.java:185)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.getInstance(ConfigurationManager.java:85)
+	at org.gudy.azureus2.core3.logging.impl.LoggerImpl.init(LoggerImpl.java:77)
+	at org.gudy.azureus2.core3.logging.Logger.<clinit>(Logger.java:45)
+	at org.gudy.azureus2.ui.swt.StartServer.<init>(StartServer.java:68)
+	at org.gudy.azureus2.ui.swt.Main.<init>(Main.java:74)
+	at org.gudy.azureus2.ui.swt.Main.main(Main.java:297)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at com.aelitis.azureus.launcher.MainExecutor$1.run(MainExecutor.java:32)
+	at java.lang.Thread.run(Thread.java:748)
+DEBUG::Tue Mar 26 13:07:21 KST 2019::org.gudy.azureus2.platform.PlatformManagerFactory::getPlatformManager::86:
+  java.lang.IllegalAccessException: Class org.gudy.azureus2.platform.PlatformManagerFactory can not access a member of class org.gudy.azureus2.platform.win32.PlatformManagerImpl with modifiers "protected"
+	at sun.reflect.Reflection.ensureMemberAccess(Reflection.java:102)
+	at java.lang.Class.newInstance(Class.java:436)
+	at org.gudy.azureus2.platform.PlatformManagerFactory.getPlatformManager(PlatformManagerFactory.java:81)
+	at org.gudy.azureus2.core3.util.SystemProperties.getUserPath(SystemProperties.java:253)
+	at org.gudy.azureus2.core3.util.FileUtil.readResilientConfigFile(FileUtil.java:578)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.load(ConfigurationManager.java:138)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.load(ConfigurationManager.java:185)
+	at org.gudy.azureus2.core3.config.impl.ConfigurationManager.getInstance(ConfigurationManager.java:85)
+	at org.gudy.azureus2.core3.logging.impl.LoggerImpl.init(LoggerImpl.java:77)
+	at org.gudy.azureus2.core3.logging.Logger.<clinit>(Logger.java:45)
+	at org.gudy.azureus2.ui.swt.StartServer.<init>(StartServer.java:68)
+	at org.gudy.azureus2.ui.swt.Main.<init>(Main.java:74)
+	at org.gudy.azureus2.ui.swt.Main.main(Main.java:297)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at com.aelitis.azureus.launcher.MainExecutor$1.run(MainExecutor.java:32)
+	at java.lang.Thread.run(Thread.java:748)
+
+UIFunctions/ImageLoad took 0ms
+DEBUG::Tue Mar 26 13:07:25 KST 2019::org.gudy.azureus2.core3.util.DebugLight::printStackTrace::33:
+  java.lang.UnsatisfiedLinkError: org.gudy.azureus2.platform.win32.access.impl.AEWin32AccessInterface.getVersion()Ljava/lang/String;
+	at org.gudy.azureus2.platform.win32.access.impl.AEWin32AccessInterface.getVersion(Native Method)
+	at org.gudy.azureus2.platform.win32.access.impl.AEWin32AccessImpl.getVersion(AEWin32AccessImpl.java:147)
+	at org.gudy.azureus2.ui.swt.win32.Win32UIEnhancer$1.run(Win32UIEnhancer.java:351)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+
+new shell took 228ms
+new shell setup took 100ms
+[SWTSkin] startID = main.shell
+[SWTSkin] sMainGroups.length = 1
+[SWTSkin] sID[0] = main.shell.area
+skin init took 75ms
+MainMenu init took 75ms
+pre skin widgets init took 25ms
+[MainWindowImpl] initMDI() is called...
+skin widgets (1/2) init took 275ms
+skin widgets (2/2) init took 100ms
+pre SWTInstance init took 0ms
+Init Core Columns took 125ms
+SWTInstance init took 0ms
+shell.layout took 100ms
+---------SHOWN AT 1553573246377;5313ms
+---------DONE DISPATCH AT 1553573246702;5638ms
+---------READY AT 1553573246702;5650ms
+shell.open took 350ms
+processStartupDMS took 0ms
+postPluginSetup init took 0ms
+Locale Initializing took 0ms
+[PluginInitializer] userDir = C:\Users\ê°ìëì²­\AppData\Roaming\Azureus\plugins
+[PluginInitializer] appDir = C:\Users\ê°ìëì²­\Desktop\ì ì§ë³´ì\workspace\torrent\vuze_5750\plugins
+[PRUDPTrackerCodecs] registerCodecs() is called...
+[LocalTrackerPlugin] initialize() is called...
+Core Initializing took 729ms
+[GUI] SWT update aborted due to previously reported issues regarding its install location
+[PRUDPPacketHandlerImpl] make new socket...
+[PRUDPPacketHandlerFactoryImpl] receiverMap.put(27553) is called...
+{
+    27553 = null
+}
+[DHTUDPPacketHandlerFactory] portMap.put(27553) is called...
+{
+    27553 = null
+}
+type 1 is called...
+[DHTRouterNodeImpl] : buckets = 1{23DF4BC1...[hba=Y,bad=0,OK=0]}, replacements = null * tsll=1553573248259
+[DHTControlImpl] contactsToQuery.size() = 1
+[DHTControlImpl] contact[0].getAddress() = /210.179.205.225:27553
+[DHTTransportUDPImpl] sendPing() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPImpl.sendPing(DHTTransportUDPImpl.java:1276)
+	at com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPImpl.sendPing(DHTTransportUDPImpl.java:1336)
+	at com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPContactImpl.sendPing(DHTTransportUDPContactImpl.java:274)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.requestPing(DHTControlImpl.java:2878)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.nodeAddedToRouter(DHTControlImpl.java:2902)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$6.requestAdd(DHTControlImpl.java:546)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.dispatchNodeAdds(DHTRouterImpl.java:1076)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.addContact(DHTRouterImpl.java:434)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.contactKnown(DHTRouterImpl.java:316)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.contactImported(DHTControlImpl.java:622)
+	at com.aelitis.azureus.core.dht.transport.util.DHTTransportRequestCounter.contactImported(DHTTransportRequestCounter.java:118)
+	at com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPImpl.importContact(DHTTransportUDPImpl.java:1079)
+	at com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPImpl.importContact(DHTTransportUDPImpl.java:1060)
+	at com.aelitis.azureus.plugins.dht.impl.DHTPluginImpl.importSeed(DHTPluginImpl.java:534)
+	at com.aelitis.azureus.plugins.dht.impl.DHTPluginImpl.importRootSeed(DHTPluginImpl.java:496)
+	at com.aelitis.azureus.plugins.dht.impl.DHTPluginImpl.<init>(DHTPluginImpl.java:242)
+	at com.aelitis.azureus.plugins.dht.DHTPlugin$12$1$1.run(DHTPlugin.java:611)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+[DHTPluginImpl] >>> 3
+[DHTControlImpl] contactsToQuery.size() = 2
+[DHTControlImpl] contact[0].getAddress() = /210.179.205.225:27553
+[DHTControlImpl] contact[1].getAddress() = dht.vuze.com/174.129.43.152:6881
+[DHTControlImpl] >>> lookup() is called... #1
+[DHTControlImpl] _lookupId = 23DF4BC16DCCA5F4DEEB61BFAB5E9CD555DB20FC
+java.lang.Throwable
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.lookup(DHTControlImpl.java:1845)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.seed(DHTControlImpl.java:731)
+	at com.aelitis.azureus.core.dht.impl.DHTImpl.integrate(DHTImpl.java:427)
+	at com.aelitis.azureus.plugins.dht.impl.DHTPluginImpl.integrateDHT(DHTPluginImpl.java:404)
+	at com.aelitis.azureus.plugins.dht.impl.DHTPluginImpl.<init>(DHTPluginImpl.java:264)
+	at com.aelitis.azureus.plugins.dht.DHTPlugin$12$1$1.run(DHTPlugin.java:611)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+[DHTTransportUDPImpl] sendFindNode() is called...
+[DHTTransportUDPImpl] nid = 23DF4BC16DCCA5F4DEEB61BFAB5E9CD555DB20FC
+java.lang.Throwable
+	at com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPImpl.sendFindNode(DHTTransportUDPImpl.java:1786)
+	at com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPContactImpl.sendFindNode(DHTTransportUDPContactImpl.java:311)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$16.lookupSteps(DHTControlImpl.java:2415)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$16.startLookup(DHTControlImpl.java:1980)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$16.runSupport(DHTControlImpl.java:1909)
+	at org.gudy.azureus2.core3.util.AERunnable.run(AERunnable.java:31)
+	at org.gudy.azureus2.core3.util.ThreadPool.runIt(ThreadPool.java:247)
+	at org.gudy.azureus2.core3.util.ThreadPool$ThreadPoolWorker.run(ThreadPool.java:524)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+[DHTRouterNodeImpl] : *
+[DHTRouterNodeImpl]   1: buckets = 0{}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]   0: *
+[DHTRouterNodeImpl]     01: buckets = 10{412F67DB...[hba=Y,bad=0,OK=14199], 445661A6...[hba=Y,bad=0,OK=14174], 43946D3D...[hba=Y,bad=0,OK=13999], 46DA9F9A...[hba=Y,bad=0,OK=13949], 44C0ACC3...[hba=Y,bad=0,OK=13849], 43263E96...[hba=Y,bad=0,OK=13824], 457B5D1A...[hba=Y,bad=0,OK=13824], 4F9F3721...[hba=Y,bad=0,OK=13799], 44A77147...[hba=Y,bad=0,OK=13799], 43C95517...[hba=Y,bad=0,OK=13724]}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]     00: *
+[DHTRouterNodeImpl]       001: *
+[DHTRouterNodeImpl]         0011: buckets = 0{}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]         0010: *
+[DHTRouterNodeImpl]           00101: buckets = 4{2E1C6880...[hba=Y,bad=0,OK=14599], 2CB5F21E...[hba=Y,bad=0,OK=14574], 28B8CA75...[hba=Y,bad=0,OK=14499], 290168CC...[hba=Y,bad=0,OK=13974]}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]           00100: *
+[DHTRouterNodeImpl]             001001: buckets = 0{}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]             001000: *
+[DHTRouterNodeImpl]               0010001: *
+[DHTRouterNodeImpl]                 00100011: *
+[DHTRouterNodeImpl]                   001000111: *
+[DHTRouterNodeImpl]                     0010001111: *
+[DHTRouterNodeImpl]                       00100011111: buckets = 1{23ED2A87...[hba=Y,bad=0,OK=14474]}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]                       00100011110: *
+[DHTRouterNodeImpl]                         001000111101: *
+[DHTRouterNodeImpl]                           0010001111011: *
+[DHTRouterNodeImpl]                             00100011110111: buckets = 4{23DF4BC1...[hba=Y,bad=0,OK=0], 23DD0111...[hba=Y,bad=0,OK=14249], 23DCE8C5...[hba=Y,bad=0,OK=14099], 23DF2D31...[hba=Y,bad=1,OK=0]}, replacements = null * tsll=10799
+[DHTRouterNodeImpl]                             00100011110110: buckets = 6{23DBF6FD...[hba=Y,bad=0,OK=14499], 23DBB092...[hba=Y,bad=0,OK=14424], 23D921F6...[hba=Y,bad=0,OK=14149], 23D86635...[hba=Y,bad=0,OK=14099], 23D83897...[hba=Y,bad=0,OK=14349], 23DA426A...[hba=Y,bad=0,OK=13049]}, replacements = null SST tsll=1553573263133
+[DHTRouterNodeImpl]                           0010001111010: buckets = 12{23D3D2EB...[hba=Y,bad=0,OK=14199], 23D73AEB...[hba=Y,bad=0,OK=13899], 23D6D25E...[hba=Y,bad=0,OK=14249], 23D20865...[hba=Y,bad=0,OK=14174], 23D39DCC...[hba=Y,bad=0,OK=13924], 23D28EC3...[hba=Y,bad=0,OK=14249], 23D13123...[hba=Y,bad=0,OK=14199], 23D653C8...[hba=Y,bad=0,OK=12474], 23D21518...[hba=Y,bad=0,OK=11274], 23D36592...[hba=Y,bad=0,OK=12349], 23D33839...[hba=Y,bad=0,OK=12274], 23D02F04...[hba=Y,bad=0,OK=14149]}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]                         001000111100: buckets = 1{23CF0EA1...[hba=Y,bad=0,OK=13999]}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]                     0010001110: buckets = 7{23B3D9CA...[hba=Y,bad=0,OK=12049], 23A038EE...[hba=Y,bad=0,OK=12024], 239EB674...[hba=Y,bad=0,OK=11774], 23910786...[hba=Y,bad=0,OK=11599], 239DBB9C...[hba=Y,bad=0,OK=11599], 23994D5F...[hba=Y,bad=0,OK=11549], 23A15007...[hba=Y,bad=0,OK=11499]}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]                   001000110: 
+[DHTRouterNodeImpl]                     0010001101: buckets = 7{235DC0D3...[hba=Y,bad=0,OK=11949], 235B0CC8...[hba=Y,bad=0,OK=11649], 23787BF2...[hba=Y,bad=0,OK=11499], 234F01BB...[hba=Y,bad=0,OK=11424], 237EFEA2...[hba=Y,bad=0,OK=11399], 2376A80A...[hba=Y,bad=0,OK=11399], 2373C61F...[hba=Y,bad=0,OK=11374]}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]                     0010001100: buckets = 9{2335C565...[hba=Y,bad=0,OK=11974], 2305B53A...[hba=Y,bad=0,OK=11949], 23347F9C...[hba=Y,bad=0,OK=11924], 2319C325...[hba=Y,bad=0,OK=11899], 232E9D2B...[hba=Y,bad=0,OK=11824], 230E201D...[hba=Y,bad=0,OK=11474], 23177F93...[hba=Y,bad=0,OK=11449], 2318AFF2...[hba=Y,bad=0,OK=11424], 2306ADD2...[hba=Y,bad=0,OK=11399]}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]                 00100010: buckets = 0{}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]               0010000: buckets = 0{}, replacements = null  tsll=1553573263133
+[DHTRouterNodeImpl]       000: buckets = 0{}, replacements = null  tsll=1553573263133
+java.lang.Throwable
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.lookup(DHTControlImpl.java:1845)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$6.requestLookup(DHTControlImpl.java:522)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.requestLookup(DHTRouterImpl.java:1091)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.seedSupport(DHTRouterImpl.java:828)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl$1.perform(DHTRouterImpl.java:170)
+[DHTControlImpl] >>> lookup() is called... #2
+[DHTControlImpl] _lookupId = C50948EB06878113B8ED28E0E1C70E067E58334A
+	at org.gudy.azureus2.core3.util.TimerEventPeriodic.perform(TimerEventPeriodic.java:84)
+	at org.gudy.azureus2.core3.util.TimerEvent.runSupport(TimerEvent.java:106)
+	at org.gudy.azureus2.core3.util.AERunnable.run(AERunnable.java:31)
+	at org.gudy.azureus2.core3.util.ThreadPool.runIt(ThreadPool.java:247)
+	at org.gudy.azureus2.core3.util.ThreadPool$ThreadPoolWorker.run(ThreadPool.java:524)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+[DHTControlImpl] >>> lookup() is called... #3
+[DHTControlImpl] _lookupId = 6BC0EAB8DFFFFDFC755ACFE513E53D904B7594BC
+java.lang.Throwable
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.lookup(DHTControlImpl.java:1845)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$6.requestLookup(DHTControlImpl.java:522)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.requestLookup(DHTRouterImpl.java:1091)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.seedSupport(DHTRouterImpl.java:828)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl$1.perform(DHTRouterImpl.java:170)
+	at org.gudy.azureus2.core3.util.TimerEventPeriodic.perform(TimerEventPeriodic.java:84)
+	at org.gudy.azureus2.core3.util.TimerEvent.runSupport(TimerEvent.java:106)
+	at org.gudy.azureus2.core3.util.AERunnable.run(AERunnable.java:31)
+	at org.gudy.azureus2.core3.util.ThreadPool.runIt(ThreadPool.java:247)
+	at org.gudy.azureus2.core3.util.ThreadPool$ThreadPoolWorker.run(ThreadPool.java:524)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+java.lang.Throwable
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.lookup(DHTControlImpl.java:1845)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$6.requestLookup(DHTControlImpl.java:522)
+[DHTControlImpl] >>> lookup() is called... #4
+[DHTControlImpl] _lookupId = 31FA3EF0E22A8410DC58631FDE5255D3F542D9AD
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.requestLookup(DHTRouterImpl.java:1091)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.seedSupport(DHTRouterImpl.java:828)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl$1.perform(DHTRouterImpl.java:170)
+	at org.gudy.azureus2.core3.util.TimerEventPeriodic.perform(TimerEventPeriodic.java:84)
+	at org.gudy.azureus2.core3.util.TimerEvent.runSupport(TimerEvent.java:106)
+	at org.gudy.azureus2.core3.util.AERunnable.run(AERunnable.java:31)
+	at org.gudy.azureus2.core3.util.ThreadPool.runIt(ThreadPool.java:247)
+	at org.gudy.azureus2.core3.util.ThreadPool$ThreadPoolWorker.run(ThreadPool.java:524)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+[DHTControlImpl] >>> lookup() is called... #5
+[DHTControlImpl] _lookupId = 2D2BF8FE1D12A145E135827F83B976B15A60358F
+java.lang.Throwable
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl.lookup(DHTControlImpl.java:1845)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$6.requestLookup(DHTControlImpl.java:522)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.requestLookup(DHTRouterImpl.java:1091)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl.seedSupport(DHTRouterImpl.java:828)
+	at com.aelitis.azureus.core.dht.router.impl.DHTRouterImpl$1.perform(DHTRouterImpl.java:170)
+	at org.gudy.azureus2.core3.util.TimerEventPeriodic.perform(TimerEventPeriodic.java:84)
+	at org.gudy.azureus2.core3.util.TimerEvent.runSupport(TimerEvent.java:106)
+	at org.gudy.azureus2.core3.util.AERunnable.run(AERunnable.java:31)
+	at org.gudy.azureus2.core3.util.ThreadPool.runIt(ThreadPool.java:247)
+	at org.gudy.azureus2.core3.util.ThreadPool$ThreadPoolWorker.run(ThreadPool.java:524)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+[DHTControlImpl] >>> lookup() is called... #6
+[DHTControlImpl] _lookupId = 1D7DBCC0D9474D4D363DD87171821FD079F51C4B
+[DHTControlImpl] >>> lookup() is called... #7
+[DHTControlImpl] _lookupId = 0A15DB08089DBE3E93EF965F32A4A94BE22383AD
+[DHTControlImpl] >>> lookup() is called... #8
+[DHTControlImpl] _lookupId = 25F5EE7B2139C258A23E18A576ACD17DE3781052
+[DHTTransportUDPImpl] sendFindValue() is called...
+java.lang.Throwable
+	at com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPImpl.sendFindValue(DHTTransportUDPImpl.java:1883)
+	at com.aelitis.azureus.core.dht.transport.udp.impl.DHTTransportUDPContactImpl.sendFindValue(DHTTransportUDPContactImpl.java:319)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$16.lookupSteps(DHTControlImpl.java:2412)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$16.startLookup(DHTControlImpl.java:1980)
+	at com.aelitis.azureus.core.dht.control.impl.DHTControlImpl$16.runSupport(DHTControlImpl.java:1909)
+	at org.gudy.azureus2.core3.util.AERunnable.run(AERunnable.java:31)
+	at org.gudy.azureus2.core3.util.ThreadPool.runIt(ThreadPool.java:247)
+	at org.gudy.azureus2.core3.util.ThreadPool$ThreadPoolWorker.run(ThreadPool.java:524)
+	at org.gudy.azureus2.core3.util.AEThread2$ThreadWrapper.run(AEThread2.java:214)
+[PRUDPTrackerCodecs] registerCodecs() is called...
+com.vuze.plugins.azlocprov.internat.Messages: no default resource bundle
+[DHTControlImpl] >>> lookup() is called... #9
+[DHTControlImpl] _lookupId = D177010A11FC2AFBEE471934FD10C4F58C7BE398
+[DHTControlImpl] >>> lookup() is called... #10
+[DHTControlImpl] _lookupId = 1E3FBB8E7A567055A3450B46DDFEA3F4AEBF8131
+[DHTControlImpl] >>> lookup() is called... #11
+[DHTControlImpl] _lookupId = 3E54463E9D2AB162C21691EB85A2C30758AB6B64
+... 생략 ...
+[DHTControlImpl] >>> lookup() is called... #28
+[DHTControlImpl] _lookupId = F5C3FFB1964CF3212EFAEF77DEE5D25E83F446E0
+[DHTControlImpl] >>> lookup() is called... #29
+[DHTControlImpl] _lookupId = 2CFDABB7EFA9C24299ED285D47840C7ED9179B15
+[DHTControlImpl] >>> lookup() is called... #30
+[DHTControlImpl] _lookupId = BE688E01F79027A8EBA7EC4C522004FA265A4A36
+core.stop
+core.stop done in 5372

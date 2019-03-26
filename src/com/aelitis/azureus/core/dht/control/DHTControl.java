@@ -47,15 +47,15 @@ public interface DHTControl {
 	public static final int		ENCODE_KEYS_DEFAULT						= 1;
 	public static final int		ENABLE_RANDOM_DEFAULT					= 1;
 
-	public void	seed(boolean		full_wait);
+	public void seed(boolean fullWait);
 	public boolean isSeeded();
 
 	/**
 	 * Manually mark things as seeded
 	 */
-	public void	setSeeded();
+	public void setSeeded();
 
-	public void	setSuspended(boolean		susp);
+	public void setSuspended(boolean susp);
 
 	public void	put(
 		byte[]					key,
@@ -67,16 +67,11 @@ public interface DHTControl {
 		boolean					high_priority,
 		DHTOperationListener	listener);
 
-	public boolean isDiversified(
-		byte[]		key);
+	public boolean isDiversified(byte[] key);
 
-	public DHTTransportValue
-	getLocalValue(
-		byte[]		key);
+	public DHTTransportValue getLocalValue(byte[] key);
 
-	public List<DHTTransportValue>
-	getStoredValues(
-		byte[]		key);
+	public List<DHTTransportValue> getStoredValues(byte[] key);
 
 	public void get(
 		byte[]					key,

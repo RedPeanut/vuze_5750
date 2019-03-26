@@ -38,28 +38,29 @@ public class DHTControlFactory {
 		DHTTransport		transport,
 		int					K,
 		int					B,
-		int					max_rep_per_node,
-		int					search_concurrency,
-		int					lookup_concurrency,
-		int					original_republish_interval,
-		int					cache_republish_interval,
-		int					cache_at_closest_n,
+		int					maxRepPerNode,
+		int					searchConcurrency,
+		int					lookupConcurrency,
+		int					originalRepublishInterval,
+		int					cacheRepublishInterval,
+		int					cacheAtClosestN,
 		boolean				encode_keys,
 		boolean				enable_random_poking,
 		DHTLogger			logger) {
 		System.out.println("type 1 is called...");
 		return (new DHTControlImpl(
-						adapter,
-						transport,
-						K, B, max_rep_per_node,
-						search_concurrency,
-						lookup_concurrency,
-						original_republish_interval,
-						cache_republish_interval,
-						cache_at_closest_n,
-						encode_keys,
-						enable_random_poking,
-						logger));
+				adapter,
+				transport,
+				K, B, maxRepPerNode,
+				searchConcurrency,
+				lookupConcurrency,
+				originalRepublishInterval,
+				cacheRepublishInterval,
+				cacheAtClosestN,
+				encode_keys,
+				enable_random_poking,
+				logger)
+		);
 	}
 
 	public static DHTControl create(

@@ -423,33 +423,32 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 						model.getLogArea().appendText( error.toString()+"\n");
 					}
 				});
-		dhtLog =  new DHTLogger() {
-				public void log(String	str) {
+		dhtLog = new DHTLogger() {
+			public void log(String str) {
+				log.log(str);
+			}
+
+			public void log(Throwable e) {
+				log.log(e);
+			}
+
+			public void log(int logType, String str) {
+				if (isEnabled(logType)) {
 					log.log(str);
 				}
-				public void log(
-					Throwable e) {
-					log.log(e);
+			}
+
+			public boolean isEnabled(int log_type) {
+				if (log_type == DHTLogger.LT_IP_FILTER) {
+					return ipfilter_logging[0];
 				}
-				public void log(
-					int		log_type,
-					String	str) {
-					if (isEnabled( log_type)) {
-						log.log(str);
-					}
-				}
-				public boolean isEnabled(
-					int	log_type) {
-					if (log_type == DHTLogger.LT_IP_FILTER) {
-						return ipfilter_logging[0];
-					}
-					return (true);
-				}
-				public PluginInterface
-				getPluginInterface() {
-					return ( log.getLogger().getPluginInterface());
-				}
-			};
+				return (true);
+			}
+
+			public PluginInterface getPluginInterface() {
+				return (log.getLogger().getPluginInterface());
+			}
+		};
 
 		if (!enabledParam.getValue()) {
 			model.getStatus().setText("Disabled");

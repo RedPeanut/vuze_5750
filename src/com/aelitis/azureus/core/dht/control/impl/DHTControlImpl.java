@@ -251,6 +251,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		boolean				_enable_random_poking,
 		DHTLogger 			_logger) {
 		
+		Log.d(TAG, ">>> K = " + _K);
+		
 		adapter		= _adapter;
 		transport	= _transport;
 		logger		= _logger;
@@ -425,6 +427,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		boolean				_encode_keys,
 		boolean				_enable_random_poking,
 		DHTLogger 			_logger) {
+		
+		//Log.d(TAG, ">>> K = " + _K);
 		
 		adapter		= _adapter;
 		transport	= _transport;
@@ -1838,11 +1842,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final int 					searchAccuracy,
 		final LookupResultHandler	handler) {
 		
-		int count = SingleCounter9.getInstance().getAndIncreaseCount();
+		int count = SingleCounter0.getInstance().getAndIncreaseCount();
 		Log.d(TAG, String.format(">>> lookup() is called... #%d", count));
 		Log.d(TAG, "_lookupId = " + Util.toHexString(_lookupId));
-		if (count <= 5)
-			new Throwable().printStackTrace();
+		/*if (count <= 3)
+			new Throwable().printStackTrace();*/
 		
 		final byte[] lookupId;
 		final byte[] obsValue;
@@ -1912,6 +1916,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			private void startLookup() {
 				contactsToQueryMon = new AEMonitor("DHTControl:ctq");
 				
+				//if (SingleCounter9.getInstance().getAndIncreaseCount() == 1)
+					//new Throwable().printStackTrace();
+				
 				/*int count = SingleCounter0.getInstance().getAndIncreaseCount();
 				if (count == 1)
 					new Throwable().printStackTrace();
@@ -1920,6 +1927,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				Log.d(TAG, "lookupId = " + Util.toHexString(lookupId));*/
 				//Log.d(TAG, "K = " + K);
 				contactsToQuery = getClosestContactsSet(lookupId, K, false);
+				
 				//Log.d(TAG, "contactsToQuery.size() = " + contactsToQuery.size());
 				
 				Iterator<DHTTransportContact> it;
@@ -1994,7 +2002,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					if (!error) {
 						// maybe unterminated searches still going on so protect ourselves
 						// against concurrent modification of result set
-						List closest_res = null;
+						List closestRes = null;
 						try {
 							contactsToQueryMon.enter();
 							if (DHTLog.isOn()) {
@@ -2003,16 +2011,16 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 								DHTLog.log("    to query = " + DHTLog.getString(contactsToQuery));
 								DHTLog.log("    ok = " + DHTLog.getString(okContacts));
 							}
-							closest_res = new ArrayList(okContacts);
+							closestRes = new ArrayList(okContacts);
 							// we need to reverse the list as currently closest is at the end
-							Collections.reverse(closest_res);
+							Collections.reverse(closestRes);
 							if (timeout <= 0 && !valueSearch)
 								// we can use the results of this to estimate the DHT size
 								estimateDHTSize(lookupId, contactsQueried.values(), searchAccuracy);
 						} finally {
 							contactsToQueryMon.exit();
 						}
-						handler.closest(closest_res);
+						handler.closest(closestRes);
 					}
 					handler.complete(timeoutOccurred);
 				} finally {
@@ -2087,9 +2095,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 							break; // temporary stop, will be revived by release()*/
 
 						try {
-
+							
 							contactsToQueryMon.enter();
-
+							
 							// for stats queries the values returned are unique to target so don't assume 2 replies sufficient
 							if (valuesFound >= maxValues || ((flags & DHT.FLAG_STATS) == 0 &&  valueReplies >= 2)) {
 								// all hits should have the same values anyway...
@@ -2125,12 +2133,13 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 							// if the next closest is further away than the furthest successful hit so
 							// far and we have K hits, we're done
 							if (okContacts.size() == searchAccuracy) {
-								DHTTransportContact furthest_ok = (DHTTransportContact) okContacts.iterator().next();
-								int distance = computeAndCompareDistances(furthest_ok.getID(), closest.getID(), lookupId);
+								DHTTransportContact furthestOk = (DHTTransportContact) okContacts.iterator().next();
+								int distance = computeAndCompareDistances(furthestOk.getID(), closest.getID(), lookupId);
 								if (distance <= 0) {
 									if (DHTLog.isOn()) {
 										DHTLog.log("lookup: terminates - we've searched the closest " + searchAccuracy + " contacts");
 									}
+									Log.d(TAG, "lookup: terminates - we've searched the closest " + searchAccuracy + " contacts");
 									terminate = true;
 									break;
 								}
@@ -2371,17 +2380,17 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 									findNodeReply(contact, contacts);
 								}
 
-								public void failed(DHTTransportContact target_contact, Throwable error) {
+								public void failed(DHTTransportContact targetContact, Throwable error) {
 									try {
 										// if at least one reply has been received then we
 										// don't treat subsequent failure as indication of
 										// a contact failure (just packet loss)
 										if (!valueReplyReceived) {
 											if (DHTLog.isOn()) {
-												DHTLog.log("findNode/findValue " + DHTLog.getString(target_contact) + " -> failed: " + error.getMessage());
+												DHTLog.log("findNode/findValue " + DHTLog.getString(targetContact) + " -> failed: " + error.getMessage());
 											}
 
-											router.contactDead(target_contact.getID(), false);
+											router.contactDead(targetContact.getID(), false);
 										}
 									} finally {
 										try {
@@ -3194,7 +3203,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		long size = l.size();
 		//Log.d(TAG, "size = " + size);
 		for (int i=0;i<size;i++) {
-			sortedSet.add(((DHTControlContact)((DHTRouterContact)l.get(i)).getAttachment()).getTransportContact());
+			sortedSet.add(
+					( 
+							(DHTControlContact)(l.get(i)).getAttachment() 
+					).getTransportContact()
+			);
 		}
 		return (sortedSet);
 	}

@@ -19,6 +19,9 @@
 
 package com.aelitis.azureus.core.dht.router.impl;
 
+import hello.util.Log;
+import hello.util.SingleCounter0;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -49,9 +52,6 @@ import com.aelitis.azureus.core.dht.router.DHTRouterStats;
 import com.aelitis.azureus.core.util.CopyOnWriteList;
 import com.aelitis.azureus.core.util.bloom.BloomFilter;
 import com.aelitis.azureus.core.util.bloom.BloomFilterFactory;
-
-import hello.util.Log;
-import hello.util.Util;
 
 /**
  * @author parg
@@ -593,7 +593,36 @@ public class DHTRouterImpl implements DHTRouter {
 		//Throwable t = new Throwable();
 		//t.printStackTrace();
 		
+		//if (SingleCounter0.getInstance().getAndIncreaseCount() <= 10) {
+			
+			//Throwable t = new Throwable();
+			//t.printStackTrace();
+			
+			/*StackTraceElement[] ste = t.getStackTrace();
+			for (int i = 0; i < ste.length; i++) {
+				Log.d(TAG, String.format("ste[%d].getClassName() = %s", i, ste[i].getClassName()));
+				//Log.d(TAG, String.format("ste[%d].getFileName() = %s", i, ste[i].getFileName()));
+			}*/
+		//}
+		
+		boolean contains = false;
+		Throwable t = new Throwable();
+		StackTraceElement[] ste = t.getStackTrace();
+		for (int i = 0; i < ste.length; i++) {
+			if (ste[i].toString().contains("startLookup")) {
+				contains = true;
+				break;
+			}
+			//Log.d(TAG, String.format("ste[%d].getClassName() = %s", i, ste[i].getClassName()));
+			//Log.d(TAG, String.format("ste[%d].getFileName() = %s", i, ste[i].getFileName()));
+		}
+		
 		List<DHTRouterContactImpl> buckets = currentNode.getBuckets();
+		
+		if (contains) {
+			Log.d(TAG, "buckets = " + buckets);
+		}
+		
 		if (buckets != null) {
 			// add everything from the buckets - caller will sort and select
 			// the best ones as required

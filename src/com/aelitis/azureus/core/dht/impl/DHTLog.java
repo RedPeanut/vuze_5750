@@ -35,15 +35,14 @@ import com.aelitis.azureus.core.dht.DHTLogger;
 import com.aelitis.azureus.core.dht.transport.DHTTransportContact;
 import com.aelitis.azureus.core.dht.transport.DHTTransportValue;
 
-public class
-DHTLog
-{
+public class DHTLog {
+	
 	public static final boolean		GLOBAL_BLOOM_TRACE		= false;
 	public static final boolean		LOCAL_BLOOM_TRACE		= false;
 	public static final boolean		CONTACT_VERIFY_TRACE	= false;
 	public static final boolean		TRACE_VERSIONS 			= false;
 
-	static{
+	static {
 		if (GLOBAL_BLOOM_TRACE) {
 			System.out.println("**** DHTLog: global bloom trace on ****");
 		}
@@ -58,52 +57,35 @@ DHTLog
 		}
 	}
 
-
-	public static boolean	logging_on	= false;
-
+	public static boolean		loggingOn	= false;
 	private static DHTLogger	logger;
 
-	protected static void
-	setLogging(
-		boolean	on) {
-		logging_on 	= on;
+	protected static void setLogging(boolean on) {
+		loggingOn = on;
 	}
 
-	public static boolean
-	isOn() {
-		return (logging_on);
+	public static boolean isOn() {
+		return (loggingOn);
 	}
 
-	public static void log(
-		String	str) {
-		if (logging_on) {
-
+	public static void log(String str) {
+		if (loggingOn) {
 			if (logger != null) {
-
 				logger.log(str);
-
 			} else {
-
 				System.out.println(str);
 			}
 		}
 	}
 
-	public static void setLogger(
-		DHTLogger l) {
-		logger	= l;
+	public static void setLogger(DHTLogger l) {
+		logger = l;
 	}
 
-
-	public static String getString(
-		byte[]	b) {
-		if (logging_on) {
-
-			return ( getString2(b));
-
-
+	public static String getString(byte[] b) {
+		if (loggingOn) {
+			return (getString2(b));
 		} else {
-
 			return ("");
 		}
 	}
@@ -116,71 +98,55 @@ DHTLog
 		return (res);
 	}
 
-	public static String getFullString(
-		byte[]	b) {
-		return ( ByteFormatter.nicePrint(b));
+	public static String getFullString(byte[] b) {
+		return (ByteFormatter.nicePrint(b));
 	}
 
-	public static String getString(
-		HashWrapper	w) {
-		if (logging_on) {
-
-			return ( getString( w.getHash()));
-
+	public static String getString(HashWrapper w) {
+		if (loggingOn) {
+			return (getString(w.getHash()));
 		} else {
 			return ("");
 		}
 	}
 
-	public static String getString(
-		DHTTransportContact[]	contacts) {
-		if (logging_on) {
-
+	public static String getString(DHTTransportContact[] contacts) {
+		if (loggingOn) {
 			StringBuilder sb = new StringBuilder(128);
 			sb.append("{");
-
-			for (int i=0;i<contacts.length;i++) {
-
+			for (int i = 0; i < contacts.length; i++) {
 				if (i > 0) {
 					sb.append(",");
 				}
-				sb.append( getString(contacts[i].getID()));
+				sb.append(getString(contacts[i].getID()));
 			}
-
 			sb.append("}");
-
-			return ( sb.toString());
+			return (sb.toString());
 		} else {
 			return ("");
 		}
 	}
 
-	public static String getString(
-		DHTTransportContact	contact) {
-		if (logging_on) {
-			return ( contact.getString());
+	public static String getString(DHTTransportContact contact) {
+		if (loggingOn) {
+			return (contact.getString());
 		} else {
 			return ("");
 		}
 	}
 
-	public static String getString(
-		List		l) {
-		if (logging_on) {
+	public static String getString(List l) {
+		if (loggingOn) {
 			StringBuilder sb = new StringBuilder(128);
 			sb.append("{");
-
-			for (int i=0;i<l.size();i++) {
-
+			for (int i = 0; i < l.size(); i++) {
 				if (i > 0) {
 					sb.append(",");
 				}
-				sb.append(getString((DHTTransportContact)l.get(i)));
+				sb.append(getString((DHTTransportContact) l.get(i)));
 			}
-
 			sb.append("}");
-
-			return ( sb.toString());
+			return (sb.toString());
 		} else {
 			return ("");
 		}
@@ -188,7 +154,7 @@ DHTLog
 
 	public static String getString(
 		Set			s) {
-		if (logging_on) {
+		if (loggingOn) {
 			StringBuilder sb = new StringBuilder(128);
 			sb.append("{");
 
@@ -212,7 +178,7 @@ DHTLog
 
 	public static String getString(
 		Map			s) {
-		if (logging_on) {
+		if (loggingOn) {
 			StringBuilder sb = new StringBuilder(128);
 			sb.append("{");
 
@@ -236,7 +202,7 @@ DHTLog
 
 	public static String getString(
 		ByteArrayHashMap<?>			s) {
-		if (logging_on) {
+		if (loggingOn) {
 			StringBuilder sb = new StringBuilder(128);
 			sb.append("{");
 
@@ -260,7 +226,7 @@ DHTLog
 
 	public static String getString(
 		DHTTransportValue[]	values) {
-		if (logging_on) {
+		if (loggingOn) {
 
 			if (values == null) {
 
@@ -285,7 +251,7 @@ DHTLog
 	public static void getString(
 		StringBuilder		sb,
 		DHTTransportValue	value) {
-		if (logging_on) {
+		if (loggingOn) {
 
 			if (value == null) {
 
@@ -311,7 +277,7 @@ DHTLog
 
 	public static String getString(
 		DHTTransportValue	value) {
-		if (logging_on) {
+		if (loggingOn) {
 
 			if (value == null) {
 

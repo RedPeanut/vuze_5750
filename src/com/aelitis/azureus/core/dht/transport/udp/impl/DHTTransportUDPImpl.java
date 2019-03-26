@@ -1271,11 +1271,11 @@ public class DHTTransportUDPImpl
 		long								timeout,
 		int									priority) {
 		
-		if (SingleCounter1.getInstance().getAndIncreaseCount() == 1) {
+		/*if (SingleCounter1.getInstance().getAndIncreaseCount() == 1) {
 			Log.d(TAG, "sendPing() is called..."); 
 			Throwable t = new Throwable();
 			t.printStackTrace();
-		}
+		}*/
 		
 		try {
 			checkAddress(contact);
@@ -1779,7 +1779,7 @@ outer:
 		final DHTTransportReplyHandler		handler,
 		byte[]								nid) {
 		
-		///*
+		/*
 		if (SingleCounter2.getInstance().getAndIncreaseCount() == 1) {
 			Log.d(TAG, "sendFindNode() is called..."); 
 			Log.d(TAG, "nid = " + Util.toHexString(nid));
@@ -1878,10 +1878,10 @@ outer:
 		int									max_values,
 		short								flags) {
 		
-		if (SingleCounter3.getInstance().getAndIncreaseCount() == 1) {
+		/*if (SingleCounter3.getInstance().getAndIncreaseCount() == 1) {
 			Log.d(TAG, "sendFindValue() is called..."); 
 			new Throwable().printStackTrace();
-		}
+		}*/
 		
 		try {
 			checkAddress(contact);

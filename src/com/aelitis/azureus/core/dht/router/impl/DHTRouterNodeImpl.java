@@ -99,8 +99,7 @@ public class DHTRouterNodeImpl {
 		return (buckets);
 	}
 
-	protected List<DHTRouterContactImpl>
-	getReplacements() {
+	protected List<DHTRouterContactImpl> getReplacements() {
 		return (replacements);
 	}
 
