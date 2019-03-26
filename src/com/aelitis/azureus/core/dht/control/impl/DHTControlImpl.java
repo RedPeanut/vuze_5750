@@ -18,6 +18,11 @@
 
 package com.aelitis.azureus.core.dht.control.impl;
 
+import hello.util.Log;
+import hello.util.SingleCounter0;
+import hello.util.SingleCounter9;
+import hello.util.Util;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -100,10 +105,6 @@ import com.aelitis.azureus.core.dht.transport.DHTTransportRequestHandler;
 import com.aelitis.azureus.core.dht.transport.DHTTransportStoreReply;
 import com.aelitis.azureus.core.dht.transport.DHTTransportValue;
 import com.aelitis.azureus.core.dht.transport.udp.DHTTransportUDP;
-
-import hello.util.Log;
-import hello.util.SingleCounter0;
-import hello.util.Util;
 
 /**
  * @author parg
@@ -518,22 +519,22 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					
 					//Log.d(TAG, "requestLookup() is called...");
 					
-					lookup(internalLookupPool, false,
-							id,
-							description,
-							(byte)0,
-							false, // boolean valueSearch
-							5*60*1000,		// upper bound on this refresh/seeding operation
-							searchConcurrency,
-							1,
-							router.getK()/2,	// (parg - removed this; re-added the /2 on May 2014 to see how it performs) decrease search accuracy for refreshes
-							new lookupResultHandler(new DHTOperationAdapter()) {
-						
-								public void diversify(
-									DHTTransportContact	cause,
-									byte				diversification_type) {}
+					lookup(internalLookupPool,
+							false,				
+							id,					
+							description,		
+							(byte)0,			
+							false,				// boolean valueSearch: 
+							5*60*1000,			// long timeout: upper bound on this refresh/seeding operation
+							searchConcurrency,	
+							1,					
+							router.getK()/2,	// int searchAccuracy: (parg - removed this; re-added the /2 on May 2014 to see how it performs) decrease search accuracy for refreshes
+							new LookupResultHandler(new DHTOperationAdapter()) {
+								public void diversify(DHTTransportContact cause, byte diversificationType) {
+								}
 								
-								public void closest(List res) {}
+								public void closest(List res) {
+								}
 							});
 				}
 				
@@ -737,11 +738,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				searchConcurrency*4,
 				1,
 				router.getK(),
-				new lookupResultHandler(new DHTOperationAdapter()) {
+				new LookupResultHandler(new DHTOperationAdapter()) {
 			
 					public void diversify(
 						DHTTransportContact	cause,
-						byte diversification_type) {}
+						byte diversificationType) {}
 					
 					public void closest(List res) {
 						if (!fullWait) {
@@ -973,7 +974,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					searchConcurrency,
 					1,
 					router.getK(),
-					new lookupResultHandler(listener) {
+					new LookupResultHandler(listener) {
 				
 						public void diversify(
 							DHTTransportContact	cause,
@@ -1618,7 +1619,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					searchConcurrency,
 					1,
 					router.getK(),
-					new lookupResultHandler(delegate) {
+					new LookupResultHandler(delegate) {
 			
 						public void diversify(
 							DHTTransportContact	cause,
@@ -1681,7 +1682,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					is_stats_query?searchConcurrency*2:searchConcurrency,
 					max_values,
 					router.getK(),
-					new lookupResultHandler(get_listener) {
+					new LookupResultHandler(get_listener) {
 					
 						private final List	found_values = new ArrayList();
 						
@@ -1835,12 +1836,13 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final int 					concurrency,
 		final int 					maxValues,
 		final int 					searchAccuracy,
-		final lookupResultHandler 	handler) {
+		final LookupResultHandler	handler) {
 		
-		//Log.d(TAG, "lookup() is called...");
-		//Log.d(TAG, "_lookupId = " + Util.toHexString(_lookupId));
-		/*Throwable t = new Throwable();
-		t.printStackTrace();*/
+		int count = SingleCounter9.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format(">>> lookup() is called... #%d", count));
+		Log.d(TAG, "_lookupId = " + Util.toHexString(_lookupId));
+		if (count <= 5)
+			new Throwable().printStackTrace();
 		
 		final byte[] lookupId;
 		final byte[] obsValue;
@@ -1910,12 +1912,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			private void startLookup() {
 				contactsToQueryMon = new AEMonitor("DHTControl:ctq");
 				
-				int count = SingleCounter0.getInstance().getAndIncreaseCount();
+				/*int count = SingleCounter0.getInstance().getAndIncreaseCount();
 				if (count == 1)
 					new Throwable().printStackTrace();
 				Log.d(TAG, "count = " + count);
 				Log.d(TAG, "startLookup() is called...");
-				Log.d(TAG, "lookupId = " + Util.toHexString(lookupId));
+				Log.d(TAG, "lookupId = " + Util.toHexString(lookupId));*/
 				//Log.d(TAG, "K = " + K);
 				contactsToQuery = getClosestContactsSet(lookupId, K, false);
 				//Log.d(TAG, "contactsToQuery.size() = " + contactsToQuery.size());
@@ -2137,20 +2139,20 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 							// we optimise the first few entries based on their Vivaldi distance. Only a few
 							// however as we don't want to start too far away from the target.
 							if (contactsQueried.size() < concurrency) {
-								DHTNetworkPosition[] loc_nps = localContact.getNetworkPositions();
+								DHTNetworkPosition[] locNps = localContact.getNetworkPositions();
 								DHTTransportContact vp_closest = null;
 								Iterator vp_it = contactsToQuery.iterator();
-								int vp_count_limit = (concurrency * 2) - contactsQueried.size();
+								int vp_countLimit = (concurrency * 2) - contactsQueried.size();
 								int vp_count = 0;
-								float best_dist = Float.MAX_VALUE;
-								while (vp_it.hasNext() && vp_count < vp_count_limit) {
+								float bestDist = Float.MAX_VALUE;
+								while (vp_it.hasNext() && vp_count < vp_countLimit) {
 									vp_count++;
 									DHTTransportContact entry = (DHTTransportContact) vp_it.next();
-									DHTNetworkPosition[] rem_nps = entry.getNetworkPositions();
+									DHTNetworkPosition[] remNps = entry.getNetworkPositions();
 
-									float dist = DHTNetworkPositionManager.estimateRTT(loc_nps, rem_nps);
-									if ((!Float.isNaN(dist)) && dist < best_dist) {
-										best_dist = dist;
+									float dist = DHTNetworkPositionManager.estimateRTT(locNps, remNps);
+									if ((!Float.isNaN(dist)) && dist < bestDist) {
+										bestDist = dist;
 										vp_closest = entry;
 										// System.out.println(start + ": lookup for " + DHTLog.getString2( lookup_id) + ": vp override (dist = " + dist + ")");
 									}
@@ -2460,11 +2462,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				// can be null if 'added' listener callback runs before class init complete...
 				if (contactsToQueryMon != null) {
 					contactsToQueryMon.enter();
-
+					
 					try {
-
+						
 						if (contactsQueried != null && levelMap != null) {
-
+							
 							List<Map.Entry<DHTTransportContact, Object[]>> lm_entries = new ArrayList<Map.Entry<DHTTransportContact,Object[]>>( levelMap.entrySet());
 							Collections.sort(
 								lm_entries,
@@ -3815,19 +3817,15 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		}
 	}
 
-	abstract static class lookupResultHandler
-		extends DHTOperationListenerDemuxer
-	{
-		protected lookupResultHandler(DHTOperationListener delegate) {
+	abstract static class LookupResultHandler extends DHTOperationListenerDemuxer {
+		
+		protected LookupResultHandler(DHTOperationListener delegate) {
 			super(delegate);
 		}
-
+		
 		public abstract void closest(List res);
-
-		public abstract void diversify(
-			DHTTransportContact	cause,
-			byte				diversification_type);
-
+		public abstract void diversify(DHTTransportContact cause, byte diversificationType);
+		
 	}
 
 
@@ -4223,10 +4221,10 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	protected abstract class DhtTask extends ThreadPoolTask {
-		private final controlActivity activity;
+		private final ControlActivity activity;
 
 		protected DhtTask(ThreadPool threadPool) {
-			activity = new controlActivity(threadPool, this);
+			activity = new ControlActivity(threadPool, this);
 			try {
 				activityMonitor.enter();
 				activities.add(activity);
@@ -4337,13 +4335,13 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		}
 	}
 
-	protected class controlActivity implements DHTControlActivity {
+	protected class ControlActivity implements DHTControlActivity {
 		
 		protected final ThreadPool	tp;
 		protected final DhtTask		task;
 		protected final int			type;
 
-		protected controlActivity(
+		protected ControlActivity(
 			ThreadPool	_tp,
 			DhtTask		_task) {
 			tp		= _tp;

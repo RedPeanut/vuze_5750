@@ -28,25 +28,10 @@ import com.aelitis.azureus.core.dht.transport.DHTTransportValue;
  */
 
 public interface DHTOperationListener {
-	
-	public void searching(
-		DHTTransportContact	contact,
-		int					level,
-		int					active_searches);
-
+	public void searching(DHTTransportContact contact, int level, int active_searches);
 	public boolean diversified(String desc);
-
-	public void found(
-		DHTTransportContact		contact,
-		boolean					is_closest);
-
-	public void read(
-		DHTTransportContact	contact,
-		DHTTransportValue	value);
-
-	public void wrote(
-		DHTTransportContact	contact,
-		DHTTransportValue	value);
-
+	public void found(DHTTransportContact contact, boolean is_closest);
+	public void read(DHTTransportContact contact, DHTTransportValue value);
+	public void wrote(DHTTransportContact contact, DHTTransportValue value);
 	public void complete(boolean timeout);
 }

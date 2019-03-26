@@ -269,56 +269,34 @@ DHTNetworkPositionManager
 		return (best_position);
 	}
 
-	public static DHTNetworkPosition[]
-	createPositions(
-		byte[]		ID,
-		boolean		is_local) {
-		DHTNetworkPositionProvider[]	prov = providers;
-
+	public static DHTNetworkPosition[] createPositions(byte[] ID, boolean isLocal) {
+		DHTNetworkPositionProvider[] prov = providers;
 		if (prov.length == 0) {
-
 			return (NP_EMPTY_ARRAY);
-
 		} else {
-			DHTNetworkPosition[]	res = new DHTNetworkPosition[prov.length];
-
-			int	skipped	= 0;
-
-			for (int i=0;i<res.length;i++) {
-
+			DHTNetworkPosition[] res = new DHTNetworkPosition[prov.length];
+			int skipped = 0;
+			for (int i = 0; i < res.length; i++) {
 				try {
-					res[i] = prov[i].create(ID, is_local);
-
+					res[i] = prov[i].create(ID, isLocal);
 				} catch (Throwable e) {
-
 					Debug.printStackTrace(e);
-
 					skipped++;
 				}
 			}
-
-			if  (skipped > 0) {
-
-				DHTNetworkPosition[] x	= new DHTNetworkPosition[ res.length - skipped ];
-
-				int	pos = 0;
-
-				for (int i=0;i<res.length;i++) {
-
+			if (skipped > 0) {
+				DHTNetworkPosition[] x = new DHTNetworkPosition[res.length - skipped];
+				int pos = 0;
+				for (int i = 0; i < res.length; i++) {
 					if (res[i] != null) {
-
 						x[pos++] = res[i];
 					}
 				}
-
-				res	= x;
-
+				res = x;
 				if (res.length == 0) {
-
 					Debug.out("hmm");
 				}
 			}
-
 			return (res);
 		}
 	}

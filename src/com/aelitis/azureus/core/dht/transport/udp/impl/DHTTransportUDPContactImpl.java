@@ -98,7 +98,7 @@ public class DHTTransportUDPContactImpl implements DHTTransportUDPContact {
 	private int					randomId;
 	private int					nodeStatus	= NODE_STATUS_UNKNOWN;
 
-	private DHTNetworkPosition[]		network_positions;
+	private DHTNetworkPosition[]		networkPositions;
 
 	protected DHTTransportUDPContactImpl(
 		boolean					_isLocal,
@@ -369,21 +369,22 @@ public class DHTTransportUDPContactImpl implements DHTTransportUDPContact {
 	}
 
 	protected void setNetworkPositions(DHTNetworkPosition[] positions) {
-  		network_positions	= positions;
-  	}
+		networkPositions = positions;
+	}
 
-	public void	createNetworkPositions(boolean is_local) {
-		network_positions	= DHTNetworkPositionManager.createPositions(id==null?DHTUDPUtils.getBogusNodeID():id, is_local);
+	public void createNetworkPositions(boolean isLocal) {
+		networkPositions = DHTNetworkPositionManager.createPositions(
+				id == null ? DHTUDPUtils.getBogusNodeID() : id, isLocal);
 	}
 
 	public DHTNetworkPosition[] getNetworkPositions() {
-		return (network_positions);
+		return (networkPositions);
 	}
 
   	public DHTNetworkPosition getNetworkPosition(byte position_type) {
-  		for (int i=0;i<network_positions.length;i++) {
-  			if (network_positions[i].getPositionType() == position_type) {
-  				return (network_positions[i]);
+  		for (int i=0;i<networkPositions.length;i++) {
+  			if (networkPositions[i].getPositionType() == position_type) {
+  				return (networkPositions[i]);
   			}
   		}
   		return (null);

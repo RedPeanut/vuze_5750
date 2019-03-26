@@ -27,18 +27,15 @@ import com.aelitis.azureus.core.dht.transport.DHTTransportValue;
  *
  */
 
-public class
-DHTOperationAdapter
-	implements DHTOperationListener
-{
+public class DHTOperationAdapter implements DHTOperationListener {
+	
 	private final DHTOperationListener	delegate;
 
 	public DHTOperationAdapter() {
 		delegate = null;
 	}
 
-	public DHTOperationAdapter(
-		DHTOperationListener		_delegate) {
+	public DHTOperationAdapter(DHTOperationListener _delegate) {
 		delegate = _delegate;
 	}
 
@@ -51,40 +48,33 @@ DHTOperationAdapter
 		}
 	}
 
-	public boolean diversified(
-		String		desc) {
+	public boolean diversified(String desc) {
 		if (delegate != null) {
-			return ( delegate.diversified(desc));
+			return (delegate.diversified(desc));
 		} else {
-			return (true);}
+			return (true);
+		}
 	}
 
-	public void found(
-		DHTTransportContact	contact,
-		boolean				is_closest) {
+	public void found(DHTTransportContact contact, boolean is_closest) {
 		if (delegate != null) {
 			delegate.found(contact, is_closest);
 		}
 	}
 
-	public void read(
-		DHTTransportContact	contact,
-		DHTTransportValue	value) {
+	public void read(DHTTransportContact contact, DHTTransportValue value) {
 		if (delegate != null) {
 			delegate.read(contact, value);
 		}
 	}
 
-	public void wrote(
-		DHTTransportContact	contact,
-		DHTTransportValue	value) {
+	public void wrote(DHTTransportContact contact, DHTTransportValue value) {
 		if (delegate != null) {
 			delegate.wrote(contact, value);
 		}
 	}
 
-	public void complete(
-		boolean				timeout) {
+	public void complete(boolean timeout) {
 		if (delegate != null) {
 			delegate.complete(timeout);
 		}

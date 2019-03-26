@@ -191,10 +191,10 @@ public class DMReaderImpl implements DMReader {
 		final DiskManagerReadRequest			request,
 		final DiskManagerReadRequestListener	_listener) {
 		
-		if (SingleCounter9.getInstance().getAndIncreaseCount() < 1) {
+		/*if (SingleCounter9.getInstance().getAndIncreaseCount() == 1) {
 			Log.d(TAG, "readBlock() is called...");
 			new Throwable().printStackTrace();
-		}
+		}*/
 		
 		request.requestStarts();
 		final DiskManagerReadRequestListener listener =
@@ -203,10 +203,10 @@ public class DMReaderImpl implements DMReader {
 						DiskManagerReadRequest 	request,
 						DirectByteBuffer 		data) {
 					
-					if (SingleCounter9.getInstance().getAndIncreaseCount() < 2) {
+					/*if (SingleCounter9.getInstance().getAndIncreaseCount() == 2) {
 						Log.d(TAG, "readCompleted() is called...");
 						new Throwable().printStackTrace();
-					}
+					}*/
 					
 					request.requestEnds(true);
 					_listener.readCompleted(request, data);
