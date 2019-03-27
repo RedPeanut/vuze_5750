@@ -1845,8 +1845,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		int count = SingleCounter0.getInstance().getAndIncreaseCount();
 		Log.d(TAG, String.format(">>> lookup() is called... #%d", count));
 		Log.d(TAG, "_lookupId = " + Util.toHexString(_lookupId));
-		/*if (count <= 3)
-			new Throwable().printStackTrace();*/
+		Log.d(TAG, "valueSearch = " + valueSearch);
+		if (count <= 2)
+			new Throwable().printStackTrace();
 		
 		final byte[] lookupId;
 		final byte[] obsValue;
@@ -2893,10 +2894,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					router.contactAlive(_contact.getID(), new DHTControlContactImpl(_contact));
 				}
 
-				public void failed(DHTTransportContact _contact,
-					Throwable _error) {
+				public void failed(DHTTransportContact _contact, Throwable _error) {
 					if (DHTLog.isOn()) {
-						DHTLog.log("ping " + DHTLog.getString( _contact) + " -> failed: " + _error.getMessage());
+						DHTLog.log("ping " + DHTLog.getString(_contact) + " -> failed: " + _error.getMessage());
 					}
 					router.contactDead(_contact.getID(), false);
 				}

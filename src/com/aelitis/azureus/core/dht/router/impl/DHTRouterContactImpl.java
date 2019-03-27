@@ -54,14 +54,17 @@ public class DHTRouterContactImpl implements DHTRouterContact {
 		if (nodeId.length() > 8)
 			nodeId = nodeId.substring(0,8)+"...";
 		String address = "";
-		int nodeStatus = -1;
+		String nodeStatus = "UNKNOWN";
 		if (attachment != null) {
 			DHTTransportContact t_contact = ((DHTControlContact) this.attachment).getTransportContact();
 			address = t_contact.getAddress().toString();
-			if (t_contact instanceof DHTTransportUDPContactImpl)
-				nodeStatus = ((DHTTransportUDPContactImpl) t_contact).getNodeStatus();
+			if (t_contact instanceof DHTTransportUDPContactImpl) {
+				int _nodeStatus = ((DHTTransportUDPContactImpl) t_contact).getNodeStatus();
+				if (_nodeStatus == DHTTransportUDPContactImpl.NODE_STATUS_ROUTABLE)
+					nodeStatus = "ROUTABLE";
+			}
 		}
-		return String.format("nodeId= %s,addr=%s,sttus=%d", nodeId, address, nodeStatus);
+		return String.format("nodeId= %s,addr=%s,sttus=%s", nodeId, address, nodeStatus);
 	}
 	
 	protected DHTRouterContactImpl(

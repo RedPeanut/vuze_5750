@@ -292,7 +292,7 @@ public class Show extends IConsoleCommand {
 	 * @param dm
 	 * @param torrentNum
 	 */
-	private static void printTorrentDetails( PrintStream out, DownloadManager dm, int torrentNum, List<String> args) {
+	private static void printTorrentDetails(PrintStream out, DownloadManager dm, int torrentNum, List<String> args) {
 		String name = dm.getDisplayName();
 		if (name == null)
 			name = "?";
@@ -465,33 +465,34 @@ public class Show extends IConsoleCommand {
 				for (int j=0;j<nps.length;j++) {
 					np_str += (j==0?"":",") + nps[j];
 				}
-				ci.out.println( 	"DHT:ip=" + transport.getLocalContact().getAddress() +
-									",net=" + transport.getNetwork() +
-									",prot=V" + transport.getProtocolVersion() +
-									",np=" + np_str +
-									",sleeping=" + dht.isSleeping());
+				ci.out.println(		
+						"DHT:ip=" + transport.getLocalContact().getAddress() +
+						",net=" + transport.getNetwork() +
+						",prot=V" + transport.getProtocolVersion() +
+						",np=" + np_str +
+						",sleeping=" + dht.isSleeping());
 				ci.out.println(
-							"Router" +
-							":nodes=" + rs[DHTRouterStats.ST_NODES] +
-							",leaves=" + rs[DHTRouterStats.ST_LEAVES] +
-							",contacts=" + rs[DHTRouterStats.ST_CONTACTS] +
-							",replacement=" + rs[DHTRouterStats.ST_REPLACEMENTS] +
-							",live=" + rs[DHTRouterStats.ST_CONTACTS_LIVE] +
-							",unknown=" + rs[DHTRouterStats.ST_CONTACTS_UNKNOWN] +
-							",failing=" + rs[DHTRouterStats.ST_CONTACTS_DEAD]);
+						"Router" +
+						":nodes=" + rs[DHTRouterStats.ST_NODES] +
+						",leaves=" + rs[DHTRouterStats.ST_LEAVES] +
+						",contacts=" + rs[DHTRouterStats.ST_CONTACTS] +
+						",replacement=" + rs[DHTRouterStats.ST_REPLACEMENTS] +
+						",live=" + rs[DHTRouterStats.ST_CONTACTS_LIVE] +
+						",unknown=" + rs[DHTRouterStats.ST_CONTACTS_UNKNOWN] +
+						",failing=" + rs[DHTRouterStats.ST_CONTACTS_DEAD]);
 				ci.out.println(
-							"Transport" +
-							":" + t_stats.getString());
+						"Transport" +
+						":" + t_stats.getString());
 				int[] dbv_details = d_stats.getValueDetails();
 				ci.out.println(
-							"Control:dht=" + c_stats.getEstimatedDHTSize() +
-						   	", Database:keys=" + d_stats.getKeyCount() +
-						   	",vals=" + dbv_details[DHTDBStats.VD_VALUE_COUNT]+
-						   	",loc=" + dbv_details[DHTDBStats.VD_LOCAL_SIZE]+
-						   	",dir=" + dbv_details[DHTDBStats.VD_DIRECT_SIZE]+
-						   	",ind=" + dbv_details[DHTDBStats.VD_INDIRECT_SIZE]+
-						   	",div_f=" + dbv_details[DHTDBStats.VD_DIV_FREQ]+
-						   	",div_s=" + dbv_details[DHTDBStats.VD_DIV_SIZE]);
+						"Control:dht=" + c_stats.getEstimatedDHTSize() +
+						", Database:keys=" + d_stats.getKeyCount() +
+						",vals=" + dbv_details[DHTDBStats.VD_VALUE_COUNT]+
+						",loc=" + dbv_details[DHTDBStats.VD_LOCAL_SIZE]+
+						",dir=" + dbv_details[DHTDBStats.VD_DIRECT_SIZE]+
+						",ind=" + dbv_details[DHTDBStats.VD_INDIRECT_SIZE]+
+						",div_f=" + dbv_details[DHTDBStats.VD_DIV_FREQ]+
+						",div_s=" + dbv_details[DHTDBStats.VD_DIV_SIZE]);
 				dht.getRouter().print();
 			}
 		} catch (Throwable e) {

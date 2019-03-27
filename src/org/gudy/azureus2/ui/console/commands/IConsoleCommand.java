@@ -28,32 +28,34 @@ import org.gudy.azureus2.ui.console.ConsoleInput;
  * @author Tobias Minich
  */
 public abstract class IConsoleCommand {
+	
 	protected static final class TorrentComparator implements Comparator<DownloadManager> {
-			public final int compare(DownloadManager aDL, DownloadManager bDL) {
-				boolean aIsComplete = aDL.getStats().getDownloadCompleted(false) == 1000;
-				boolean bIsComplete = bDL.getStats().getDownloadCompleted(false) == 1000;
-				if (aIsComplete && !bIsComplete)
-					return 1;
-				if (!aIsComplete && bIsComplete)
-					return -1;
-				return aDL.getPosition() - bDL.getPosition();
-			}
+		public final int compare(DownloadManager aDL, DownloadManager bDL) {
+			boolean aIsComplete = aDL.getStats().getDownloadCompleted(false) == 1000;
+			boolean bIsComplete = bDL.getStats().getDownloadCompleted(false) == 1000;
+			if (aIsComplete && !bIsComplete)
+				return 1;
+			if (!aIsComplete && bIsComplete)
+				return -1;
+			return aDL.getPosition() - bDL.getPosition();
 		}
-	private String main_name;
-	private String short_name;
+	}
+	
+	private String mainName;
+	private String shortName;
 	private HashSet commands;
 
-	public IConsoleCommand(String main_name) {
-		this(main_name, null);
+	public IConsoleCommand(String mainName) {
+		this(mainName, null);
 	}
 
-	public IConsoleCommand(String main_name, String short_name) {
+	public IConsoleCommand(String mainName, String shortName) {
 		this.commands = new HashSet();
-		this.main_name = main_name;
-		this.short_name = short_name;
+		this.mainName = mainName;
+		this.shortName = shortName;
 
-		if (main_name != null)  {commands.add(main_name);}
-		if (short_name != null) {commands.add(short_name);}
+		if (mainName != null)  {commands.add(mainName);}
+		if (shortName != null) {commands.add(shortName);}
 	}
 
 	/**
@@ -112,8 +114,8 @@ public abstract class IConsoleCommand {
 		return Collections.unmodifiableSet(commands);
 	}
 
-	public final String getCommandName() {return this.main_name;}
-	public final String getShortCommandName() {return this.short_name;}
+	public final String getCommandName() {return this.mainName;}
+	public final String getShortCommandName() {return this.shortName;}
 
 
 	/**

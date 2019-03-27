@@ -131,12 +131,12 @@ public class Main {
 		initRootLogger();
 		
 		try {
-		 	CommandLine commands = parseCommands(args, true);
-		 	if (commands != null && directLaunch(args, commands)) {
-		 		return;
-		 	}
-		 	
-	 		// don't create core until we know we really need it
+			CommandLine commands = parseCommands(args, true);
+			if (commands != null && directLaunch(args, commands)) {
+				return;
+			}
+			
+			// don't create core until we know we really need it
 			if (mi) {
 				System.out.println("MULTI_INSTANCE enabled");
 				 	core = AzureusCoreFactory.create();
@@ -210,7 +210,7 @@ public class Main {
 		if (commands==null) {
 			commands = parseCommands(args, false);
 		}
-		if (commands!=null && ( args.length > 0 || new_core != null)) {
+		if (commands!=null && (args.length > 0 || new_core != null)) {
 			if (UIConst.UIS == null) {
 				UIConst.UIS = new HashMap();
 			}

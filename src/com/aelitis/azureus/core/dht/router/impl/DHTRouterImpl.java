@@ -21,6 +21,7 @@ package com.aelitis.azureus.core.dht.router.impl;
 
 import hello.util.Log;
 import hello.util.SingleCounter0;
+import hello.util.SingleCounter2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,9 +123,9 @@ public class DHTRouterImpl implements DHTRouter {
 		DHTRouterContactAttachment	_attachment,
 		DHTLogger					_logger) {
 
-		/*Log.d(TAG, "<init>() is called...");
-		Log.d(TAG, "_routerNodeId = " + Util.toHexString(_routerNodeId));
-		new Throwable().printStackTrace();*/
+		Log.d(TAG, "<init>() is called...");
+		//Log.d(TAG, "_routerNodeId = " + Util.toHexString(_routerNodeId));
+		new Throwable().printStackTrace();
 		
 		try {
 			// only needed for in-process multi-router testing :P
@@ -152,7 +153,7 @@ public class DHTRouterImpl implements DHTRouter {
 		buckets.add(localContact);
 		root = new DHTRouterNodeImpl(this, 0, true, buckets);
 		
-		print();
+		//print();
 		
 		timerEvent = SimpleTimer.addPeriodicEvent(
 			"DHTRouter:pinger",
@@ -573,7 +574,21 @@ public class DHTRouterImpl implements DHTRouter {
 		try {
 			monitor.enter();
 			List<DHTRouterContact> res = new ArrayList<>();
+			
+			boolean contains = false;
+			Throwable t = new Throwable();
+			StackTraceElement[] ste = t.getStackTrace();
+			for (int i = 0; i < ste.length; i++) {
+				if (ste[i].toString().contains("startLookup")) {
+					contains = true;
+					break;
+				}
+			}
+			
+			if (contains) Log.d(TAG, "-------------------------");
 			findClosestContacts(nodeId, numToReturn, 0, root, liveOnly, res);
+			if (contains) Log.d(TAG, "-------------------------");
+			
 			return (res);
 		} finally {
 			monitor.exit();
@@ -620,10 +635,13 @@ public class DHTRouterImpl implements DHTRouter {
 		List<DHTRouterContactImpl> buckets = currentNode.getBuckets();
 		
 		if (contains) {
+			String indent = "";
+			for (int i = 0; i < depth; i++)
+				indent += "  ";
 			if (buckets != null)
-				Log.d(TAG, String.format("buckets = %d%s", buckets.size(), buckets));
+				Log.d(TAG, String.format("%s%d%s", indent, buckets.size(), buckets));
 			else
-				Log.d(TAG, String.format("buckets = null"));
+				Log.d(TAG, String.format("%snull", indent));
 		}
 		
 		if (buckets != null) {
@@ -707,73 +725,48 @@ public class DHTRouterImpl implements DHTRouter {
 	}
 
 	protected long getNodeCount() {
-		return (getNodeCount( root));
+		return (getNodeCount(root));
 	}
 
-	protected long getNodeCount(
-		DHTRouterNodeImpl	node) {
+	protected long getNodeCount(DHTRouterNodeImpl node) {
 		if (node.getBuckets() != null) {
-
 			return (1);
-
 		} else {
-
-			return ( 1 + getNodeCount( node.getLeft())) + getNodeCount( node.getRight());
+			return (1 + getNodeCount(node.getLeft())) + getNodeCount(node.getRight());
 		}
 	}
 
 	protected long getContactCount() {
-		return (getContactCount( root));
+		return (getContactCount(root));
 	}
 
-	protected long getContactCount(
-		DHTRouterNodeImpl	node) {
+	protected long getContactCount(DHTRouterNodeImpl node) {
 		if (node.getBuckets() != null) {
-
-			return ( node.getBuckets().size());
-
+			return (node.getBuckets().size());
 		} else {
-
-			return ( getContactCount( node.getLeft())) + getContactCount( node.getRight());
+			return (getContactCount(node.getLeft())) + getContactCount(node.getRight());
 		}
 	}
 
-	public List
-	findBestContacts(
-		int		max) {
-		Set	set =
-			new TreeSet(
-					new Comparator() {
-						public int compare(
-							Object	o1,
-							Object	o2) {
-							DHTRouterContactImpl	c1 = (DHTRouterContactImpl)o1;
-							DHTRouterContactImpl	c2 = (DHTRouterContactImpl)o2;
-
-							return ((int)( c2.getTimeAlive() - c1.getTimeAlive()));
-						}
-					});
-
-
+	public List findBestContacts(int max) {
+		Set<Object> set = new TreeSet<Object>(new Comparator<Object>() {
+			public int compare(Object o1, Object o2) {
+				DHTRouterContactImpl c1 = (DHTRouterContactImpl) o1;
+				DHTRouterContactImpl c2 = (DHTRouterContactImpl) o2;
+				return ((int) (c2.getTimeAlive() - c1.getTimeAlive()));
+			}
+		});
 		try {
 			monitor.enter();
-
 			findAllContacts(set, root);
-
 		} finally {
-
 			monitor.exit();
 		}
-
-		List	result = new ArrayList(max);
-
-		Iterator	it = set.iterator();
-
+		List result = new ArrayList(max);
+		Iterator it = set.iterator();
 		while (it.hasNext() && (max <= 0 || result.size() < max)) {
-
-			result.add( it.next());
+			result.add(it.next());
 		}
-
 		return (result);
 	}
 
@@ -788,45 +781,32 @@ public class DHTRouterImpl implements DHTRouter {
 		}
 	}
 
-	protected void findAllContacts(
-		Set					set,
-		DHTRouterNodeImpl	node) {
-		List	buckets = node.getBuckets();
-
+	protected void findAllContacts(Set set, DHTRouterNodeImpl node) {
+		List buckets = node.getBuckets();
 		if (buckets == null) {
-
-			findAllContacts( set, node.getLeft());
-
-			findAllContacts( set, node.getRight());
+			findAllContacts(set, node.getLeft());
+			findAllContacts(set, node.getRight());
 		} else {
-
-			for (int i=0;i<buckets.size();i++) {
-
-				DHTRouterContactImpl	contact = (DHTRouterContactImpl)buckets.get(i);
-
+			for (int i = 0; i < buckets.size(); i++) {
+				DHTRouterContactImpl contact = (DHTRouterContactImpl) buckets.get(i);
 				set.add(contact);
 			}
 		}
 	}
 
-	protected void findAllContacts(
-		List				list,
-		DHTRouterNodeImpl	node) {
-		
-		//Log.d(TAG, "findAllContacts() is called...");
-		
+	protected void findAllContacts(List list, DHTRouterNodeImpl node) {
+		// Log.d(TAG, "findAllContacts() is called...");
 		List buckets = node.getBuckets();
 		if (buckets == null) {
 			findAllContacts(list, node.getLeft());
 			findAllContacts(list, node.getRight());
 		} else {
-			for (int i=0;i<buckets.size();i++) {
-				DHTRouterContactImpl contact = (DHTRouterContactImpl)buckets.get(i);
+			for (int i = 0; i < buckets.size(); i++) {
+				DHTRouterContactImpl contact = (DHTRouterContactImpl) buckets.get(i);
 				list.add(contact);
 			}
 		}
-		
-		//Log.d(TAG, "list.size() = " + list.size()); 
+		// Log.d(TAG, "list.size() = " + list.size());
 	}
 
 	public void seed() {
@@ -836,9 +816,14 @@ public class DHTRouterImpl implements DHTRouter {
 
 	protected void seedSupport() {
 		
-		/*Log.d(TAG, "seedSupport() is called...");
+		/*
 		Throwable t = new Throwable();
 		t.printStackTrace();*/
+		
+		int count = SingleCounter2.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format("seedSupport() is called... #%d", count));
+		if (count <= 2)
+			print();
 		
 		// refresh all buckets apart from closest neighbour
 		byte[]	path = new byte[routerNodeId.length];
@@ -878,36 +863,37 @@ public class DHTRouterImpl implements DHTRouter {
 			}
 			refreshNode(nodesToRefresh, node, path);
 		}
+		
 		// synchronous refresh may result in this bucket being split
 		// so we retest here to refresh sub-buckets as required
 		if (node.getBuckets() == null) {
-			int	depth = node.getDepth();
-			byte	mask = (byte)( 0x01<<(7-(depth%8)));
-			path[depth/8] = (byte)(path[depth/8] | mask);
-			refreshNodes(nodesToRefresh, node.getLeft(), path,seeding, maxPermittedIdle);
-			path[depth/8] = (byte)(path[depth/8] & ~mask);
-			refreshNodes(nodesToRefresh, node.getRight(), path,seeding, maxPermittedIdle);
+			int depth = node.getDepth();
+			byte mask = (byte) (0x01 << (7 - (depth % 8)));
+			path[depth / 8] = (byte) (path[depth / 8] | mask);
+			refreshNodes(nodesToRefresh, node.getLeft(), path, seeding, maxPermittedIdle);
+			path[depth / 8] = (byte) (path[depth / 8] & ~mask);
+			refreshNodes(nodesToRefresh, node.getRight(), path, seeding, maxPermittedIdle);
 		}
 	}
 
 	protected void refreshNode(
-		List				nodes_to_refresh,
-		DHTRouterNodeImpl	node,
-		byte[]				path) {
-			// pick a random id in the node's range.
-		byte[]	id = new byte[routerNodeId.length];
+			List nodesToRefresh,
+			DHTRouterNodeImpl node,
+			byte[] path) {
+		// pick a random id in the node's range.
+		byte[] id = new byte[routerNodeId.length];
 		random.nextBytes(id);
-		int	depth = node.getDepth();
-		for (int i=0;i<depth;i++) {
-			byte	mask = (byte)( 0x01<<(7-(i%8)));
-			boolean bit = ((path[i/8]>>(7-(i%8)))&0x01 ) == 1;
+		int depth = node.getDepth();
+		for (int i = 0; i < depth; i++) {
+			byte mask = (byte) (0x01 << (7 - (i % 8)));
+			boolean bit = ((path[i / 8] >> (7 - (i % 8))) & 0x01) == 1;
 			if (bit) {
-				id[i/8] = (byte)(id[i/8] | mask);
+				id[i / 8] = (byte) (id[i / 8] | mask);
 			} else {
-				id[i/8] = (byte)(id[i/8] & ~mask);
+				id[i / 8] = (byte) (id[i / 8] & ~mask);
 			}
 		}
-		nodes_to_refresh.add(id);
+		nodesToRefresh.add(id);
 	}
 
 	protected DHTRouterNodeImpl getSmallestSubtree() {
@@ -971,10 +957,10 @@ public class DHTRouterImpl implements DHTRouter {
 		if (outstandingPings.size() == 0) {
 			return;
 		}
-		List	pings;
+		List pings;
 		try {
 			monitor.enter();
-			pings	= outstandingPings;
+			pings = outstandingPings;
 			outstandingPings = new ArrayList();
 		} finally {
 			monitor.exit();
@@ -982,8 +968,8 @@ public class DHTRouterImpl implements DHTRouter {
 		if (suspended) {
 			return;
 		}
-		for (int i=0;i<pings.size();i++) {
-			adapter.requestPing((DHTRouterContactImpl)pings.get(i));
+		for (int i = 0; i < pings.size(); i++) {
+			adapter.requestPing((DHTRouterContactImpl) pings.get(i));
 		}
 	}
 
@@ -1141,9 +1127,13 @@ public class DHTRouterImpl implements DHTRouter {
 	}
 
 	public void print() {
+		
+		new Throwable().printStackTrace();
+		
 		try {
 			monitor.enter();
 			log("DHT: " + DHTLog.getString2(routerNodeId) + ", node count=" + getNodeCount()+ ", contacts=" + getContactCount());
+			Log.d(TAG, String.format("DHT: %s, node count = %d, contacts=%d", DHTLog.getString2(routerNodeId), getNodeCount(), getContactCount()));
 			root.print("", "");
 		} finally {
 			monitor.exit();
