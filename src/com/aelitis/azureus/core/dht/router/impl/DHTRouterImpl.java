@@ -20,8 +20,8 @@
 package com.aelitis.azureus.core.dht.router.impl;
 
 import hello.util.Log;
-import hello.util.SingleCounter0;
-import hello.util.SingleCounter2;
+import hello.util.SingleCounter1;
+import hello.util.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -575,7 +575,7 @@ public class DHTRouterImpl implements DHTRouter {
 			monitor.enter();
 			List<DHTRouterContact> res = new ArrayList<>();
 			
-			boolean contains = false;
+			/*boolean contains = false;
 			Throwable t = new Throwable();
 			StackTraceElement[] ste = t.getStackTrace();
 			for (int i = 0; i < ste.length; i++) {
@@ -583,11 +583,11 @@ public class DHTRouterImpl implements DHTRouter {
 					contains = true;
 					break;
 				}
-			}
+			}*/
 			
-			if (contains) Log.d(TAG, "-------------------------");
+			//if (contains) Log.d(TAG, "-------------------------");
 			findClosestContacts(nodeId, numToReturn, 0, root, liveOnly, res);
-			if (contains) Log.d(TAG, "-------------------------");
+			//if (contains) Log.d(TAG, "-------------------------");
 			
 			return (res);
 		} finally {
@@ -634,7 +634,7 @@ public class DHTRouterImpl implements DHTRouter {
 		
 		List<DHTRouterContactImpl> buckets = currentNode.getBuckets();
 		
-		if (contains) {
+		if (contains && SingleCounter1.getInstance().getAndIncreaseCount() <= 2) {
 			String indent = "";
 			for (int i = 0; i < depth; i++)
 				indent += "  ";
@@ -820,10 +820,16 @@ public class DHTRouterImpl implements DHTRouter {
 		Throwable t = new Throwable();
 		t.printStackTrace();*/
 		
-		int count = SingleCounter2.getInstance().getAndIncreaseCount();
+		/*int count = SingleCounter2.getInstance().getAndIncreaseCount();
 		Log.d(TAG, String.format("seedSupport() is called... #%d", count));
 		if (count <= 2)
-			print();
+			print();*/
+		
+		// this function called once
+		Log.d(TAG, String.format("seedSupport() is called..."));
+		
+		Log.d(TAG, ">>> before...");
+		print();
 		
 		// refresh all buckets apart from closest neighbour
 		byte[]	path = new byte[routerNodeId.length];
@@ -835,7 +841,16 @@ public class DHTRouterImpl implements DHTRouter {
 			monitor.exit();
 		}
 		
+		Log.d(TAG, ">>> after...");
+		print();
+		
+		Log.d(TAG, ">>> ids.size() = " + ids.size());
 		for (int i=0;i<ids.size();i++) {
+			// random id in the node's range.
+			/*String id = Util.toHexString((byte[])ids.get(i));
+			if (id.length() > 8)
+				id = id.substring(0,8)+"...";
+			Log.d(TAG, String.format("ids[%d]=%s",i,id));*/
 			requestLookup((byte[])ids.get(i), "Seeding DHT");
 		}
 	}
@@ -996,7 +1011,7 @@ public class DHTRouterImpl implements DHTRouter {
 						if (!contact.getPingOutstanding()) {
 							int	fails = contact.getFailCount();
 							if (fails > maxFails) {
-								maxFails			= fails;
+								maxFails		= fails;
 								maxFailsContact	= contact;
 							}
 						}
@@ -1067,9 +1082,7 @@ public class DHTRouterImpl implements DHTRouter {
 		return (id);
 	}
 
-	protected void requestLookup(
-		byte[]		id,
-		String		description) {
+	protected void requestLookup(byte[] id, String description) {
 		DHTLog.log("DHTRouter: requestLookup:" + DHTLog.getString(id));
 		adapter.requestLookup(id, description);
 	}
@@ -1128,7 +1141,7 @@ public class DHTRouterImpl implements DHTRouter {
 
 	public void print() {
 		
-		new Throwable().printStackTrace();
+		//new Throwable().printStackTrace();
 		
 		try {
 			monitor.enter();

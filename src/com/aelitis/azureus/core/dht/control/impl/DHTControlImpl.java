@@ -527,7 +527,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 							false,				
 							id,					
 							description,		
-							(byte)0,			
+							(byte)0,			// short flags
 							false,				// boolean valueSearch: 
 							5*60*1000,			// long timeout: upper bound on this refresh/seeding operation
 							searchConcurrency,	
@@ -921,9 +921,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	protected void put(
-		final ThreadPool					thread_pool,
-		final boolean						high_priority,
-		final byte[]						initial_encoded_key,
+		final ThreadPool					threadPool,
+		final boolean						highPriority,
+		final byte[]						initialEncodedKey,
 		final String						description,
 		final DHTTransportValue[]			values,
 		final short							flags,
@@ -940,7 +940,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					null,
 					true,
 					true,
-					initial_encoded_key,
+					initialEncodedKey,
 					DHT.DT_NONE,
 					original_mappings,
 					getMaxDivDepth());
@@ -953,8 +953,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		
 		// may be > 1 if diversification is replicating (for load balancing)
 		for (int i=0;i<encoded_keys.length;i++) {
-			final byte[]	encoded_key	= encoded_keys[i];
-			HashWrapper	hw = new HashWrapper(encoded_key);
+			final byte[]	encodedKey	= encoded_keys[i];
+			HashWrapper	hw = new HashWrapper(encodedKey);
 			synchronized(things_written) {
 				if (things_written.contains( hw)) {
 					// System.out.println("put: skipping key as already written");
@@ -963,15 +963,16 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				things_written.add(hw);
 			}
 			
-			final String this_description =
-				Arrays.equals(encoded_key, initial_encoded_key) ?
+			final String thisDescription =
+				Arrays.equals(encodedKey, initialEncodedKey) ?
 						description :
 						("Diversification of [" + description + "]");
 			
-			lookup(thread_pool,
-					high_priority,
-					encoded_key,
-					this_description,
+			lookup(
+					threadPool,
+					highPriority,
+					encodedKey,
+					thisDescription,
 					(short)(flags | DHT.FLAG_LOOKUP_FOR_STORE),
 					false, // boolean valueSearch
 					timeout,
@@ -987,11 +988,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 						}
 						
 						public void closest(List _closest) {
-							put( 	
-								thread_pool,
-								high_priority,
-								new byte[][]{ encoded_key },
-								"Store of [" + this_description + "]",
+							put(
+								threadPool,
+								highPriority,
+								new byte[][]{ encodedKey },
+								"Store of [" + thisDescription + "]",
 								new DHTTransportValue[][]{ values },
 								flags,
 								_closest,
@@ -1169,32 +1170,32 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	protected void put(
-		final ThreadPool						thread_pool,
-		final boolean							high_priority,
-		byte[][]								initial_encoded_keys,
-		final String							description,
-		final DHTTransportValue[][]				initial_value_sets,
-		final short								flags,
-		final List								contacts,
-		final long								timeout,
-		final DHTOperationListenerDemuxer		listener,
-		final boolean							consider_diversification,
-		final Set								things_written,
-		final int								put_level,
-		final boolean							immediate) {
+		final ThreadPool					threadPool,
+		final boolean						highPriority,
+		byte[][]							initialEncodedKeys,
+		final String						description,
+		final DHTTransportValue[][]			initialValueSets,
+		final short							flags,
+		final List							contacts,
+		final long							timeout,
+		final DHTOperationListenerDemuxer	listener,
+		final boolean						considerDiversification,
+		final Set							thingsWritten,
+		final int							putLevel,
+		final boolean						immediate) {
 		
-		int max_depth = getMaxDivDepth();
-		if (put_level > max_depth) {
-			Debug.out("Put level exceeded, terminating diversification (level=" + put_level + ",max=" + max_depth + ")");
+		int maxDepth = getMaxDivDepth();
+		if (putLevel > maxDepth) {
+			Debug.out("Put level exceeded, terminating diversification (level=" + putLevel + ",max=" + maxDepth + ")");
 			listener.incrementCompletes();
 			listener.complete(false);
 			return;
 		}
 		
-		boolean[]	ok = new boolean[initial_encoded_keys.length];
+		boolean[]	ok = new boolean[initialEncodedKeys.length];
 		int	failed = 0;
-		for (int i=0;i<initial_encoded_keys.length;i++) {
-			if (! (ok[i] = !database.isKeyBlocked(initial_encoded_keys[i]))) {
+		for (int i=0;i<initialEncodedKeys.length;i++) {
+			if (! (ok[i] = !database.isKeyBlocked(initialEncodedKeys[i]))) {
 				failed++;
 			}
 		}
@@ -1206,14 +1207,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			return;
 		}
 		
-		final byte[][] 				encoded_keys 	= failed==0?initial_encoded_keys:new byte[ok.length-failed][];
-		final DHTTransportValue[][] value_sets 		= failed==0?initial_value_sets:new DHTTransportValue[ok.length-failed][];
+		final byte[][] 				encoded_keys 	= failed==0?initialEncodedKeys:new byte[ok.length-failed][];
+		final DHTTransportValue[][] value_sets 		= failed==0?initialValueSets:new DHTTransportValue[ok.length-failed][];
 		if (failed > 0) {
 			int	pos = 0;
 			for (int i=0;i<ok.length;i++) {
 				if (ok[i]) {
-					encoded_keys[ pos ] = initial_encoded_keys[i];
-					value_sets[ pos ] 	= initial_value_sets[i];
+					encoded_keys[ pos ] = initialEncodedKeys[i];
+					value_sets[ pos ] 	= initialValueSets[i];
 					pos++;
 				}
 			}
@@ -1248,16 +1249,15 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				skipped++;
 			} else {
 				boolean skip_this = false;
-				synchronized(things_written) {
-					if (things_written.contains(contact)) {
-
+				synchronized(thingsWritten) {
+					if (thingsWritten.contains(contact)) {
 						// if we've come back to an already hit contact due to a diversification loop
 						// then ignore it
 						// Debug.out("Put: contact encountered for a second time, ignoring");
 						skipped++;
 						skip_this	= true;
 					} else {
-						things_written.add(contact);
+						thingsWritten.add(contact);
 					}
 				}
 				
@@ -1285,7 +1285,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 										router.contactAlive( _contact.getID(), new DHTControlContactImpl(_contact));
 										// can be null for old protocol versions
 										boolean div_done = false;
-										if (consider_diversification && _diversifications != null) {
+										if (considerDiversification && _diversifications != null) {
 											for (int j=0;j<_diversifications.length;j++) {
 												if (_diversifications[j] != DHT.DT_NONE && !diversified[j]) {
 													div_done = true;
@@ -1295,16 +1295,16 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 													logDiversification(_contact, encoded_keys, diversified_keys);
 													for (int k=0;k<diversified_keys.length;k++) {
-														put( 	thread_pool,
-																high_priority,
+														put(	threadPool,
+																highPriority,
 																diversified_keys[k],
 																"Diversification of [" + description + "]",
 																value_sets[j],
 																flags,
 																timeout,
 																false,
-																things_written,
-																put_level + 1,
+																thingsWritten,
+																putLevel + 1,
 																listener);
 													}
 												}
@@ -1314,28 +1314,28 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 										if (!div_done) {
 											if (obs_keys != null) {
 												contact.sendStore(
-														new DHTTransportReplyHandlerAdapter() {
-															public void storeReply(
-																DHTTransportContact _contact,
-																byte[]				_diversifications) {
-																if (DHTLog.isOn()) {
-																	DHTLog.log("Obs store OK " + DHTLog.getString( _contact));
-																}
-																listener.complete(false);
+													new DHTTransportReplyHandlerAdapter() {
+														public void storeReply(
+															DHTTransportContact _contact,
+															byte[]				_diversifications) {
+															if (DHTLog.isOn()) {
+																DHTLog.log("Obs store OK " + DHTLog.getString( _contact));
 															}
-															
-															public void failed(
-																DHTTransportContact 	_contact,
-																Throwable 				_error) {
-																if (DHTLog.isOn()) {
-																	DHTLog.log("Obs store failed " + DHTLog.getString( _contact) + " -> failed: " + _error.getMessage());
-																}
-																listener.complete(true);
+															listener.complete(false);
+														}
+														
+														public void failed(
+															DHTTransportContact 	_contact,
+															Throwable 				_error) {
+															if (DHTLog.isOn()) {
+																DHTLog.log("Obs store failed " + DHTLog.getString( _contact) + " -> failed: " + _error.getMessage());
 															}
-														},
-														obs_keys,
-														obs_vals,
-														immediate);
+															listener.complete(true);
+														}
+													},
+													obs_keys,
+													obs_vals,
+													immediate);
 												complete_is_async = true;
 											}
 										}
@@ -1613,31 +1613,33 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				}
 			};
 
-		lookup( 	externalLookupPool,
-					highPriority,
-					encodedKey,
-					description,
-					(byte)0,
-					false, // boolean valueSearch
-					timeout,
-					searchConcurrency,
-					1,
-					router.getK(),
-					new LookupResultHandler(delegate) {
-			
-						public void diversify(
-							DHTTransportContact	cause,
-							byte				diversification_type) {
-							diversified("Diversification of [lookup]");
-							diversified[0] = true;
-						}
+		lookup(
+				externalLookupPool,
+				highPriority,
+				encodedKey,
+				description,
+				(byte)0,
+				false,				// boolean valueSearch
+				timeout,
+				searchConcurrency,
+				1,
+				router.getK(),
+				new LookupResultHandler(delegate) {
+		
+					public void diversify(
+						DHTTransportContact	cause,
+						byte				diversification_type) {
+						diversified("Diversification of [lookup]");
+						diversified[0] = true;
+					}
 
-						public void closest(List closest) {
-							for (int i=0;i<closest.size();i++) {
-								lookupListener.found((DHTTransportContact)closest.get(i),true);
-							}
+					public void closest(List closest) {
+						for (int i=0;i<closest.size();i++) {
+							lookupListener.found((DHTTransportContact)closest.get(i),true);
 						}
-					});
+					}
+				}
+		);
 
 		sem.reserve();
 
@@ -1676,12 +1678,13 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			}
 			boolean	is_stats_query = (flags & DHT.FLAG_STATS ) != 0;
 			result.add(
-				lookup(externalLookupPool,
+				lookup(
+					externalLookupPool,
 					high_priority,
 					encoded_key,
 					this_description,
-					flags,
-					true, // boolean valueSearch
+					flags,				
+					true,				// boolean valueSearch
 					timeout,
 					is_stats_query?searchConcurrency*2:searchConcurrency,
 					max_values,
@@ -1842,12 +1845,18 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final int 					searchAccuracy,
 		final LookupResultHandler	handler) {
 		
-		int count = SingleCounter0.getInstance().getAndIncreaseCount();
-		Log.d(TAG, String.format(">>> lookup() is called... #%d", count));
+		if ( 
+				   (flags & DHT.FLAG_LOOKUP_FOR_STORE) == 1
+				|| valueSearch
+		)
+			new Throwable().printStackTrace();
+		
+		/*int count = SingleCounter0.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format("lookup() is called... #%d", count));
 		Log.d(TAG, "_lookupId = " + Util.toHexString(_lookupId));
 		Log.d(TAG, "valueSearch = " + valueSearch);
 		if (count <= 2)
-			new Throwable().printStackTrace();
+			new Throwable().printStackTrace();*/
 		
 		final byte[] lookupId;
 		final byte[] obsValue;
@@ -2893,7 +2902,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					}
 					router.contactAlive(_contact.getID(), new DHTControlContactImpl(_contact));
 				}
-
+				
 				public void failed(DHTTransportContact _contact, Throwable _error) {
 					if (DHTLog.isOn()) {
 						DHTLog.log("ping " + DHTLog.getString(_contact) + " -> failed: " + _error.getMessage());
@@ -3704,7 +3713,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 						", network=" + transport.getNetwork() +
 						", protocol=V" + transport.getProtocolVersion() +
 						", nps=" + np_str + ", est_size=" + getTransportEstimatedDHTSize());
-		router.print();
+		//router.print();
 		database.print(full);
 		/*
 		List	c = getContacts();
@@ -3956,7 +3965,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 		public DHTTransportContact
 		getOriginator() {
-			return (new anonContact( delegate.getOriginator()));
+			return (new AnonContact( delegate.getOriginator()));
 		}
 
 		public int getFlags() {
@@ -3987,142 +3996,119 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		}
 	}
 
-	protected static class
-	anonContact
-		implements DHTTransportContact
-	{
-		private static InetSocketAddress anon_address;
+	protected static class AnonContact implements DHTTransportContact {
+		
+		private static InetSocketAddress anonAddress;
 
-		static{
+		static {
 			try {
-				anon_address = new InetSocketAddress(InetAddress.getByName("0.0.0.0"), 0);
-
+				anonAddress = new InetSocketAddress(InetAddress.getByName("0.0.0.0"), 0);
 			} catch (Throwable e) {
-
 				Debug.printStackTrace(e);
 			}
 		}
 
 		private final DHTTransportContact	delegate;
 
-		protected
-		anonContact(
-			DHTTransportContact		c) {
+		protected AnonContact(DHTTransportContact c) {
 			delegate = c;
 		}
 
 		public int getMaxFailForLiveCount() {
-			return ( delegate.getMaxFailForLiveCount());
+			return (delegate.getMaxFailForLiveCount());
 		}
 
 		public int getMaxFailForUnknownCount() {
-			return ( delegate.getMaxFailForUnknownCount());
+			return (delegate.getMaxFailForUnknownCount());
 		}
 
 		public int getInstanceID() {
-			return ( delegate.getInstanceID());
+			return (delegate.getInstanceID());
 		}
 
-		public byte[]
-		getID() {
+		public byte[] getID() {
 			Debug.out("hmm");
 
-			return ( delegate.getID());
+			return (delegate.getID());
 		}
 
-		public byte
-		getProtocolVersion() {
-			return ( delegate.getProtocolVersion());
+		public byte getProtocolVersion() {
+			return (delegate.getProtocolVersion());
 		}
 
 		public long getClockSkew() {
-			return ( delegate.getClockSkew());
+			return (delegate.getClockSkew());
 		}
 
 		public int getRandomIDType() {
-			return ( delegate.getRandomIDType());
+			return (delegate.getRandomIDType());
 		}
 
-		public void setRandomID(
-			int	id) {
+		public void setRandomID(int id) {
 			delegate.setRandomID(id);
 		}
 
 		public int getRandomID() {
-			return ( delegate.getRandomID());
+			return (delegate.getRandomID());
 		}
 
-		public void setRandomID2(
-			byte[]		id) {
+		public void setRandomID2(byte[] id) {
 			delegate.setRandomID2(id);
 		}
 
-		public byte[]
-		getRandomID2() {
+		public byte[] getRandomID2() {
 			return (delegate.getRandomID2());
 		}
 
 		public String getName() {
-			return ( delegate.getName());
+			return (delegate.getName());
 		}
 
-		public byte[]
-		getBloomKey() {
+		public byte[] getBloomKey() {
 			return (delegate.getBloomKey());
 		}
 
-		public InetSocketAddress
-		getAddress() {
-			return (anon_address);
+		public InetSocketAddress getAddress() {
+			return (anonAddress);
 		}
 
-		public InetSocketAddress
-		getTransportAddress() {
-			return ( getAddress());
+		public InetSocketAddress getTransportAddress() {
+			return (getAddress());
 		}
 
-		public InetSocketAddress
-		getExternalAddress() {
-			return ( getAddress());
+		public InetSocketAddress getExternalAddress() {
+			return (getAddress());
 		}
 
-		public Map<String, Object>
-		exportContactToMap() {
-			return ( delegate.exportContactToMap());
+		public Map<String, Object> exportContactToMap() {
+			return (delegate.exportContactToMap());
 		}
 
-		public boolean isAlive(
-			long		timeout) {
-			return (delegate.isAlive( timeout));
+		public boolean isAlive(long timeout) {
+			return (delegate.isAlive(timeout));
 		}
 
-		public void isAlive(
-			DHTTransportReplyHandler	handler,
-			long						timeout) {
+		public void isAlive(DHTTransportReplyHandler handler, long timeout) {
 			delegate.isAlive(handler, timeout);
 		}
 
 		public boolean isValid() {
-			return ( delegate.isValid());
+			return (delegate.isValid());
 		}
 
 		public boolean isSleeping() {
-			return ( delegate.isSleeping());
+			return (delegate.isSleeping());
 		}
 
-		public void sendPing(
-			DHTTransportReplyHandler	handler) {
+		public void sendPing(DHTTransportReplyHandler handler) {
 			delegate.sendPing(handler);
 		}
 
-		public void sendImmediatePing(
-			DHTTransportReplyHandler	handler,
-			long						timeout) {
+		public void sendImmediatePing(DHTTransportReplyHandler handler, long timeout) {
 			delegate.sendImmediatePing(handler, timeout);
 		}
 
-		public void sendStats(
-			DHTTransportReplyHandler	handler) {
+		public void sendStats(DHTTransportReplyHandler handler) {
 			delegate.sendStats(handler);
 		}
 
@@ -4201,19 +4187,18 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		implements DHTTransportStoreReply
 	{
 		private byte[]	divs;
-		private byte[]	block_request;
-		private byte[]	block_sig;
+		private byte[]	blockRequest;
+		private byte[]	blockSig;
 
-		protected DHTTransportStoreReplyImpl(
-			byte[]		_divs) {
-			divs	= _divs;
+		protected DHTTransportStoreReplyImpl(byte[] _divs) {
+			divs = _divs;
 		}
 
 		protected DHTTransportStoreReplyImpl(
 			byte[]		_bk,
 			byte[]		_bs) {
-			block_request	= _bk;
-			block_sig		= _bs;
+			blockRequest	= _bk;
+			blockSig		= _bs;
 		}
 
 		public byte[] getDiversificationTypes() {
@@ -4221,15 +4206,15 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		}
 
 		public boolean blocked() {
-			return (block_request != null);
+			return (blockRequest != null);
 		}
 
 		public byte[] getBlockRequest() {
-			return (block_request);
+			return (blockRequest);
 		}
 
 		public byte[] getBlockSignature() {
-			return (block_sig);
+			return (blockSig);
 		}
 	}
 
@@ -4313,22 +4298,22 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		}
 		
 		private void cancel() {
-			Object	to_cancel;
+			Object	toCancel;
 			synchronized(this) {
 				if (cancelled) {
 					return;
 				}
 				cancelled = true;
-				to_cancel = things;
+				toCancel = things;
 				things = null;
 			}
-			if (to_cancel != null) {
-				if (to_cancel instanceof DhtTask) {
-					((DhtTask)to_cancel).cancel();
-				} else if (to_cancel instanceof DhtTaskSet) {
-					((DhtTaskSet)to_cancel).cancel();
+			if (toCancel != null) {
+				if (toCancel instanceof DhtTask) {
+					((DhtTask)toCancel).cancel();
+				} else if (toCancel instanceof DhtTaskSet) {
+					((DhtTaskSet)toCancel).cancel();
 				} else {
-					List	l = (List)to_cancel;
+					List	l = (List)toCancel;
 					for (int i=0;i<l.size();i++) {
 						Object o = l.get(i);
 						if (o instanceof DhtTask) {
@@ -4342,8 +4327,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		}
 		
 		private boolean isCancelled() {
-			synchronized(this) {
-				return ( cancelled);
+			synchronized (this) {
+				return (cancelled);
 			}
 		}
 	}

@@ -380,19 +380,19 @@ public class DHTTransportUDPContactImpl implements DHTTransportUDPContact {
 		return (networkPositions);
 	}
 
-  	public DHTNetworkPosition getNetworkPosition(byte position_type) {
-  		for (int i=0;i<networkPositions.length;i++) {
-  			if (networkPositions[i].getPositionType() == position_type) {
-  				return (networkPositions[i]);
-  			}
-  		}
-  		return (null);
-  	}
+	public DHTNetworkPosition getNetworkPosition(byte position_type) {
+		for (int i=0;i<networkPositions.length;i++) {
+			if (networkPositions[i].getPositionType() == position_type) {
+				return (networkPositions[i]);
+			}
+		}
+		return (null);
+	}
 
 	public String getString() {
-		if (transportAddress.equals( externalAddress)) {
-			return ( DHTLog.getString2(id) + "["+transportAddress.toString()+",V" + getProtocolVersion() +"]");
+		if (transportAddress.equals(externalAddress)) {
+			return (DHTLog.getString2(id) + "["+transportAddress.toString()+",V" + getProtocolVersion() +"]");
 		}
-		return ( DHTLog.getString2(id) + "[tran="+transportAddress.toString()+",ext="+externalAddress+",V" + getProtocolVersion() +"]");
+		return (DHTLog.getString2(id) + "[tran="+transportAddress.toString()+",ext="+externalAddress+",V" + getProtocolVersion() +"]");
 	}
 }

@@ -24,17 +24,8 @@ package com.aelitis.azureus.core.dht.router;
  *
  */
 
-public interface
-DHTRouterAdapter
-{
-	public void requestAdd(
-		DHTRouterContact	contact);
-
-	public void requestPing(
-		DHTRouterContact	contact);
-
-	public void requestLookup(
-		byte[]	id,
-		String	description);
-
+public interface DHTRouterAdapter {
+	public void requestAdd(DHTRouterContact contact);
+	public void requestPing(DHTRouterContact contact);
+	public void requestLookup(byte[] id, String description);
 }

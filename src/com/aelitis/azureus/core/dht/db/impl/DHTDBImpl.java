@@ -792,419 +792,255 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 	protected int[]
 	republishCachedMappings() {
 		if (suspended) {
-
 			logger.log("Cache republish skipped as suspended");
-
 			return (new int[]{ 0, 0, 0 });
 		}
-
 			// first refresh any leaves that have not performed at least one lookup in the
 			// last period
-
 		router.refreshIdleLeaves(cache_republish_interval);
-
 		final Map<HashWrapper,List<DHTDBValueImpl>>	republish = new HashMap<HashWrapper,List<DHTDBValueImpl>>();
-
 		List<DHTDBMapping>	republish_via_survey = new ArrayList<DHTDBMapping>();
-
 		long	now = System.currentTimeMillis();
-
 		try {
 			this_mon.enter();
-
 			checkCacheExpiration(true);
-
 			Iterator<Map.Entry<HashWrapper,DHTDBMapping>>	it = storedValues.entrySet().iterator();
-
 			while (it.hasNext()) {
-
 				Map.Entry<HashWrapper,DHTDBMapping>	entry = it.next();
-
 				HashWrapper			key		= entry.getKey();
-
 				DHTDBMapping		mapping	= entry.getValue();
-
 					// assume that if we've diversified then the other k-1 locations are under similar
 					// stress and will have done likewise - no point in republishing cache values to them
 					// New nodes joining will have had stuff forwarded to them regardless of diversification
 					// status
-
 				if (mapping.getDiversificationType() != DHT.DT_NONE) {
-
 					continue;
 				}
-
 				Iterator<DHTDBValueImpl>	it2 = mapping.getValues();
-
 				boolean	all_rf_values = it2.hasNext();
-
 				List<DHTDBValueImpl>	values = new ArrayList<DHTDBValueImpl>();
-
 				while (it2.hasNext()) {
-
 					DHTDBValueImpl	value = it2.next();
-
 					if (value.isLocal()) {
-
 						all_rf_values = false;
-
 					} else {
-
 						if (value.getReplicationFactor() == DHT.REP_FACT_DEFAULT) {
-
 							all_rf_values = false;
 						}
-
 							// if this value was stored < period ago then we assume that it was
 							// also stored to the other k-1 locations at the same time and therefore
 							// we don't need to re-store it
-
 						if (now < value.getStoreTime()) {
-
 								// deal with clock changes
-
 							value.setStoreTime(now);
-
 						} else if (now - value.getStoreTime() <= cache_republish_interval) {
-
 							// System.out.println("skipping store");
-
 						} else {
-
 							values.add(value);
 						}
 					}
 				}
-
 				if (all_rf_values) {
-
 						// if surveying is disabled then we swallow values here to prevent them
 						// from being replicated using the existing technique and muddying the waters
-
 					values.clear();	// handled by the survey process
-
 					republish_via_survey.add(mapping);
 				}
-
 				if (values.size() > 0) {
-
 					republish.put(key, values);
 				}
 			}
 		} finally {
-
 			this_mon.exit();
 		}
-
 		if (republish_via_survey.size() > 0) {
-
 				// we still check for being too far away here
-
 			List<HashWrapper>	stop_caching = new ArrayList<HashWrapper>();
-
 			for (DHTDBMapping mapping: republish_via_survey) {
-
 				HashWrapper			key		= mapping.getKey();
-
 				byte[]	lookup_id	= key.getHash();
-
 				List<DHTTransportContact>	contacts = control.getClosestKContactsList(lookup_id, false);
-
 					// if we are no longer one of the K closest contacts then we shouldn't
 					// cache the value
-
 				boolean	keep_caching	= false;
-
 				for (int j=0;j<contacts.size();j++) {
-
 					if (router.isID(((DHTTransportContact)contacts.get(j)).getID())) {
-
 						keep_caching	= true;
-
 						break;
 					}
 				}
-
 				if (!keep_caching) {
-
 					DHTLog.log("Dropping cache entry for " + DHTLog.getString( lookup_id ) + " as now too far away");
-
 					stop_caching.add(key);
 				}
 			}
-
 			if (stop_caching.size() > 0) {
-
 				try {
 					this_mon.enter();
-
 					for (int i=0;i<stop_caching.size();i++) {
-
 						DHTDBMapping	mapping = (DHTDBMapping)storedValues.remove( stop_caching.get(i));
-
 						if (mapping != null) {
-
 							removeFromPrefixMap(mapping);
-
 							mapping.destroy();
 						}
 					}
 				} finally {
-
 					this_mon.exit();
 				}
 			}
 		}
-
 		final int[]	values_published	= {0};
 		final int[]	keys_published		= {0};
 		final int[]	republish_ops		= {0};
-
 		final HashSet<DHTTransportContact>	anti_spoof_done	= new HashSet<DHTTransportContact>();
-
 		if (republish.size() > 0) {
-
 			// System.out.println("cache replublish");
-
 				// The approach is to refresh all leaves in the smallest subtree, thus populating the tree with
 				// sufficient information to directly know which nodes to republish the values
 				// to.
-
 				// However, I'm going to rely on the "refresh idle leaves" logic above
 				// (that's required to keep the DHT alive in general) to ensure that all
 				// k-buckets are reasonably up-to-date
-
 			Iterator<Map.Entry<HashWrapper,List<DHTDBValueImpl>>>	it1 = republish.entrySet().iterator();
-
 			List<HashWrapper>	stop_caching = new ArrayList<HashWrapper>();
-
 				// build a map of contact -> list of keys to republish
-
 			Map<HashWrapper,Object[]>	contact_map	= new HashMap<HashWrapper,Object[]>();
-
 			while (it1.hasNext()) {
-
 				Map.Entry<HashWrapper,List<DHTDBValueImpl>>	entry = it1.next();
-
 				HashWrapper			key		= entry.getKey();
-
 				byte[]	lookup_id	= key.getHash();
-
 					// just use the closest contacts - if some have failed then they'll
 					// get flushed out by this operation. Grabbing just the live ones
 					// is a bad idea as failures may rack up against the live ones due
 					// to network problems and kill them, leaving the dead ones!
-
 				List<DHTTransportContact>	contacts = control.getClosestKContactsList(lookup_id, false);
-
 					// if we are no longer one of the K closest contacts then we shouldn't
 					// cache the value
-
 				boolean	keep_caching	= false;
-
 				for (int j=0;j<contacts.size();j++) {
-
 					if (router.isID(((DHTTransportContact)contacts.get(j)).getID())) {
-
 						keep_caching	= true;
-
 						break;
 					}
 				}
-
 				if (!keep_caching) {
-
 					DHTLog.log("Dropping cache entry for " + DHTLog.getString( lookup_id ) + " as now too far away");
-
 					stop_caching.add(key);
-
 						// we carry on and do one last publish
-
 				}
-
 				for (int j=0;j<contacts.size();j++) {
-
 					DHTTransportContact	contact = (DHTTransportContact)contacts.get(j);
-
 					if (router.isID( contact.getID())) {
-
 						continue;	// ignore ourselves
 					}
-
 					Object[]	data = (Object[])contact_map.get(new HashWrapper(contact.getID()));
-
 					if (data == null) {
-
 						data	= new Object[]{ contact, new ArrayList<HashWrapper>()};
-
 						contact_map.put(new HashWrapper(contact.getID()), data);
 					}
-
 					((List<HashWrapper>)data[1]).add(key);
 				}
 			}
-
 			Iterator<Object[]> it2 = contact_map.values().iterator();
-
 			final int	con_tot 	= contact_map.size();
 			int con_num 	= 0;
-
 			while (it2.hasNext()) {
-
 				con_num++;
-
 				final int f_con_num = con_num;
-
 				final Object[]	data = it2.next();
-
 				final DHTTransportContact	contact = (DHTTransportContact)data[0];
-
 					// move to anti-spoof on cache forwards - gotta do a find-node first
 					// to get the random id
-
 				final AESemaphore	sem = new AESemaphore("DHTDB:cacheForward");
-
 				contact.sendFindNode(
 						new DHTTransportReplyHandlerAdapter() {
 							public void findNodeReply(
 								DHTTransportContact 	_contact,
 								DHTTransportContact[]	_contacts) {
 								anti_spoof_done.add(_contact);
-
 								try {
 									// System.out.println("cacheForward: pre-store findNode OK");
-
 									List<HashWrapper>				keys	= (List<HashWrapper>)data[1];
-
 									byte[][]				store_keys 		= new byte[keys.size()][];
 									DHTTransportValue[][]	store_values 	= new DHTTransportValue[store_keys.length][];
-
 									keys_published[0] += store_keys.length;
-
 									for (int i=0;i<store_keys.length;i++) {
-
 										HashWrapper	wrapper = keys.get(i);
-
 										store_keys[i] = wrapper.getHash();
-
 										List<DHTDBValueImpl>		values	= republish.get(wrapper);
-
 										store_values[i] = new DHTTransportValue[values.size()];
-
 										values_published[0] += store_values[i].length;
-
 										for (int j=0;j<values.size();j++) {
-
 											DHTDBValueImpl	value	= values.get(j);
-
 												// we reduce the cache distance by 1 here as it is incremented by the
 												// recipients
-
 											store_values[i][j] = value.getValueForRelay(local_contact);
 										}
 									}
-
 									List<DHTTransportContact>	contacts = new ArrayList<DHTTransportContact>();
-
 									contacts.add(contact);
-
 									republish_ops[0]++;
-
 									control.putDirectEncodedKeys(
 											store_keys,
 											"Republish cache: " + f_con_num + " of " + con_tot,
 											store_values,
 											contacts);
 								} finally {
-
 									sem.release();
 								}
 							}
-
 							public void failed(
 								DHTTransportContact 	_contact,
 								Throwable				_error) {
 								try {
 									// System.out.println("cacheForward: pre-store findNode Failed");
-
 									DHTLog.log("cacheForward: pre-store findNode failed " + DHTLog.getString( _contact) + " -> failed: " + _error.getMessage());
-
 									router.contactDead( _contact.getID(), false);
-
 								} finally {
-
 									sem.release();
 								}
 							}
 						},
 						contact.getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_ANTI_SPOOF2?new byte[0]:new byte[20],
 						DHT.FLAG_LOOKUP_FOR_STORE);
-
 				sem.reserve();
 			}
-
 			try {
 				this_mon.enter();
-
 				for (int i=0;i<stop_caching.size();i++) {
-
 					DHTDBMapping	mapping = (DHTDBMapping)storedValues.remove( stop_caching.get(i));
-
 					if (mapping != null) {
-
 						removeFromPrefixMap(mapping);
-
 						mapping.destroy();
 					}
 				}
 			} finally {
-
 				this_mon.exit();
 			}
 		}
-
 		DHTStorageBlock[]	direct_key_blocks = getDirectKeyBlocks();
-
 		if (direct_key_blocks.length > 0) {
-
 			for (int i=0;i<direct_key_blocks.length;i++) {
-
 				final DHTStorageBlock	key_block = direct_key_blocks[i];
-
 				List	contacts = control.getClosestKContactsList(key_block.getKey(), false);
-
 				boolean	forward_it = false;
-
 					// ensure that the key is close enough to us
-
 				for (int j=0;j<contacts.size();j++) {
-
 					final DHTTransportContact	contact = (DHTTransportContact)contacts.get(j);
-
 					if (router.isID( contact.getID())) {
-
 						forward_it	= true;
-
 						break;
 					}
 				}
-
 				for (int j=0; forward_it && j<contacts.size();j++) {
-
 					final DHTTransportContact	contact = (DHTTransportContact)contacts.get(j);
-
 					if (key_block.hasBeenSentTo( contact)) {
-
 						continue;
 					}
-
 					if (router.isID( contact.getID())) {
-
 						continue;	// ignore ourselves
 					}
-
 					if (contact.getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_BLOCK_KEYS) {
-
 						final Runnable task =
 							new Runnable() {
 								public void run() {
@@ -1213,10 +1049,8 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 											public void keyBlockReply(
 												DHTTransportContact 	_contact) {
 												DHTLog.log("key block forward ok " + DHTLog.getString( _contact));
-
 												key_block.sentTo(_contact);
 											}
-
 											public void failed(
 												DHTTransportContact 	_contact,
 												Throwable				_error) {
@@ -1227,13 +1061,9 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 										key_block.getCertificate());
 								}
 							};
-
 							if (anti_spoof_done.contains( contact)) {
-
 								task.run();
-
 							} else {
-
 								contact.sendFindNode(
 										new DHTTransportReplyHandlerAdapter() {
 											public void findNodeReply(
@@ -1245,9 +1075,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 												DHTTransportContact 	_contact,
 												Throwable				_error) {
 												// System.out.println("nodeAdded: pre-store findNode Failed");
-
 												DHTLog.log("pre-kb findNode failed " + DHTLog.getString( _contact) + " -> failed: " + _error.getMessage());
-
 												router.contactDead( _contact.getID(), false);
 											}
 										},
@@ -1258,7 +1086,6 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 				}
 			}
 		}
-
 		return (new int[]{ values_published[0], keys_published[0], republish_ops[0] });
 	}
 
