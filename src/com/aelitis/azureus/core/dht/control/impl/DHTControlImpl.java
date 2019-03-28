@@ -1845,11 +1845,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final int 					searchAccuracy,
 		final LookupResultHandler	handler) {
 		
-		if ( 
+		/*if ( 
 				   (flags & DHT.FLAG_LOOKUP_FOR_STORE) == 1
 				|| valueSearch
 		)
-			new Throwable().printStackTrace();
+			new Throwable().printStackTrace();*/
 		
 		/*int count = SingleCounter0.getInstance().getAndIncreaseCount();
 		Log.d(TAG, String.format("lookup() is called... #%d", count));
@@ -2225,7 +2225,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 											// ignore responses that are ourselves
 											if (compareDistances(router.getID(), contact.getID()) == 0)
 												continue;
-
+											
 											// dunno if its alive or not, however record its existance
 											router.contactKnown(contact.getID(), new DHTControlContactImpl(contact), false);
 										}

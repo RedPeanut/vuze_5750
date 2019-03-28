@@ -1822,10 +1822,10 @@ outer:
 							contact.setInstanceIDAndVersion( packet.getTargetInstanceID(), packet.getProtocolVersion());
 							requestSendReplyProcessor(contact, handler, packet, elapsedTime);
 							DHTUDPPacketReplyFindNode reply = (DHTUDPPacketReplyFindNode) packet;
-
+							
 							// copy out the random id in preparation for a possible subsequent
 							// store operation
-
+							
 							contact.setRandomID(reply.getRandomID());
 							updateContactStatus(contact, reply.getNodeStatus(), false);
 							requestHandler.setTransportEstimatedDHTSize(reply.getEstimatedDHTSize());
@@ -1901,15 +1901,15 @@ outer:
 					
 					public void packetReceived(
 						DHTUDPPacketReply	packet,
-						InetSocketAddress	from_address,
-						long				elapsed_time) {
+						InetSocketAddress	fromAddress,
+						long				elapsedTime) {
 						
 						try {
 							if (packet.getConnectionId() != connection_id) {
 								throw (new Exception("connection id mismatch"));
 							}
-							contact.setInstanceIDAndVersion( packet.getTargetInstanceID(), packet.getProtocolVersion());
-							requestSendReplyProcessor(contact, handler, packet, elapsed_time);
+							contact.setInstanceIDAndVersion(packet.getTargetInstanceID(), packet.getProtocolVersion());
+							requestSendReplyProcessor(contact, handler, packet, elapsedTime);
 							DHTUDPPacketReplyFindValue	reply = (DHTUDPPacketReplyFindValue)packet;
 							stats.findValueOK();
 							DHTTransportValue[]	res = reply.getValues();

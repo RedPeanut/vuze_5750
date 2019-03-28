@@ -101,14 +101,14 @@ public class DHTTransportUDPContactImpl implements DHTTransportUDPContact {
 	private DHTNetworkPosition[]		networkPositions;
 
 	protected DHTTransportUDPContactImpl(
-		boolean					_isLocal,
-		DHTTransportUDPImpl		_transport,
-		InetSocketAddress		_transportAddress,
-		InetSocketAddress		_externalAddress,
-		byte					_protocolVersion,
-		int						_instanceId,
-		long					_skew,
-		byte					_genericFlags)
+			boolean					_isLocal,
+			DHTTransportUDPImpl		_transport,
+			InetSocketAddress		_transportAddress,
+			InetSocketAddress		_externalAddress,
+			byte					_protocolVersion,
+			int						_instanceId,
+			long					_skew,
+			byte					_genericFlags)
 		throws DHTTransportException {
 		
 		transport			= _transport;
@@ -118,9 +118,9 @@ public class DHTTransportUDPContactImpl implements DHTTransportUDPContact {
 		if (transportAddress.equals(externalAddress)) {
 			externalAddress	= transportAddress;
 		}
-		instanceId		=	_instanceId;
-		skew			= 	_skew;
-		genericFlags	= 	_genericFlags;
+		instanceId			=	_instanceId;
+		skew				= 	_skew;
+		genericFlags		= 	_genericFlags;
 		
 		if (	transportAddress == externalAddress ||
 				transportAddress.getAddress().equals(externalAddress.getAddress())
