@@ -35,6 +35,9 @@ import org.gudy.azureus2.core3.util.Debug;
 import org.gudy.azureus2.core3.util.FileUtil;
 import org.gudy.azureus2.core3.util.SystemProperties;
 
+import hello.util.Log;
+import hello.util.SingleCounter0;
+
 
 /**
  * @author Arbeiten
@@ -44,17 +47,15 @@ import org.gudy.azureus2.core3.util.SystemProperties;
 @SuppressWarnings("restriction")
 public class MessageText {
 
+	private static String TAG = MessageText.class.getSimpleName();
+	
 	public static final Locale LOCALE_ENGLISH = Constants.LOCALE_ENGLISH;
-
 	public static final Locale LOCALE_DEFAULT = new Locale("", ""); // == english
-
 	private static Locale LOCALE_CURRENT = LOCALE_DEFAULT;
-
 	private static final String BUNDLE_NAME;
-
 	private static final Map<String,String>	DEFAULT_EXPANSIONS = new HashMap<String, String>();
 
-	static{
+	static {
 		BUNDLE_NAME = System.getProperty("az.factory.internat.bundle", "org.gudy.azureus2.internat.MessagesBundle");
 		updateProductName();
 	}
@@ -62,7 +63,7 @@ public class MessageText {
 	private static final Map pluginLocalizationPaths = new HashMap();
 	private static final Collection pluginResourceBundles = new ArrayList();
 	private static IntegratedResourceBundle RESOURCE_BUNDLE;
-	private static Set			platform_specific_keys	= new HashSet();
+	private static Set			platformSpecificKeys	= new HashSet();
 	private static final Pattern PAT_PARAM_ALPHA = Pattern.compile("\\{([^0-9].+?)\\}");
 
 
@@ -71,7 +72,7 @@ public class MessageText {
 	private static final List listeners = new ArrayList();
 
 	// preload default language w/o plugins
-	static{
+	static {
 		setResourceBundle(new IntegratedResourceBundle(getResourceBundle(BUNDLE_NAME, LOCALE_DEFAULT, MessageText.class.getClassLoader()), pluginLocalizationPaths, null, 4000, true));
 	}
 
@@ -81,7 +82,7 @@ public class MessageText {
 
 	public static void updateProductName() {
 		DEFAULT_EXPANSIONS.put("base.product.name", 		Constants.APP_NAME);
-		DEFAULT_EXPANSIONS.put("base.plus.product.name", Constants.APP_PLUS_NAME);
+		DEFAULT_EXPANSIONS.put("base.plus.product.name", 	Constants.APP_PLUS_NAME);
 	}
 
 	public static void loadBundle() {
@@ -137,23 +138,20 @@ public class MessageText {
 		listeners.add(listener);
 	}
 	
- 	public static void addAndFireListener(
-			MessageTextListener	listener ) {
-			listeners.add(listener);
+	public static void addAndFireListener(MessageTextListener listener) {
+		listeners.add(listener);
+		listener.localeChanged(getCurrentLocale(), getCurrentLocale());
+	}
 
-			listener.localeChanged( getCurrentLocale(), getCurrentLocale());
-		}
-
-		public static void removeListener(
-			MessageTextListener	listener ) {
-			listeners.remove(listener);
-		}
+	public static void removeListener(MessageTextListener listener) {
+		listeners.remove(listener);
+	}
 
 	static ResourceBundle
-	getResourceBundle(
-	String		name,
-	Locale		loc,
-	ClassLoader	cl ) {
+		getResourceBundle(
+		String		name,
+		Locale		loc,
+		ClassLoader	cl ) {
 		try {
 		 return (ResourceBundle.getBundle(name, loc, cl));
 		} catch (Throwable e) {
@@ -199,7 +197,7 @@ public class MessageText {
 						RESOURCE_BUNDLE.getString(key));
 			}
 		}
-		platform_specific_keys = platformKeys;
+		platformSpecificKeys = platformKeys;
 	}
 
 
@@ -232,7 +230,7 @@ public class MessageText {
 		if (key == null)
 			return "";
 		String	target_key = key + getPlatformSuffix();
-		if (!platform_specific_keys.contains( target_key)) {
+		if (!platformSpecificKeys.contains( target_key)) {
 			target_key	= key;
 		}
 		try {
@@ -246,9 +244,10 @@ public class MessageText {
 		if (key == null)
 			return "";
 		String	targetKey = key + getPlatformSuffix();
-		if (!platform_specific_keys.contains( targetKey)) {
+		if (!platformSpecificKeys.contains(targetKey)) {
 			targetKey	= key;
 		}
+		
 		try {
 			return getResourceBundleString(targetKey);
 		} catch (MissingResourceException e) {
@@ -280,9 +279,10 @@ public class MessageText {
 	}
 
 	private static String getResourceBundleString(String key) {
+		
 		if (key == null)
 			return "";
-			
+		
 		String value = RESOURCE_BUNDLE.getString(key);
 		return expandValue(value);
 	}
@@ -623,26 +623,20 @@ public class MessageText {
 
 				{
 					LineNumberInputStream lnis	= null;
-
 						try {
-								ClassLoader fff = new URLClassLoader(urls);
-
-								java.io.InputStream stream = fff.getResourceAsStream("MessagesBundle_th_TH.properties");
-
-								lnis = new LineNumberInputStream(stream);
-
-								new java.util.PropertyResourceBundle(lnis);
+							ClassLoader fff = new URLClassLoader(urls);
+							java.io.InputStream stream = fff.getResourceAsStream("MessagesBundle_th_TH.properties");
+							lnis = new LineNumberInputStream(stream);
+							new java.util.PropertyResourceBundle(lnis);
 						} catch (Throwable e) {
-
 							System.out.println( lnis.getLineNumber());
-
 							e.printStackTrace();
 						}
 				}
 				*/
 
-				newResourceBundle = getResourceBundle("MessagesBundle", newLocale,
-																											new URLClassLoader(urls));
+				newResourceBundle = getResourceBundle("MessagesBundle", newLocale, new URLClassLoader(urls));
+				
 				// do more searches if getBundle failed, or if the language is not the
 				// same and the user wanted a specific country
 				if ((!newResourceBundle.getLocale().getLanguage().equals(newLocale.getLanguage()) &&
@@ -665,7 +659,7 @@ public class MessageText {
 						for (int i = 0; i < locales.length; i++) {
 							if (locales[i].getLanguage().equals(newLocale.getLanguage())) {
 								newResourceBundle = getResourceBundle("MessagesBundle", locales[i],
-																															new URLClassLoader(urls));
+										new URLClassLoader(urls));
 								break;
 							}
 						}

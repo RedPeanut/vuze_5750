@@ -24,16 +24,39 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.*;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabFolder2Adapter;
+import org.eclipse.swt.custom.CTabFolderEvent;
+import org.eclipse.swt.custom.CTabFolderRenderer;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.gudy.azureus2.core3.config.COConfigurationManager;
 import org.gudy.azureus2.core3.config.ParameterListener;
 import org.gudy.azureus2.core3.config.impl.ConfigurationManager;
 import org.gudy.azureus2.core3.download.DownloadManager;
 import org.gudy.azureus2.core3.internat.MessageText;
-import org.gudy.azureus2.core3.util.*;
+import org.gudy.azureus2.core3.util.AEDiagnostics;
+import org.gudy.azureus2.core3.util.AEDiagnosticsEvidenceGenerator;
+import org.gudy.azureus2.core3.util.AERunnable;
+import org.gudy.azureus2.core3.util.Constants;
+import org.gudy.azureus2.core3.util.Debug;
+import org.gudy.azureus2.core3.util.IndentWriter;
 import org.gudy.azureus2.plugins.PluginInterface;
 import org.gudy.azureus2.plugins.PluginManager;
 import org.gudy.azureus2.plugins.download.Download;
@@ -66,6 +89,7 @@ import com.aelitis.azureus.ui.swt.utils.ColorCache;
 import com.aelitis.azureus.ui.swt.views.skin.SkinnedDialog;
 
 import hello.util.Log;
+import hello.util.SingleCounter0;
 
 public class TabbedMDI
 	extends BaseMDI
@@ -354,23 +378,16 @@ public class TabbedMDI
 				if (ptOnControl.y > tabFolder.getTabHeight()) {
 					return;
 				}
-
 				final CTabItem item = tabFolder.getItem(
 						tabFolder.toControl(cursorLocation.x, cursorLocation.y));
-
 				boolean need_sep = false;
-
 				if (item == null) {
-
 					need_sep = mapUserClosedTabs.size() > 0;
 					if (need_sep) {
   					for (Object id : mapUserClosedTabs.keySet()) {
   						final String view_id = (String) id;
-
   						MenuItem mi = new MenuItem(menu, SWT.PUSH);
-
   						String title;
-
   						Object oTitle = mapUserClosedTabs.get(id);
   						if (oTitle instanceof String && ((String) oTitle).length() > 0) {
 								title = (String) oTitle;
@@ -378,44 +395,32 @@ public class TabbedMDI
 								title = MessageText.getString(getViewTitleID(view_id));
 							}
   						mi.setText(title);
-
   						mi.addListener(SWT.Selection, new Listener() {
   							public void handleEvent(Event event) {
   								String key = propsPrefix + ".closedtabs";
-
   								Map closedtabs = COConfigurationManager.getMapParameter(key,
   										new HashMap());
-
   								if (closedtabs.containsKey(view_id)) {
-
   									closedtabs.remove(view_id);
-
   									COConfigurationManager.setParameter(key, closedtabs);
   								}
-
   								showEntryByID(view_id);
   							}
   						});
-
   					}
 					}
 				}
-
 				if (need_sep) {
 					new MenuItem(menu, SWT.SEPARATOR);
 				}
-
 
 				TabbedEntry entry = null;
 				if (item != null) {
 					entry = getEntryFromTabItem(item);
 
-
 					showEntry(entry);
 				}
-
 				fillMenu(menu, entry, isMainMDI ? "sidebar" : propsPrefix);
-
 			}
 		});
 
@@ -482,7 +487,6 @@ public class TabbedMDI
 					if (entry == null) {
 						return;
 					}
-
 					ViewTitleInfo viewTitleInfo = entry.getViewTitleInfo();
 					if (viewTitleInfo != null) {
 						Object titleRight = viewTitleInfo.getTitleInfoProperty(ViewTitleInfo.TITLE_INDICATOR_TEXT);
@@ -491,7 +495,6 @@ public class TabbedMDI
 							int x1IndicatorOfs = 0;
 							int SIDEBAR_SPACING = 0;
 							int x2 = bounds.x + bounds.width;
-
 							if (item.getShowClose()) {
 								try {
 									Field fldCloseRect = item.getClass().getDeclaredField("closeRect");
@@ -505,77 +508,53 @@ public class TabbedMDI
 								}
 							}
 							gc.setAntialias(SWT.ON);
-
 							Point textSize = gc.textExtent(textIndicator);
 							//Point minTextSize = gc.textExtent("99");
 							//if (textSize.x < minTextSize.x + 2) {
 							//	textSize.x = minTextSize.x + 2;
 							//}
-
 							int width = textSize.x + 10;
 							x1IndicatorOfs += width + SIDEBAR_SPACING;
 							int startX = x2 - x1IndicatorOfs;
-
 							int textOffsetY = 0;
-
 							int height = textSize.y + 1;
 							int startY = bounds.y + ((bounds.height - height) / 2) + 1;
-
 							//gc.setBackground(((state & SWT.SELECTED) != 0 ) ? item.getParent().getSelectionBackground() : item.getParent().getBackground());
 							//gc.fillRectangle(startX - 5, startY, width + 5, height);
-
 							//Pattern pattern;
 							//Color color1;
 							//Color color2;
-
 							//gc.fillRectangle(startX, startY, width, height);
 
-
 							Color default_color = ColorCache.getSchemedColor(gc.getDevice(), "#5b6e87");
-
 							Object color =  viewTitleInfo.getTitleInfoProperty(ViewTitleInfo.TITLE_INDICATOR_COLOR);
-
 							if (color instanceof int[]) {
-
 								gc.setBackground(ColorCache.getColor(gc.getDevice(),(int[])color));
-
 							} else {
-
 								gc.setBackground(default_color);
 							}
 
-
 							Color text_color = Colors.white;
-
 							gc.fillRoundRectangle(startX, startY, width, height, textSize.y * 2 / 3,
 									height * 2 / 3);
-
 							if (color != null) {
-
 								Color bg = gc.getBackground();
-
 								int	red 	= bg.getRed();
 								int green 	= bg.getGreen();
 								int blue	= bg.getBlue();
-
 								double brightness = Math.sqrt( red*red*0.299+green*green*0.587+blue*blue*0.114);
-
 								if (brightness >= 130) {
 									text_color = Colors.black;
 								}
-
 								gc.setBackground(default_color);
-
 								gc.drawRoundRectangle(startX, startY, width, height, textSize.y * 2 / 3,
 										height * 2 / 3);
 							}
 							gc.setForeground(text_color);
 							GCStringPrinter.printString(gc, textIndicator, new Rectangle(startX,
 									startY + textOffsetY, width, height), true, false, SWT.CENTER);
-
 						}
 					}
-
 				} catch (Throwable t) {
 					Debug.out(t);
 				}
@@ -1119,14 +1098,17 @@ public class TabbedMDI
 
 	@Override
 	public void fillMenu(Menu menu, final MdiEntry entry, String menuID) {
-
 		super.fillMenu(menu, entry, menuID);
-
+		
+		/*if (SingleCounter0.getInstance().getAndIncreaseCount() == 1) {
+			Log.d(TAG, "fillMenu() is called...");
+			Log.d(TAG, "menu = " + menu);
+			new Throwable().printStackTrace();
+		}*/
+		
 		if (entry != null) {
 			org.gudy.azureus2.plugins.ui.menus.MenuItem[] menu_items = MenuItemManager.getInstance().getAllAsArray(entry.getId() + "._end_");
-
 			if (menu_items.length > 0) {
-
 				MenuBuildUtils.addPluginMenuItems(menu_items, menu, false, true,
 						new MenuBuildUtils.MenuItemPluginMenuControllerImpl(new Object[] {
 							entry

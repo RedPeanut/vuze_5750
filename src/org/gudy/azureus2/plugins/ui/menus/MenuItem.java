@@ -26,83 +26,72 @@ import org.gudy.azureus2.plugins.ui.Graphic;
  * @author parg (Original ContextMenuItem code)
  * @author TuxPaper (Generic-izing, commenting)
  */
-public interface MenuItem
-{
-		/**
-		 * normal selection menu, no Data value required
-		 */
+public interface MenuItem {
+	
+	/**
+	 * normal selection menu, no Data value required
+	 */
 	public static final int STYLE_PUSH				= 1;
 
-		/**
-		 * check box style menu item - data must be of type Boolean
-		 */
-
+	/**
+	 * check box style menu item - data must be of type Boolean
+	 */
 	public static final int STYLE_CHECK				= 2;
 
-		/**
-		 * radio style - data must be Boolean
-		 */
-
+	/**
+	 * radio style - data must be Boolean
+	 */
 	public static final int STYLE_RADIO				= 3;
 
-		/**
-		 * separator line
-		 */
-
+	/**
+	 * separator line
+	 */
 	public static final int STYLE_SEPARATOR			= 4;
 
-	   /**
-	    * menu containing submenu items
-	    */
+	/**
+	 * menu containing submenu items
+	 */
 	public static final int STYLE_MENU              = 5;
 
-  /** Retrieve the resource key ("name") of this menu item
-   *
-   * @return resource key for this menu
-   */
+	/** Retrieve the resource key ("name") of this menu item
+	 *
+	 * @return resource key for this menu
+	 */
 	public String getResourceKey();
 
-		/**
-		 * Get the type of the menu item
-		 */
-
+	/**
+	 * Get the type of the menu item
+	 */
 	public int getStyle();
 
-		/**
-		 * Set the style of the menu item (see STYLE_ constants)
-		 * @param style
-		 */
+	/**
+	 * Set the style of the menu item (see STYLE_ constants)
+	 * @param style
+	 */
+	public void setStyle(int style);
 
-	public void setStyle(
-		int		style);
-
-		/**
-		 * Get the current data value associated with the menu: Boolean for CHECK style
-		 * @return
-		 */
-
+	/**
+	 * Get the current data value associated with the menu: Boolean for CHECK style
+	 * @return
+	 */
 	public Object getData();
 
-		/**
-		 * Set the current data value associated with the menu: Boolean for CHECK style
-		 * @param data
-		 */
-
-	public void setData(
-		Object	data);
+	/**
+	 * Set the current data value associated with the menu: Boolean for CHECK style
+	 * @param data
+	 */
+	public void setData(Object	data);
 
 		/**
 		 * Whether or not this item is enabled or not
 		 * @return
 		 */
-
 	public boolean isEnabled();
 
 		/**
 		 * Set the enabled status of the menu item
 		 * @param enabled
 		 */
-
 	public void setEnabled(
 		boolean	enabled);
 
@@ -110,17 +99,14 @@ public interface MenuItem
 		 * set the menu item's icon
 		 * @param graphic
 		 */
-
 	public void setGraphic(
 		Graphic		graphic);
 
-		/**
-		 * get the menu's graphic
-		 * @return
-		 */
-
-	public Graphic
-	getGraphic();
+	/**
+	 * get the menu's graphic
+	 * @return
+	 */
+	public Graphic getGraphic();
 
 	/**
 	 * Adds a listener to be notified when the menu item is about to be
@@ -153,15 +139,15 @@ public interface MenuItem
    	 */
    	public void addMultiListener(MenuItemListener l);
 
-    /**
-     * Removes a selection listener from this menu item.
-     *
-     * You only use this method to remove a listener added via
-     * {@link #addMultiListener(MenuItemListener)}.
-     *
-     * @param l listener to remove
-     * @since 3.0.2
-     */
+	/**
+	 * Removes a selection listener from this menu item.
+	 *
+	 * You only use this method to remove a listener added via
+	 * {@link #addMultiListener(MenuItemListener)}.
+	 *
+	 * @param l listener to remove
+	 * @since 3.0.2
+	 */
  	public void removeMultiListener(MenuItemListener l);
 
 	/**
@@ -170,10 +156,10 @@ public interface MenuItem
 	 */
 	public void	addListener(MenuItemListener l);
 
-   /**
-    * Removes a selection listener from this menu item.
-    * @param l listener to remove
-    */
+	/**
+	 * Removes a selection listener from this menu item.
+	 * @param l listener to remove
+	 */
 	public void	removeListener(MenuItemListener	l);
 
 	/**

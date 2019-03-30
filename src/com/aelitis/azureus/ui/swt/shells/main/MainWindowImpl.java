@@ -452,6 +452,10 @@ public class MainWindowImpl
 	 * called in both delayedCore and !delayedCore
 	 */
 	private void createWindow(IUIIntializer uiInitializer) {
+		
+		Log.d(TAG, "createWindow() is called...");
+		new Throwable().printStackTrace();
+		
 		//System.out.println("MainWindow: createWindow)");
 		long startTime = SystemTime.getCurrentTime();
 		UIFunctionsSWT existing_uif = UIFunctionsManagerSWT.getUIFunctionsSWT();

@@ -3234,22 +3234,16 @@ TorrentUtils
 	 */
 	public static String nicePrintTorrentHash(TOTorrent torrent, boolean tight) {
 		byte[] hash;
-
 		if (torrent == null) {
-
 			hash = new byte[20];
 		} else {
 			try {
 				hash = torrent.getHash();
-
 			} catch (TOTorrentException e) {
-
 				Debug.printStackTrace(e);
-
 				hash = new byte[20];
 			}
 		}
-
 		return (ByteFormatter.nicePrint(hash, tight));
 	}
 

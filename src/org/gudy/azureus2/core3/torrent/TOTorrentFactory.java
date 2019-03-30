@@ -159,23 +159,20 @@ TOTorrentFactory
 		return (createFromFileOrDirWithComputedPieceLength( file, announce_url, false));
 	}
 
-	public static TOTorrentCreator
-	createFromFileOrDirWithComputedPieceLength(
+	public static TOTorrentCreator createFromFileOrDirWithComputedPieceLength(
 		File						file,
 		URL							announce_url,
-		boolean						add_hashes )
-
+		boolean						add_hashes)
 		throws TOTorrentException
 	{
-		return ( createFromFileOrDirWithComputedPieceLength(
-					file,
-					announce_url,
-					add_hashes,
-					TO_DEFAULT_VARIABLE_PIECE_SIZE_MIN,
-					TO_DEFAULT_VARIABLE_PIECE_SIZE_MAX,
-					TO_DEFAULT_VARIABLE_PIECE_NUM_LOWER,
-					TO_DEFAULT_VARIABLE_PIECE_NUM_UPPER ));
-
+		return (createFromFileOrDirWithComputedPieceLength(
+				file,
+				announce_url,
+				add_hashes,
+				TO_DEFAULT_VARIABLE_PIECE_SIZE_MIN,
+				TO_DEFAULT_VARIABLE_PIECE_SIZE_MAX,
+				TO_DEFAULT_VARIABLE_PIECE_NUM_LOWER,
+				TO_DEFAULT_VARIABLE_PIECE_NUM_UPPER));
 	}
 
 	public static TOTorrentCreator
@@ -195,8 +192,7 @@ TOTorrentFactory
 
 	}
 
-	public static TOTorrentCreator
-	createFromFileOrDirWithComputedPieceLength(
+	public static TOTorrentCreator createFromFileOrDirWithComputedPieceLength(
 		File						file,
 		URL							announce_url,
 		boolean						add_hashes,
@@ -204,13 +200,11 @@ TOTorrentFactory
 		long						piece_max_size,
 		long						piece_num_lower,
 		long						piece_num_upper )
-
 		throws TOTorrentException
 	{
 		return (new TOTorrentCreatorImpl(
 					file, announce_url, add_hashes, piece_min_size, piece_max_size,
 					piece_num_lower, piece_num_upper ));
-
 	}
 
 	public static long

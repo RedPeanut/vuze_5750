@@ -48,6 +48,9 @@ import com.aelitis.azureus.core.util.CopyOnWriteList;
 import com.aelitis.azureus.core.util.CopyOnWriteMap;
 import com.aelitis.azureus.core.util.LinkFileMap;
 
+import hello.util.Log;
+import hello.util.SingleCounter0;
+
 /**
  * @author parg
  * Overall aim of this is to stop updating the torrent file itself and update something
@@ -267,94 +270,61 @@ DownloadManagerStateImpl
 		return (getDownloadState( null, original_torrent, saved_state));
 	}
 
-	protected static DownloadManagerState
-	getDownloadState(
+	protected static DownloadManagerState getDownloadState(
 		DownloadManagerImpl	download_manager,
-		String				torrent_file,
-		byte[]				torrent_hash,
+		String				torrentFile,
+		byte[]				torrentHash,
 		boolean				inactive )
 
 		throws TOTorrentException
 	{
 		boolean	discard_pieces = state_map.size() > 32;
-
 		// System.out.println("getDownloadState: hash = " + (torrent_hash==null?"null":ByteFormatter.encodeString(torrent_hash) + ", file = " + torrent_file));
-
 		TOTorrent						original_torrent	= null;
-		TorrentUtils.ExtendedTorrent 	saved_state			= null;
-
+		TorrentUtils.ExtendedTorrent 	savedState			= null;
 			// first, if we already have the hash then see if we can load the saved state
-
-		if (torrent_hash != null) {
-
-			File	saved_file = getStateFile(torrent_hash);
-
+		if (torrentHash != null) {
+			File	saved_file = getStateFile(torrentHash);
 			if (saved_file.exists()) {
-
 				try {
-					Map	cached_state = (Map)global_state_cache.remove(new HashWrapper( torrent_hash));
-
+					Map	cached_state = (Map)global_state_cache.remove(new HashWrapper( torrentHash));
 					if (cached_state != null) {
-
-						CachedStateWrapper wrapper = new CachedStateWrapper(download_manager, torrent_file, torrent_hash, cached_state, inactive);
-
+						CachedStateWrapper wrapper = new CachedStateWrapper(download_manager, torrentFile, torrentHash, cached_state, inactive);
 						global_state_cache_wrappers.add(wrapper);
-
-						saved_state	= wrapper;
-
+						savedState	= wrapper;
 					} else {
-
-						saved_state = TorrentUtils.readDelegateFromFile(saved_file, discard_pieces);
+						savedState = TorrentUtils.readDelegateFromFile(saved_file, discard_pieces);
 					}
-
 				} catch (Throwable e) {
-
 					Debug.out("Failed to load download state for " + saved_file);
 				}
 			}
 		}
-
 			// if saved state not found then recreate from original torrent if required
-
-		if (saved_state == null) {
-
-			original_torrent = TorrentUtils.readDelegateFromFile(new File(torrent_file), discard_pieces);
-
-			torrent_hash = original_torrent.getHash();
-
-			File	saved_file = getStateFile(torrent_hash);
-
+		if (savedState == null) {
+			original_torrent = TorrentUtils.readDelegateFromFile(new File(torrentFile), discard_pieces);
+			torrentHash = original_torrent.getHash();
+			File	saved_file = getStateFile(torrentHash);
 			if (saved_file.exists()) {
-
 				try {
-					saved_state = TorrentUtils.readDelegateFromFile(saved_file, discard_pieces);
-
+					savedState = TorrentUtils.readDelegateFromFile(saved_file, discard_pieces);
 				} catch (Throwable e) {
-
 					Debug.out("Failed to load download state for " + saved_file);
 				}
 			}
-
-			if (saved_state == null) {
-
-					// we must copy the torrent as we want one independent from the
-					// original (someone might still have references to the original
-					// and do stuff like write it somewhere else which would screw us
-					// up)
-
+			if (savedState == null) {
+				// we must copy the torrent as we want one independent from the
+				// original (someone might still have references to the original
+				// and do stuff like write it somewhere else which would screw us
+				// up)
 				TorrentUtils.copyToFile(original_torrent, saved_file);
-
-				saved_state = TorrentUtils.readDelegateFromFile(saved_file, discard_pieces);
+				savedState = TorrentUtils.readDelegateFromFile(saved_file, discard_pieces);
 			}
 		}
-
-		DownloadManagerState res = getDownloadState(download_manager, original_torrent, saved_state);
-
+		DownloadManagerState res = getDownloadState(download_manager, original_torrent, savedState);
 		if (inactive) {
-
 			res.setActive(false);
 		}
-
 		return (res);
 	}
 
@@ -2897,18 +2867,19 @@ DownloadManagerStateImpl
 		}
 	}
 
-	protected static class
-	CachedStateWrapper
-		extends 	LogRelation
-		implements 	TorrentUtils.ExtendedTorrent
-	{
-		private final DownloadManagerImpl	download_manager;
+	protected static class CachedStateWrapper 
+			extends LogRelation 
+			implements TorrentUtils.ExtendedTorrent {
+		
+		private static String TAG = "DownloadManagerStateImpl.CachedStateWrapper";
+		
+		private final DownloadManagerImpl	downloadManager;
 
-		private final String		torrent_file;
-		private HashWrapper	torrent_hash_wrapper;
-		private Map			cache;
-		private Map			cache_attributes;
-		private Map			cache_azp;
+		private final String	torrentFile;
+		private HashWrapper		torrentHashWrapper;
+		private Map				cache;
+		private Map				cacheAttributes;
+		private Map				cacheAzp;
 
 		private volatile TorrentUtils.ExtendedTorrent		delegate;
 		private TOTorrentException							fixup_failure;
@@ -2920,81 +2891,61 @@ DownloadManagerStateImpl
 		private long		size;
 		private int			file_count;
 
-		private URL										announce_url;
-		private cacheGroup								announce_group;
+		private URL						announce_url;
+		private cacheGroup				announce_group;
 
 		private volatile boolean		discard_fluff;
 
 		protected CachedStateWrapper(
-			DownloadManagerImpl		_download_manager,
-			String					_torrent_file,
-			byte[]					_torrent_hash,
-			Map						_cache,
-			boolean					_force_piece_discard) {
-			download_manager		= _download_manager;
-			torrent_file			= _torrent_file;
-			torrent_hash_wrapper	= new HashWrapper(_torrent_hash);
-			cache					= _cache;
-
-			cache_attributes 	= (Map)cache.get("attributes");
-			cache_azp 			= (Map)cache.get("azp");
-
+			DownloadManagerImpl	_downloadManager,
+			String				_torrentFile,
+			byte[]				_torrentHash,
+			Map					_cache,
+			boolean				_force_piece_discard) {
+			
+			if (SingleCounter0.getInstance().getAndIncreaseCount() == 1) {
+				Log.d(TAG, "<init>() is called...");
+				new Throwable().printStackTrace();
+			}
+			
+			downloadManager = _downloadManager;
+			torrentFile = _torrentFile;
+			torrentHashWrapper = new HashWrapper(_torrentHash);
+			cache = _cache;
+			cacheAttributes = (Map) cache.get("attributes");
+			cacheAzp = (Map) cache.get("azp");
 			if (_force_piece_discard) {
-
-				discard_pieces	= true;
-
+				discard_pieces = true;
 			} else {
-
-				Long	l_fp = (Long)cache.get("dp");
-
+				Long l_fp = (Long) cache.get("dp");
 				if (l_fp != null) {
-
 					discard_pieces = l_fp.longValue() == 1;
 				}
 			}
-
-			Long	st = (Long)cache.get("simple");
-
+			Long st = (Long) cache.get("simple");
 			if (st != null) {
-
 				simple_torrent = Boolean.valueOf(st.longValue() == 1);
 			}
-
-			Long	fc = (Long)cache.get("fc");
-
+			Long fc = (Long) cache.get("fc");
 			if (fc != null) {
-
 				file_count = fc.intValue();
 			}
-
-			Long	l_size = (Long)cache.get("size");
-
+			Long l_size = (Long) cache.get("size");
 			if (l_size != null) {
-
 				size = l_size.longValue();
 			}
-
-			byte[]	au = (byte[])cache.get("au");
-
+			byte[] au = (byte[]) cache.get("au");
 			if (au != null) {
-
 				try {
 					announce_url = StringInterner.internURL(new URL((new String(au, "UTF-8"))));
-
 				} catch (Throwable e) {
-
 				}
 			}
-
-			List	ag = (List)cache.get("ag");
-
+			List ag = (List) cache.get("ag");
 			if (ag != null) {
-
 				try {
 					announce_group = importGroup(ag);
-
 				} catch (Throwable e) {
-
 				}
 			}
 		}
@@ -3298,18 +3249,18 @@ DownloadManagerStateImpl
 								// we've just read is irrelevant due to the cache values being
 								// used
 
-							if (cache_attributes != null) {
+							if (cacheAttributes != null) {
 
-								delegate.setAdditionalMapProperty(ATTRIBUTE_KEY, cache_attributes);
+								delegate.setAdditionalMapProperty(ATTRIBUTE_KEY, cacheAttributes);
 
-								cache_attributes = null;
+								cacheAttributes = null;
 							}
 
-							if (cache_azp != null) {
+							if (cacheAzp != null) {
 
-								delegate.setAdditionalMapProperty(AZUREUS_PROPERTIES_KEY, cache_azp);
+								delegate.setAdditionalMapProperty(AZUREUS_PROPERTIES_KEY, cacheAzp);
 
-								cache_azp = null;
+								cacheAzp = null;
 							}
 
 							announce_url = null;
@@ -3330,9 +3281,9 @@ DownloadManagerStateImpl
 
 				fixup_failure	= e;
 
-				if (download_manager != null) {
+				if (downloadManager != null) {
 
-					download_manager.setTorrentInvalid(Debug.getNestedExceptionMessage( e));
+					downloadManager.setTorrentInvalid(Debug.getNestedExceptionMessage( e));
 
 				} else {
 
@@ -3367,7 +3318,7 @@ DownloadManagerStateImpl
 				}
 			}
 
-			File	saved_file = getStateFile(torrent_hash_wrapper.getBytes());
+			File	saved_file = getStateFile(torrentHashWrapper.getBytes());
 
 			if (saved_file.exists()) {
 
@@ -3383,11 +3334,11 @@ DownloadManagerStateImpl
 
 				// try reading from original
 
-			TOTorrent original_torrent = TorrentUtils.readFromFile(new File(torrent_file), true);
+			TOTorrent original_torrent = TorrentUtils.readFromFile(new File(torrentFile), true);
 
-			torrent_hash_wrapper = original_torrent.getHashWrapper();
+			torrentHashWrapper = original_torrent.getHashWrapper();
 
-			saved_file = getStateFile( torrent_hash_wrapper.getBytes());
+			saved_file = getStateFile( torrentHashWrapper.getBytes());
 
 			if (saved_file.exists()) {
 
@@ -3749,22 +3700,18 @@ DownloadManagerStateImpl
 	   		return (new TOTorrentFile[0]);
     	}
 
-    	public byte[]
-    	getHash()
-
-    		throws TOTorrentException
-	   	{
-    			// optimise this
-
-    		return ( torrent_hash_wrapper.getBytes());
-    	}
+		public byte[] getHash()
+				throws TOTorrentException {
+			// optimise this
+			return (torrentHashWrapper.getBytes());
+		}
 
     	public HashWrapper
     	getHashWrapper()
 
     		throws TOTorrentException
 	   	{
-    		return (torrent_hash_wrapper);
+    		return (torrentHashWrapper);
     	}
 
     	public void
@@ -3946,14 +3893,14 @@ DownloadManagerStateImpl
     	getAdditionalMapProperty(
     		String		name )
        	{
-			Map	c = cache_attributes;
+			Map	c = cacheAttributes;
 
 			if (c != null &&  name.equals("attributes")) {
 
 				return (c);
 			}
 
-			c = cache_azp;
+			c = cacheAzp;
 
 			if (c != null &&  name.equals("azureus_properties")) {
 

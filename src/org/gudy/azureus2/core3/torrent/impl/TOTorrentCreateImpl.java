@@ -99,8 +99,8 @@ public class TOTorrentCreateImpl
 		}
 	}
 
-	private File					torrent_base;
-	private long					piece_length;
+	private File					torrentBase;
+	private long					pieceLength;
 
 	private TOTorrentFileHasher		file_hasher;
 
@@ -108,7 +108,7 @@ public class TOTorrentCreateImpl
 	private long	total_file_count	= 0;
 
 	private long					piece_count;
-	private boolean					add_other_hashes;
+	private boolean					addOtherHashes;
 
 	private final List<TOTorrentProgressListener>							progress_listeners = new ArrayList<TOTorrentProgressListener>();
 
@@ -116,8 +116,8 @@ public class TOTorrentCreateImpl
 
 	private Set<String>	ignore_set = new HashSet<String>();
 
-	private Map<String,File>	linkage_map;
-	private final Map<String,String>	linked_tf_map = new HashMap<String, String>();
+	private Map<String,File>	linkageMap;
+	private final Map<String,String>	linkedTfMap = new HashMap<String, String>();
 
 	private boolean	cancelled;
 
@@ -131,10 +131,10 @@ public class TOTorrentCreateImpl
 	{
 		super(_torrent_base.getName(), _announce_url, _torrent_base.isFile());
 
-		linkage_map 		= _linkage_map;
-		torrent_base		= _torrent_base;
-		piece_length		= _piece_length;
-		add_other_hashes	= _add_other_hashes;
+		linkageMap 		= _linkage_map;
+		torrentBase		= _torrent_base;
+		pieceLength		= _piece_length;
+		addOtherHashes	= _add_other_hashes;
 	}
 
 	protected TOTorrentCreateImpl(
@@ -150,61 +150,42 @@ public class TOTorrentCreateImpl
 	{
 		super( _torrent_base.getName(), _announce_url, _torrent_base.isFile());
 
-		linkage_map 		= _linkage_map;
-		torrent_base		= _torrent_base;
-		add_other_hashes	= _add_other_hashes;
+		linkageMap 		= _linkage_map;
+		torrentBase		= _torrent_base;
+		addOtherHashes	= _add_other_hashes;
 
 		long	total_size = calculateTotalFileSize(_torrent_base);
 
-		piece_length = getComputedPieceSize(total_size, _piece_min_size, _piece_max_size, _piece_num_lower, _piece_num_upper);
+		pieceLength = getComputedPieceSize(total_size, _piece_min_size, _piece_max_size, _piece_num_lower, _piece_num_upper);
 	}
 
 	protected void create()
-
 		throws TOTorrentException
 	{
-		int ignored = constructFixed(torrent_base, piece_length);
-
-			// linkage map doesn't include ignored files, if it is supplied, so take account of this when
-			// checking that linkages have resolved correctly
-
-		if (	linkage_map.size() > 0 &&
-				linkage_map.size() != (linked_tf_map.size() + ignored)) {
-
-			throw (new TOTorrentException("TOTorrentCreate: unresolved linkages: required=" + linkage_map + ", resolved=" + linked_tf_map,
+		int ignored = constructFixed(torrentBase, pieceLength);
+		// linkage map doesn't include ignored files, if it is supplied, so take account of this when
+		// checking that linkages have resolved correctly
+		if (	linkageMap.size() > 0 &&
+				linkageMap.size() != (linkedTfMap.size() + ignored)) {
+			throw (new TOTorrentException("TOTorrentCreate: unresolved linkages: required=" + linkageMap + ", resolved=" + linkedTfMap,
 					TOTorrentException.RT_DECODE_FAILS));
 		}
-
-		if (linked_tf_map.size() > 0) {
-
+		if (linkedTfMap.size() > 0) {
 			Map	m = getAdditionalMapProperty(TOTorrent.AZUREUS_PRIVATE_PROPERTIES);
-
 			if (m == null) {
-
 				m = new HashMap();
-
 				setAdditionalMapProperty(TOTorrent.AZUREUS_PRIVATE_PROPERTIES, m);
 			}
-
-			if (linked_tf_map.size() < 100) {
-
-				m.put(TorrentUtils.TORRENT_AZ_PROP_INITIAL_LINKAGE, linked_tf_map);
-
+			if (linkedTfMap.size() < 100) {
+				m.put(TorrentUtils.TORRENT_AZ_PROP_INITIAL_LINKAGE, linkedTfMap);
 			} else {
-
 				ByteArrayOutputStream baos = new ByteArrayOutputStream(100*1024);
-
 				try {
 					GZIPOutputStream gos = new GZIPOutputStream(baos);
-
-					gos.write(BEncoder.encode( linked_tf_map));
-
+					gos.write(BEncoder.encode(linkedTfMap));
 					gos.close();
-
 					m.put(TorrentUtils.TORRENT_AZ_PROP_INITIAL_LINKAGE2, baos.toByteArray());
-
 				} catch (Throwable e) {
-
 					throw (new TOTorrentException("Failed to serialise linkage", TOTorrentException.RT_WRITE_FAILS));
 				}
 			}
@@ -242,11 +223,11 @@ public class TOTorrentCreateImpl
 			((TOTorrentProgressListener)progress_listeners.get(i)).reportProgress(0);
 		}
 
-		boolean add_other_per_file_hashes 	= add_other_hashes&&!getSimpleTorrent();
+		boolean add_other_per_file_hashes 	= addOtherHashes&&!getSimpleTorrent();
 
 		file_hasher =
 			new TOTorrentFileHasher(
-					add_other_hashes,
+					addOtherHashes,
 					add_other_per_file_hashes,
 					(int)_piece_length,
 					progress_listeners.size()==0?null:this);
@@ -262,11 +243,11 @@ public class TOTorrentCreateImpl
 
 			if (getSimpleTorrent()) {
 
-				File link = linkage_map.get( _torrent_base.getName());
+				File link = linkageMap.get( _torrent_base.getName());
 
 				if (link != null) {
 
-					linked_tf_map.put("0", link.getAbsolutePath());
+					linkedTfMap.put("0", link.getAbsolutePath());
 				}
 
 				long length = file_hasher.add(link==null?_torrent_base:link);
@@ -290,7 +271,7 @@ public class TOTorrentCreateImpl
 
 			setPieces( file_hasher.getPieces());
 
-			if (add_other_hashes) {
+			if (addOtherHashes) {
 
 				byte[]	sha1_digest = file_hasher.getSHA1Digest();
 				byte[]	ed2k_digest = file_hasher.getED2KDigest();
@@ -375,11 +356,11 @@ public class TOTorrentCreateImpl
 							file_name = root + File.separator + file_name;
 						}
 
-						File link = linkage_map.get(base_name + File.separator + file_name);
+						File link = linkageMap.get(base_name + File.separator + file_name);
 
 						if (link != null) {
 
-							linked_tf_map.put( String.valueOf( encoded.size()), link.getAbsolutePath());
+							linkedTfMap.put( String.valueOf( encoded.size()), link.getAbsolutePath());
 						}
 
 						long length = hasher.add(link==null?file:link);
@@ -388,7 +369,7 @@ public class TOTorrentCreateImpl
 
 						offset += length;
 
-						if (add_other_hashes) {
+						if (addOtherHashes) {
 
 							byte[]	ed2k_digest	= hasher.getPerFileED2KDigest();
 							byte[]	sha1_digest	= hasher.getPerFileSHA1Digest();
@@ -496,7 +477,7 @@ public class TOTorrentCreateImpl
 					name = root + File.separator + name;
 				}
 
-				File link = linkage_map.get(name);
+				File link = linkageMap.get(name);
 
 				return ( link==null?file.length():link.length());
 

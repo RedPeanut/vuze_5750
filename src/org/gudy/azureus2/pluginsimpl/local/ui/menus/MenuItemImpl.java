@@ -24,6 +24,9 @@ import org.gudy.azureus2.core3.util.Debug;
 
 import com.aelitis.azureus.core.util.CopyOnWriteList;
 
+import hello.util.Log;
+import hello.util.SingleCounter0;
+
 import org.gudy.azureus2.plugins.PluginInterface;
 import org.gudy.azureus2.plugins.ui.Graphic;
 import org.gudy.azureus2.plugins.ui.UIManagerEvent;
@@ -35,36 +38,24 @@ import org.gudy.azureus2.pluginsimpl.local.ui.UIManagerImpl;
  * amc1: This class was largely derived from TableContextMenuImpl.
  */
 public class MenuItemImpl implements MenuItem {
-
+	
+	private static String TAG = MenuItemImpl.class.getSimpleName();
+	
 	private PluginInterface pi;
-
 	private String sMenuID;
-
 	private String sName;
-
 	private int style = STYLE_PUSH;
-
 	private boolean enabled = true;
-
 	private Object data;
-
 	private Graphic graphic;
-
 	private CopyOnWriteList listeners = new CopyOnWriteList(1);
-	private CopyOnWriteList m_listeners = new CopyOnWriteList(1);
-
-	private CopyOnWriteList fill_listeners = new CopyOnWriteList(1);
-
+	private CopyOnWriteList mListeners = new CopyOnWriteList(1);
+	private CopyOnWriteList fillListeners = new CopyOnWriteList(1);
 	private CopyOnWriteList children = new CopyOnWriteList();
-
 	private MenuItemImpl parent = null;
-
-	private String display_text = null;
-
+	private String displayText = null;
 	private boolean visible = true;
-
-	private MenuContextImpl menu_context = null;
-
+	private MenuContextImpl menuContext = null;
 	private MenuBuilder builder;
 
 	public MenuItemImpl(PluginInterface _pi, String menuID, String key) {
@@ -129,7 +120,7 @@ public class MenuItemImpl implements MenuItem {
 	}
 
 	public void invokeMenuWillBeShownListeners(Object target) {
-		for (Iterator iter = fill_listeners.iterator(); iter.hasNext();) {
+		for (Iterator iter = fillListeners.iterator(); iter.hasNext();) {
 			try {
 				MenuItemFillListener l = (MenuItemFillListener) iter.next();
 				l.menuWillBeShown(this, target);
@@ -140,17 +131,17 @@ public class MenuItemImpl implements MenuItem {
 	}
 
 	public void addFillListener(MenuItemFillListener listener) {
-		fill_listeners.add(listener);
+		fillListeners.add(listener);
 	}
 
 	public void removeFillListener(MenuItemFillListener listener) {
-		fill_listeners.remove(listener);
+		fillListeners.remove(listener);
 	}
 
 	// Currently used by TableView (and other places).
 	public void invokeListenersMulti(Object[] rows) {
 		// We invoke the multi listeners first...
-		invokeListenersOnList(this.m_listeners, rows);
+		invokeListenersOnList(this.mListeners, rows);
 		if (rows == null || rows.length == 0) {
 			invokeListenersSingle(null);
 			return;
@@ -161,11 +152,11 @@ public class MenuItemImpl implements MenuItem {
 	}
 
 	  public void addMultiListener(MenuItemListener l) {
-		  m_listeners.add(l);
+		  mListeners.add(l);
 	  }
 
 	  public void removeMultiListener(MenuItemListener l) {
-		  m_listeners.remove(l);
+		  mListeners.remove(l);
 	  }
 
 	private void invokeListenersSingle(Object o) {
@@ -215,14 +206,19 @@ public class MenuItemImpl implements MenuItem {
 	}
 
 	public String getText() {
-		if (this.display_text == null) {
+		
+		/*if (SingleCounter0.getInstance().getAndIncreaseCount() == 1) {
+			Log.d(TAG, "this.displayText = " + this.displayText);
+		}*/
+		
+		if (this.displayText == null) {
 			return MessageText.getString(this.getResourceKey());
 		}
-		return this.display_text;
+		return this.displayText;
 	}
 
 	public void setText(String text) {
-		this.display_text = text;
+		this.displayText = text;
 	}
 
 	protected void invokeListenersOnList(CopyOnWriteList listeners_to_notify,
@@ -250,10 +246,10 @@ public class MenuItemImpl implements MenuItem {
 		this.data = null;
 		this.graphic = null;
 		this.listeners.clear();
-		this.fill_listeners.clear();
-		this.m_listeners.clear();
+		this.fillListeners.clear();
+		this.mListeners.clear();
 
-		if (this.menu_context != null) {menu_context.dirty();}
+		if (this.menuContext != null) {menuContext.dirty();}
 	}
 
 	public void remove() {
@@ -285,7 +281,7 @@ public class MenuItemImpl implements MenuItem {
 	}
 
 	public void setContext(MenuContextImpl context) {
-		this.menu_context = context;
+		this.menuContext = context;
 	}
 
 	// @see org.gudy.azureus2.plugins.ui.menus.MenuItem#setSubmenuBuilder(org.gudy.azureus2.plugins.ui.menus.MenuBuilder)

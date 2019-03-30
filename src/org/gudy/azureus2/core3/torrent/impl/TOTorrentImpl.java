@@ -33,11 +33,14 @@ import org.gudy.azureus2.core3.util.*;
 
 import com.aelitis.azureus.core.AzureusCoreFactory;
 
-public class
-TOTorrentImpl
-	extends LogRelation
-	implements TOTorrent
-{
+import hello.util.Log;
+import hello.util.SingleCounter0;
+import hello.util.Util;
+
+public class TOTorrentImpl extends LogRelation implements TOTorrent {
+	
+	private static String TAG = TOTorrentImpl.class.getSimpleName();
+	
 	protected static final String TK_ANNOUNCE			= "announce";
 	protected static final String TK_ANNOUNCE_LIST		= "announce-list";
 	protected static final String TK_COMMENT			= "comment";
@@ -66,72 +69,58 @@ TOTorrentImpl
 	protected static final List	TK_ADDITIONAL_OK_ATTRS =
 		Arrays.asList(new String[]{ TK_COMMENT_UTF8, AZUREUS_PROPERTIES, TK_WEBSEED_BT, TK_WEBSEED_GR });
 
-	private byte[]							torrent_name;
-	private byte[]							torrent_name_utf8;
+	private byte[]		torrentName;
+	private byte[]		torrentNameUtf8;
 
-	private byte[]							comment;
-	private URL								announce_url;
-	private final TOTorrentAnnounceURLGroupImpl	announce_group = new TOTorrentAnnounceURLGroupImpl(this);
+	private byte[]		comment;
+	private URL			announceUrl;
+	private final TOTorrentAnnounceURLGroupImpl	announceGroup = new TOTorrentAnnounceURLGroupImpl(this);
 
-	private long		piece_length;
+	private long		pieceLength;
 	private byte[][]	pieces;
-	private int			number_of_pieces;
+	private int			numberOfPieces;
+	
+	private byte[]		torrentHashOverride;
 
-	private byte[]		torrent_hash_override;
-
-	private byte[]		torrent_hash;
-	private HashWrapper	torrent_hash_wrapper;
-
-	private boolean				simple_torrent;
+	private byte[]		torrentHash;
+	private HashWrapper	torrentHashWrapper;
+	
+	private boolean				simpleTorrent;
 	private TOTorrentFileImpl[]	files;
 
-	private long				creation_date;
-	private byte[]				created_by;
+	private long				creationDate;
+	private byte[]				createdBy;
 
-	private Map					additional_properties 		= new LightHashMap(4);
-	private final Map					additional_info_properties	= new LightHashMap(4);
+	private Map					additionalProperties 		= new LightHashMap(4);
+	private final Map			additionalInfoProperties	= new LightHashMap(4);
 
 	private boolean				created;
 	private boolean				serialising;
 
 	private List<TOTorrentListener>	listeners;
 
-	protected final AEMonitor this_mon 	= new AEMonitor("TOTorrent");
+	protected final AEMonitor thisMon 	= new AEMonitor("TOTorrent");
 
 	/**
 	 * Constructor for deserialisation
 	 */
-
 	protected TOTorrentImpl() {
 	}
 
 	/**
 	 * Constructor for creation
 	 */
-
-	protected TOTorrentImpl(
-		String		_torrent_name,
-		URL			_announce_url,
-		boolean		_simple_torrent )
-
-		throws TOTorrentException
-	{
-		created	= true;
-
+	protected TOTorrentImpl(String _torrent_name, URL _announce_url, boolean _simple_torrent)
+			throws TOTorrentException {
+		created = true;
 		try {
-
-			torrent_name		= _torrent_name.getBytes(Constants.DEFAULT_ENCODING);
-
-			torrent_name_utf8	= torrent_name;
-
+			torrentName = _torrent_name.getBytes(Constants.DEFAULT_ENCODING);
+			torrentNameUtf8 = torrentName;
 			setAnnounceURL(_announce_url);
-
-			simple_torrent		= _simple_torrent;
-
+			simpleTorrent = _simple_torrent;
 		} catch (UnsupportedEncodingException e) {
-
-			throw (new TOTorrentException( 	"Unsupported encoding for '" + _torrent_name + "'",
-											TOTorrentException.RT_UNSUPPORTED_ENCODING));
+			throw (new TOTorrentException("Unsupported encoding for '" + _torrent_name + "'",
+					TOTorrentException.RT_UNSUPPORTED_ENCODING));
 		}
 	}
 
@@ -293,158 +282,92 @@ TOTorrentImpl
 		}
 	}
 
-	public Map
-	serialiseToMap()
-
-		throws TOTorrentException
+	public Map serialiseToMap()
+			throws TOTorrentException
 	{
-			// protect against recursion when getting the hash
-
+		// protect against recursion when getting the hash
 		if (created && !serialising) {
-
 			try {
 				serialising	= true;	// not thread safe but we can live without the hassle of using TLS or whatever
-
 				TorrentUtils.addCreatedTorrent(this);
-
 			} finally {
-
 				serialising = false;
 			}
 		}
-
 		Map	root = new HashMap();
-
-			// seen a NPE here, not sure of cause so handling null announce_url in case
-
-		writeStringToMetaData( root, TK_ANNOUNCE, (announce_url==null?TorrentUtils.getDecentralisedEmptyURL():announce_url).toString());
-
-		TOTorrentAnnounceURLSet[] sets = announce_group.getAnnounceURLSets();
-
+		// seen a NPE here, not sure of cause so handling null announce_url in case
+		writeStringToMetaData( root, TK_ANNOUNCE, (announceUrl==null?TorrentUtils.getDecentralisedEmptyURL():announceUrl).toString());
+		TOTorrentAnnounceURLSet[] sets = announceGroup.getAnnounceURLSets();
 		if (sets.length > 0) {
-
 			List	announce_list = new ArrayList();
-
 			for (int i=0;i<sets.length;i++) {
-
 				TOTorrentAnnounceURLSet	set = sets[i];
-
 				URL[]	urls = set.getAnnounceURLs();
-
 				if (urls.length == 0) {
-
 					continue;
 				}
-
 				List sub_list = new ArrayList();
-
 				announce_list.add(sub_list);
-
 				for (int j=0;j<urls.length;j++) {
-
 					sub_list.add( writeStringToMetaData( urls[j].toString()));
 				}
 			}
-
 			if (announce_list.size() > 0) {
-
 				root.put(TK_ANNOUNCE_LIST, announce_list);
 			}
 		}
-
 		if (comment != null) {
-
 			root.put(TK_COMMENT, comment);
 		}
-
-		if (creation_date != 0) {
-
-			root.put(TK_CREATION_DATE, new Long( creation_date));
+		if (creationDate != 0) {
+			root.put(TK_CREATION_DATE, new Long(creationDate));
 		}
-
-		if (created_by != null) {
-
-			root.put(TK_CREATED_BY, created_by);
+		if (createdBy != null) {
+			root.put(TK_CREATED_BY, createdBy);
 		}
-
 		Map info = new HashMap();
-
 		root.put(TK_INFO, info);
-
-		info.put(TK_PIECE_LENGTH, new Long( piece_length));
-
+		info.put(TK_PIECE_LENGTH, new Long(pieceLength));
 		if (pieces == null) {
-
 			throw (new TOTorrentException("Pieces is null", TOTorrentException.RT_WRITE_FAILS));
 		}
-
 		byte[]	flat_pieces = new byte[pieces.length*20];
-
 		for (int i=0;i<pieces.length;i++) {
-
 			System.arraycopy(pieces[i], 0, flat_pieces, i*20, 20);
 		}
-
 		info.put(TK_PIECES, flat_pieces);
-
-		info.put(TK_NAME, torrent_name);
-
-		if (torrent_name_utf8 != null) {
-
-			info.put(TK_NAME_UTF8, torrent_name_utf8);
+		info.put(TK_NAME, torrentName);
+		if (torrentNameUtf8 != null) {
+			info.put(TK_NAME_UTF8, torrentNameUtf8);
 		}
-
-		if (torrent_hash_override != null) {
-
-			info.put(TK_HASH_OVERRIDE, torrent_hash_override);
+		if (torrentHashOverride != null) {
+			info.put(TK_HASH_OVERRIDE, torrentHashOverride);
 		}
-
-		if (simple_torrent) {
-
+		if (simpleTorrent) {
 			TOTorrentFile	file = files[0];
-
-			info.put( TK_LENGTH, new Long( file.getLength()));
-
+			info.put( TK_LENGTH, new Long(file.getLength()));
 		} else {
-
 			List	meta_files = new ArrayList();
-
 			info.put(TK_FILES, meta_files);
-
 			for (int i=0;i<files.length;i++) {
-
 				TOTorrentFileImpl	file	= files[i];
-
 				Map	file_map = file.serializeToMap();
-
 				meta_files.add(file_map);
-
 			}
 		}
-
-		Iterator info_it = additional_info_properties.keySet().iterator();
-
+		Iterator info_it = additionalInfoProperties.keySet().iterator();
 		while (info_it.hasNext()) {
-
 			String	key = (String)info_it.next();
-
-			info.put(key, additional_info_properties.get( key));
+			info.put(key, additionalInfoProperties.get( key));
 		}
-
-		Iterator it = additional_properties.keySet().iterator();
-
+		Iterator it = additionalProperties.keySet().iterator();
 		while (it.hasNext()) {
-
 			String	key = (String)it.next();
-
-			Object	value = additional_properties.get(key);
-
+			Object	value = additionalProperties.get(key);
 			if (value != null) {
-
 				root.put(key, value);
 			}
 		}
-
 		return (root);
 	}
 
@@ -465,17 +388,17 @@ TOTorrentImpl
 
 	public byte[]
 	getName() {
-		return (torrent_name);
+		return (torrentName);
 	}
 
 	protected void setName(
 		byte[]	_name) {
-		torrent_name	= _name;
+		torrentName	= _name;
 	}
 
 	public String getUTF8Name() {
 		try {
-			return torrent_name_utf8 == null ? null : new String(torrent_name_utf8,
+			return torrentNameUtf8 == null ? null : new String(torrentNameUtf8,
 					"utf8");
 		} catch (UnsupportedEncodingException e) {
 			return null;
@@ -484,11 +407,11 @@ TOTorrentImpl
 
 	protected void setNameUTF8(
 		byte[]	_name) {
-		torrent_name_utf8	= _name;
+		torrentNameUtf8	= _name;
 	}
 
 	public boolean isSimpleTorrent() {
-		return (simple_torrent);
+		return (simpleTorrent);
 	}
 
 	public byte[]
@@ -523,14 +446,14 @@ TOTorrentImpl
 
 	public URL
 	getAnnounceURL() {
-		return (announce_url);
+		return (announceUrl);
 	}
 
 	public boolean setAnnounceURL(
 		URL		url) {
 		URL newURL = anonymityTransform(url);
 		String s0 = (newURL == null) ? "" : newURL.toString();
-		String s1 = (announce_url == null) ? "" : announce_url.toString();
+		String s1 = (announceUrl == null) ? "" : announceUrl.toString();
 		if (s0.equals(s1))
 			return false;
 
@@ -541,7 +464,7 @@ TOTorrentImpl
 			newURL = TorrentUtils.getDecentralisedEmptyURL();
 		}
 
-		announce_url	= StringInterner.internURL(newURL);
+		announceUrl	= StringInterner.internURL(newURL);
 
 		fireChanged(TOTorrentListener.CT_ANNOUNCE_URLS);
 
@@ -553,7 +476,7 @@ TOTorrentImpl
 	}
 
 	public long getCreationDate() {
-		return (creation_date);
+		return (creationDate);
 	}
 
 	public void setCreationDate(
@@ -568,12 +491,12 @@ TOTorrentImpl
 			_creation_date = _creation_date/1000;
 		}
 
-		creation_date 	= _creation_date;
+		creationDate 	= _creation_date;
 	}
 
 	public void setCreatedBy(
 		byte[]		_created_by) {
-		created_by	= _created_by;
+		createdBy	= _created_by;
 	}
 
 	protected void setCreatedBy(
@@ -586,127 +509,92 @@ TOTorrentImpl
 
 			Debug.printStackTrace(e);
 
-			created_by = null;
+			createdBy = null;
 		}
 	}
 
 	public byte[]
 	getCreatedBy() {
-		return (created_by);
+		return (createdBy);
 	}
 
 	public boolean isCreated() {
 		return (created);
 	}
 
-	public byte[]
-	getHash()
-
-		throws TOTorrentException
-	{
-		if (torrent_hash == null) {
-
-			Map	root = serialiseToMap();
-
-			Map info = (Map)root.get(TK_INFO);
-
+	public byte[] getHash() throws TOTorrentException {
+		
+		if (torrentHash == null) {
+			Map root = serialiseToMap();
+			Map info = (Map) root.get(TK_INFO);
 			setHashFromInfo(info);
 		}
-
-		return (torrent_hash);
+		
+		//if (SingleCounter0.getInstance().getAndIncreaseCount() == 1) {
+		//Log.d(TAG, "getHash() is called...");
+		//Log.d(TAG, "torrentHash = " + Util.toHexString(torrentHash));
+		//}
+		
+		return (torrentHash);
 	}
 
-	public HashWrapper
-	getHashWrapper()
-
-		throws TOTorrentException
-	{
-		if (torrent_hash_wrapper == null) {
-
+	public HashWrapper getHashWrapper() throws TOTorrentException {
+		if (torrentHashWrapper == null) {
 			getHash();
 		}
-
-		return (torrent_hash_wrapper);
+		return (torrentHashWrapper);
 	}
 
 	public boolean hasSameHashAs(
 		TOTorrent		other) {
 		try {
 			byte[]	other_hash = other.getHash();
-
 			return (Arrays.equals( getHash(), other_hash));
-
 		} catch (TOTorrentException e) {
-
 			Debug.printStackTrace(e);
-
 			return (false);
 		}
 	}
 
-	protected void setHashFromInfo(
-		Map		info )
-
-		throws TOTorrentException
-	{
+	protected void setHashFromInfo(Map info) throws TOTorrentException {
 		try {
-			if (torrent_hash_override == null) {
-
+			if (torrentHashOverride == null) {
 				SHA1Hasher s = new SHA1Hasher();
-
-				torrent_hash = s.calculateHash(BEncoder.encode(info));
-
+				torrentHash = s.calculateHash(BEncoder.encode(info));
 			} else {
-
-				torrent_hash = torrent_hash_override;
+				torrentHash = torrentHashOverride;
 			}
-
-			torrent_hash_wrapper = new HashWrapper(torrent_hash);
-
+			torrentHashWrapper = new HashWrapper(torrentHash);
 		} catch (Throwable e) {
-
-			throw (new TOTorrentException( 	"Failed to calculate hash: " + Debug.getNestedExceptionMessage(e),
-											TOTorrentException.RT_HASH_FAILS ));
+			throw (new TOTorrentException(
+					"Failed to calculate hash: " + Debug.getNestedExceptionMessage(e),
+					TOTorrentException.RT_HASH_FAILS)
+			);
 		}
 	}
 
-	public void setHashOverride(
-		byte[] 	hash )
-
-		throws TOTorrentException
-	{
-		if (torrent_hash_override != null) {
-
-			if (Arrays.equals( hash, torrent_hash_override)) {
-
+	public void setHashOverride(byte[] hash) throws TOTorrentException {
+		if (torrentHashOverride != null) {
+			if (Arrays.equals(hash, torrentHashOverride)) {
 				return;
-
 			} else {
-
-				throw (new TOTorrentException( 	"Hash override can only be set once",
-								TOTorrentException.RT_HASH_FAILS ));
+				throw (new TOTorrentException("Hash override can only be set once", TOTorrentException.RT_HASH_FAILS));
 			}
 		}
-
 		/* support this for fixing borked torrents
 		if (!TorrentUtils.isDecentralised( announce_url)) {
-
 			throw (new TOTorrentException(
 						"Hash override can only be set on decentralised torrents",
 						TOTorrentException.RT_HASH_FAILS ));
 		}
 		*/
-
-		torrent_hash_override = hash;
-
-		torrent_hash	= null;
-
+		torrentHashOverride = hash;
+		torrentHash	= null;
 		getHash();
 	}
 
-	protected byte[]
-	getHashOverride() {
-		return (torrent_hash_override);
+	protected byte[] getHashOverride() {
+		return (torrentHashOverride);
 	}
 
 	public void setPrivate(
@@ -714,17 +602,17 @@ TOTorrentImpl
 
 		throws TOTorrentException
 	{
-		additional_info_properties.put( TK_PRIVATE, new Long(_private_torrent?1:0));
+		additionalInfoProperties.put( TK_PRIVATE, new Long(_private_torrent?1:0));
 
 			// update torrent hash
 
-		torrent_hash	= null;
+		torrentHash	= null;
 
 		getHash();
 	}
 
 	public boolean getPrivate() {
-		Object o = additional_info_properties.get(TK_PRIVATE);
+		Object o = additionalInfoProperties.get(TK_PRIVATE);
 
 		if (o instanceof Long) {
 
@@ -736,12 +624,12 @@ TOTorrentImpl
 
 	public TOTorrentAnnounceURLGroup
 	getAnnounceURLGroup() {
-		return (announce_group);
+		return (announceGroup);
 	}
 
 	protected void addTorrentAnnounceURLSet(
 		URL[]		urls) {
-		announce_group.addSet(new TOTorrentAnnounceURLSetImpl( this, urls));
+		announceGroup.addSet(new TOTorrentAnnounceURLSetImpl( this, urls));
 	}
 
 	public long getSize() {
@@ -756,12 +644,12 @@ TOTorrentImpl
 	}
 
 	public long getPieceLength() {
-		return (piece_length);
+		return (pieceLength);
 	}
 
 	protected void setPieceLength(
 		long	_length) {
-		piece_length	= _length;
+		pieceLength	= _length;
 	}
 
 	public int getNumberOfPieces() {
@@ -770,12 +658,12 @@ TOTorrentImpl
 			// can't adjust the pieces array itself as this results in incorrect torrent hashes
 			// being derived later after a save + restore
 
-		if (number_of_pieces == 0) {
+		if (numberOfPieces == 0) {
 
-			number_of_pieces = (int)((getSize() + (piece_length-1)) / piece_length);
+			numberOfPieces = (int)((getSize() + (pieceLength-1)) / pieceLength);
 		}
 
-		return (number_of_pieces);
+		return (numberOfPieces);
 	}
 
 	public byte[][]	getPieces() {
@@ -801,17 +689,17 @@ TOTorrentImpl
 	}
 
 	protected boolean getSimpleTorrent() {
-		return (simple_torrent);
+		return (simpleTorrent);
 	}
 
 	protected void setSimpleTorrent(
 		boolean	_simple_torrent) {
-		simple_torrent	= _simple_torrent;
+		simpleTorrent	= _simple_torrent;
 	}
 
 	protected Map
 	getAdditionalProperties() {
-		return (additional_properties);
+		return (additionalProperties);
 	}
 
 	public void setAdditionalStringProperty(
@@ -848,7 +736,7 @@ TOTorrentImpl
 	public void setAdditionalByteArrayProperty(
 		String		name,
 		byte[]		value) {
-		additional_properties.put(name, value);
+		additionalProperties.put(name, value);
 	}
 
 	public void setAdditionalProperty(
@@ -860,14 +748,14 @@ TOTorrentImpl
 
 		} else {
 
-			additional_properties.put(name, value);
+			additionalProperties.put(name, value);
 		}
 	}
 
 	public byte[]
 	getAdditionalByteArrayProperty(
 		String		name) {
-		Object	obj = additional_properties.get(name);
+		Object	obj = additionalProperties.get(name);
 
 		if (obj instanceof byte[]) {
 
@@ -880,13 +768,13 @@ TOTorrentImpl
 	public void setAdditionalLongProperty(
 		String		name,
 		Long		value) {
-		additional_properties.put(name, value);
+		additionalProperties.put(name, value);
 	}
 
 	public Long
 	getAdditionalLongProperty(
 		String		name) {
-		Object	obj = additional_properties.get(name);
+		Object	obj = additionalProperties.get(name);
 
 		if (obj instanceof Long) {
 
@@ -899,13 +787,13 @@ TOTorrentImpl
 	public void setAdditionalListProperty(
 		String		name,
 		List		value) {
-		additional_properties.put(name, value);
+		additionalProperties.put(name, value);
 	}
 
 	public List
 	getAdditionalListProperty(
 		String		name) {
-		Object	obj = additional_properties.get(name);
+		Object	obj = additionalProperties.get(name);
 
 		if (obj instanceof List) {
 
@@ -918,13 +806,13 @@ TOTorrentImpl
 	public void setAdditionalMapProperty(
 		String		name,
 		Map 		value) {
-		additional_properties.put(name, value);
+		additionalProperties.put(name, value);
 	}
 
 	public Map
 	getAdditionalMapProperty(
 		String		name) {
-		Object	obj = additional_properties.get(name);
+		Object	obj = additionalProperties.get(name);
 
 		if (obj instanceof Map) {
 
@@ -936,18 +824,18 @@ TOTorrentImpl
 
 	public Object getAdditionalProperty(
 		String		name) {
-		return (additional_properties.get(name));
+		return (additionalProperties.get(name));
 	}
 
 	public void removeAdditionalProperty(
 		String name) {
-		additional_properties.remove(name);
+		additionalProperties.remove(name);
 	}
 
 	public void removeAdditionalProperties() {
 		Map	new_props = new HashMap();
 
-		Iterator it = additional_properties.keySet().iterator();
+		Iterator it = additionalProperties.keySet().iterator();
 
 		while (it.hasNext()) {
 
@@ -955,28 +843,28 @@ TOTorrentImpl
 
 			if (TK_ADDITIONAL_OK_ATTRS.contains(key)) {
 
-				new_props.put(key, additional_properties.get( key));
+				new_props.put(key, additionalProperties.get( key));
 			}
 		}
 
-		additional_properties = new_props;
+		additionalProperties = new_props;
 	}
 
 	protected void addAdditionalProperty(
 		String			name,
 		Object			value) {
-		additional_properties.put(name, value);
+		additionalProperties.put(name, value);
 	}
 
 	protected void addAdditionalInfoProperty(
 		String			name,
 		Object			value) {
-		additional_info_properties.put(name, value);
+		additionalInfoProperties.put(name, value);
 	}
 
 	protected Map
 	getAdditionalInfoProperties() {
-		return (additional_info_properties);
+		return (additionalInfoProperties);
 	}
 
 	protected String readStringFromMetaData(
@@ -1081,22 +969,22 @@ TOTorrentImpl
 		try {
 			byte[]	hash = getHash();
 
-			System.out.println("name = " + torrent_name);
-			System.out.println("announce url = " + announce_url);
-			System.out.println("announce group = " + announce_group.getAnnounceURLSets().length);
-			System.out.println("creation date = " + creation_date);
-			System.out.println("creation by = " + created_by);
+			System.out.println("name = " + torrentName);
+			System.out.println("announce url = " + announceUrl);
+			System.out.println("announce group = " + announceGroup.getAnnounceURLSets().length);
+			System.out.println("creation date = " + creationDate);
+			System.out.println("creation by = " + createdBy);
 			System.out.println("comment = " + comment);
 			System.out.println("hash = " + ByteFormatter.nicePrint( hash));
 			System.out.println("piece length = " + getPieceLength());
 			System.out.println("pieces = " + getNumberOfPieces());
 
-			Iterator info_it = additional_info_properties.keySet().iterator();
+			Iterator info_it = additionalInfoProperties.keySet().iterator();
 
 			while (info_it.hasNext()) {
 
 				String	key = (String)info_it.next();
-				Object	value = additional_info_properties.get(key);
+				Object	value = additionalInfoProperties.get(key);
 
 				try {
 
@@ -1108,12 +996,12 @@ TOTorrentImpl
 				}
 			}
 
-			Iterator it = additional_properties.keySet().iterator();
+			Iterator it = additionalProperties.keySet().iterator();
 
 			while (it.hasNext()) {
 
 				String	key = (String)it.next();
-				Object	value = additional_properties.get(key);
+				Object	value = additionalProperties.get(key);
 
 				try {
 
@@ -1167,7 +1055,7 @@ TOTorrentImpl
 		List<TOTorrentListener> to_fire = null;
 
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			if (listeners != null) {
 
@@ -1175,7 +1063,7 @@ TOTorrentImpl
 			}
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 
 		if (to_fire != null) {
@@ -1196,7 +1084,7 @@ TOTorrentImpl
  	public void addListener(
 		TOTorrentListener		l) {
  		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			if (listeners == null) {
 
@@ -1207,14 +1095,14 @@ TOTorrentImpl
 
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
 	public void removeListener(
 		TOTorrentListener		l) {
  		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			if (listeners != null) {
 
@@ -1227,20 +1115,20 @@ TOTorrentImpl
 			}
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
 	public AEMonitor
 	getMonitor() {
-		return (this_mon);
+		return (thisMon);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.core3.logging.LogRelation#getLogRelationText()
 	 */
 	public String getRelationText() {
-		return "Torrent: '" + new String(torrent_name) + "'";
+		return "Torrent: '" + new String(torrentName) + "'";
 	}
 
 	/* (non-Javadoc)

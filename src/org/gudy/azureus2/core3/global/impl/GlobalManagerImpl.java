@@ -1786,15 +1786,14 @@ public class GlobalManagerImpl
 			return (managers);
 	}
 
-	private void loadDownloads()
-	{
+	private void loadDownloads() {
+		
 		try {
 			if (this.cripple_downloads_config) {
 				loadingComplete = true;
 				loadingSem.releaseForever();
 				return;
 			}
-
 
 			try {
 				DownloadManagerStateFactory.loadGlobalStateCache();
@@ -1825,14 +1824,15 @@ public class GlobalManagerImpl
 						iter = downloads.iterator();
 						nbDownloads = downloads.size();
 					}
+					
 					int currentDownload = 0;
 					while (iter.hasNext()) {
 						currentDownload++;
-						Map mDownload = (Map) iter.next();
+						Map download = (Map) iter.next();
 
 						DownloadManager dm =
 							loadDownload(
-									mDownload,
+									download,
 									currentDownload,
 									nbDownloads,
 									progressListener,
@@ -1858,29 +1858,30 @@ public class GlobalManagerImpl
 					//load pause/resume state
 					ArrayList pause_data = (ArrayList)map.get("pause_data");
 					if (pause_data != null) {
-						try {	pausedListMon.enter();
-						for (int i=0; i < pause_data.size(); i++) {
-							Object	pd = pause_data.get(i);
+						try {
+							pausedListMon.enter();
+							for (int i = 0; i < pause_data.size(); i++) {
+								Object pd = pause_data.get(i);
 
-							byte[]		key;
-							boolean		force;
+								byte[] key;
+								boolean force;
 
-							if (pd instanceof byte[]) {
-								// old style, migration purposes
-								key 	= (byte[])pause_data.get(i);
-								force	= false;
-							} else {
-								Map	m = (Map)pd;
+								if (pd instanceof byte[]) {
+									// old style, migration purposes
+									key = (byte[]) pause_data.get(i);
+									force = false;
+								} else {
+									Map m = (Map) pd;
 
-								key 	= (byte[])m.get("hash");
-								force 	= ((Long)m.get("force")).intValue() == 1;
+									key = (byte[]) m.get("hash");
+									force = ((Long) m.get("force")).intValue() == 1;
+								}
+								pausedList.add(new Object[] { new HashWrapper(key), Boolean.valueOf(force) });
 							}
-							pausedList.add(new Object[]{ new HashWrapper( key ), Boolean.valueOf(force)});
+						} finally {
+							pausedListMon.exit();
 						}
-						}
-						finally {	pausedListMon.exit();	}
 					}
-
 
 					// Someone could have mucked with the config file and set weird positions,
 					// so fix them up.
@@ -1901,11 +1902,9 @@ public class GlobalManagerImpl
 				}
 
 			} finally {
-
 				DownloadManagerStateFactory.discardGlobalStateCache();
 			}
 		} finally {
-
 			taggable_life_manager.initialized( getResolvedTaggables());
 		}
 	}
@@ -2025,27 +2024,21 @@ public class GlobalManagerImpl
 		}
 	}
 
-	public DownloadManager
-	loadDownload(
-	Map 							mDownload,
-	int								currentDownload,
-	int								nbDownloads,
-	GlobalMangerProgressListener	progress_listener,
-	boolean							debug )
+	public DownloadManager loadDownload(
+			Map 							download,
+			int								currentDownload,
+			int								nbDownloads,
+			GlobalMangerProgressListener	progress_listener,
+			boolean							debug)
 	{
 		try {
-			byte[]	torrent_hash = (byte[])mDownload.get("torrent_hash");
-
-			Long	lPersistent = (Long)mDownload.get("persistent");
-
+			byte[]	torrentHash = (byte[])download.get("torrent_hash");
+			Long	lPersistent = (Long)download.get("persistent");
 			boolean	persistent = lPersistent==null || lPersistent.longValue()==1;
 
-
-			String fileName = new String((byte[]) mDownload.get("torrent"), Constants.DEFAULT_ENCODING);
-
+			String fileName = new String((byte[]) download.get("torrent"), Constants.DEFAULT_ENCODING);
 			if (progress_listener != null &&	SystemTime.getCurrentTime() - lastListenerUpdate > 100) {
 				lastListenerUpdate = SystemTime.getCurrentTime();
-
 				String shortFileName = fileName;
 				try {
 					File f = new File(fileName);
@@ -2053,85 +2046,58 @@ public class GlobalManagerImpl
 				} catch (Exception e) {
 				// TODO: handle exception
 			}
-
 				progress_listener.reportPercent(100 * currentDownload / nbDownloads);
 				progress_listener.reportCurrentTask(MessageText.getString("splash.loadingTorrent")
 						+ " " + currentDownload + " "
 						+ MessageText.getString("splash.of") + " " + nbDownloads
 						+ " : " + shortFileName);
 			}
-
 			//migration from using a single savePath to a separate dir and file entry
 			String	torrent_save_dir;
 			String	torrent_save_file;
-
-			byte[] torrent_save_dir_bytes	= (byte[]) mDownload.get("save_dir");
-
+			byte[] torrent_save_dir_bytes	= (byte[]) download.get("save_dir");
 			if (torrent_save_dir_bytes != null) {
-
-				byte[] torrent_save_file_bytes 	= (byte[]) mDownload.get("save_file");
-
+				byte[] torrent_save_file_bytes 	= (byte[]) download.get("save_file");
 				torrent_save_dir	= new String(torrent_save_dir_bytes, Constants.DEFAULT_ENCODING);
-
 				if (torrent_save_file_bytes != null) {
-
 					torrent_save_file	= new String(torrent_save_file_bytes, Constants.DEFAULT_ENCODING);
 				} else {
-
 					torrent_save_file	= null;
 				}
 			} else {
-
-				byte[] savePathBytes = (byte[]) mDownload.get("path");
+				byte[] savePathBytes = (byte[]) download.get("path");
 				torrent_save_dir 	= new String(savePathBytes, Constants.DEFAULT_ENCODING);
 				torrent_save_file	= null;
 			}
 
-
-
 			int state = DownloadManager.STATE_WAITING;
 			if (debug) {
-
 				state = DownloadManager.STATE_STOPPED;
-
 			} else {
-
-				if (mDownload.containsKey("state")) {
-					state = ((Long) mDownload.get("state")).intValue();
+				if (download.containsKey("state")) {
+					state = ((Long) download.get("state")).intValue();
 					if (state != DownloadManager.STATE_STOPPED &&
 							state != DownloadManager.STATE_QUEUED &&
 							state != DownloadManager.STATE_WAITING)
-
 						state = DownloadManager.STATE_QUEUED;
-
 				} else {
-
-					int stopped = ((Long) mDownload.get("stopped")).intValue();
-
+					int stopped = ((Long) download.get("stopped")).intValue();
 					if (stopped == 1) {
-
 						state = DownloadManager.STATE_STOPPED;
 					}
 				}
 			}
-
-			Long seconds_downloading = (Long)mDownload.get("secondsDownloading");
-
+			Long seconds_downloading = (Long)download.get("secondsDownloading");
 			boolean	has_ever_been_started = seconds_downloading != null && seconds_downloading.longValue() > 0;
-
-			if (torrent_hash != null) {
-				savedDownloadManagerState.put(new HashWrapper(torrent_hash),
-						mDownload);
+			if (torrentHash != null) {
+				savedDownloadManagerState.put(new HashWrapper(torrentHash),
+						download);
 			}
-
 			// for non-persistent downloads the state will be picked up if the download is re-added
 			// it won't get saved unless it is picked up, hence dead data is dropped as required
-
 			if (persistent) {
-
 				List file_priorities;
-				Map map_file_priorities = (Map) mDownload.get("file_priorities_c");
-
+				Map map_file_priorities = (Map) download.get("file_priorities_c");
 				if (map_file_priorities != null) {
 					// We don't know how many files, so we need to build array
 					Long[] array_file_priorities = new Long[0];
@@ -2139,12 +2105,10 @@ public class GlobalManagerImpl
 						long priority = Long.parseLong(key.toString());
 						String indexRanges = new String((byte[]) map_file_priorities.get(key), "utf-8");
 						String[] rangesStrings = indexRanges.split(",");
-
 						if (array_file_priorities.length == 0 && rangesStrings.length > 1) {
 							// going to be at least the length of # of ranges
 							array_file_priorities = new Long[rangesStrings.length];
 						}
-
 						for (String rangeString : rangesStrings) {
 							String[] ranges = rangeString.split("-");
 							int start = Integer.parseInt(ranges[0]);
@@ -2157,14 +2121,12 @@ public class GlobalManagerImpl
 					}
 					file_priorities = Arrays.asList(array_file_priorities);
 				} else {
-					file_priorities = (List) mDownload.get("file_priorities");
+					file_priorities = (List) download.get("file_priorities");
 				}
-
 				final DownloadManager dm =
 					DownloadManagerFactory.create(
-							this, torrent_hash, fileName, torrent_save_dir, torrent_save_file,
+							this, torrentHash, fileName, torrent_save_dir, torrent_save_file,
 							state, true, true, has_ever_been_started, file_priorities);
-
 				if (addDownloadManager(dm, false, false) == dm) {
 					return (dm);
 				}
@@ -2178,7 +2140,6 @@ public class GlobalManagerImpl
 					"Error while loading downloads.	" +
 					"One download may not have been added to the list.", e));
 		}
-
 		return (null);
 	}
 

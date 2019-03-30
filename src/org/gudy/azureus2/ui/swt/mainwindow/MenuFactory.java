@@ -288,13 +288,13 @@ public class MenuFactory
 	}
 
 	public static MenuItem addCreateMenuItem(Menu menuParent) {
-		MenuItem file_create = addMenuItem(menuParent, MENU_ID_CREATE,
-				new Listener() {
-					public void handleEvent(Event e) {
-						new NewTorrentWizard(e.display);
-					}
-				});
-		return file_create;
+		MenuItem fileCreate = addMenuItem(menuParent, MENU_ID_CREATE,
+			new Listener() {
+				public void handleEvent(Event e) {
+					new NewTorrentWizard(e.display);
+				}
+			});
+		return fileCreate;
 	}
 
 	public static MenuItem createOpenMenuItem(Menu menuParent) {

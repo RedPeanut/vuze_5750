@@ -698,7 +698,7 @@ public class DownloadManagerImpl extends LogRelation
 	private void readTorrent(
 		String		torrent_save_dir,
 		String		torrent_save_file,
-		byte[]		torrent_hash,		// can be null for initial torrents
+		byte[]		torrentHash,		// can be null for initial torrents
 		boolean		new_torrent,		// probably equivalend to (torrent_hash == null)????
 		boolean		for_seeding,
 		boolean		has_ever_been_started,
@@ -719,7 +719,7 @@ public class DownloadManagerImpl extends LogRelation
 						DownloadManagerStateImpl.getDownloadState(
 								this,
 								torrentFileName,
-								torrent_hash,
+								torrentHash,
 								initial_state == DownloadManager.STATE_STOPPED ||
 								initial_state == DownloadManager.STATE_QUEUED);
 
@@ -779,7 +779,7 @@ public class DownloadManagerImpl extends LogRelation
 
 				if (!dl_identity_obtained) {
 					// flag set true below
-					dl_identity			= torrent_hash==null?torrent.getHash():torrent_hash;
+					dl_identity			= torrentHash==null?torrent.getHash():torrentHash;
 					this.dl_identity_hashcode = new String(dl_identity).hashCode();
 				 }
 
@@ -1088,7 +1088,7 @@ public class DownloadManagerImpl extends LogRelation
 			if (downloadManagerState == null) {
 				read_torrent_state =
 					new Object[]{
-						torrent_save_dir, torrent_save_file, torrent_hash,
+						torrent_save_dir, torrent_save_file, torrentHash,
 						Boolean.valueOf(new_torrent), Boolean.valueOf(for_seeding), Boolean.valueOf(has_ever_been_started),
 						new Integer(initial_state)
 					};

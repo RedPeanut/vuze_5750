@@ -890,73 +890,51 @@ public abstract class BaseMDI
 
 
 	public void fillMenu(Menu menu, final MdiEntry entry, String menuID) {
-		org.gudy.azureus2.plugins.ui.menus.MenuItem[] menu_items;
-
-		menu_items = MenuItemManager.getInstance().getAllAsArray(menuID);
-
-		MenuBuildUtils.addPluginMenuItems(menu_items, menu, false, true,
+		org.gudy.azureus2.plugins.ui.menus.MenuItem[] menuItems;
+		menuItems = MenuItemManager.getInstance().getAllAsArray(menuID);
+		MenuBuildUtils.addPluginMenuItems(menuItems, menu, false, true,
 				new MenuBuildUtils.MenuItemPluginMenuControllerImpl(new Object[] {
 					entry
 				}));
-
 		if (entry != null) {
-
-			menu_items = MenuItemManager.getInstance().getAllAsArray(
+			menuItems = MenuItemManager.getInstance().getAllAsArray(
 					"sidebar." + entry.getId());
-
-			if (menu_items.length == 0) {
-
+			if (menuItems.length == 0) {
 				if (entry instanceof UISWTView) {
-
 					PluginInterface pi = ((UISWTView) entry).getPluginInterface();
-
 					if (pi != null) {
-
-						final List<String> relevant_sections = new ArrayList<String>();
-
+						final List<String> relevantSections = new ArrayList<String>();
 						List<ConfigSectionHolder> sections = ConfigSectionRepository.getInstance().getHolderList();
-
 						for (ConfigSectionHolder cs : sections) {
-
 							if (pi == cs.getPluginInterface()) {
-
-								relevant_sections.add(cs.configSectionGetName());
+								relevantSections.add(cs.configSectionGetName());
 							}
 						}
-
-						if (relevant_sections.size() > 0) {
-
+						if (relevantSections.size() > 0) {
 							MenuItem mi = pi.getUIManager().getMenuManager().addMenuItem(
 									"sidebar." + entry.getId(),
 									"MainWindow.menu.view.configuration");
-
 							mi.addListener(new MenuItemListener() {
 								public void selected(MenuItem menu, Object target) {
 									UIFunctions uif = UIFunctionsManager.getUIFunctions();
-
 									if (uif != null) {
-
-										for (String s : relevant_sections) {
-
+										for (String s : relevantSections) {
 											uif.getMDI().showEntryByID(
 													MultipleDocumentInterface.SIDEBAR_SECTION_CONFIG, s);
 										}
 									}
 								}
 							});
-
-							menu_items = MenuItemManager.getInstance().getAllAsArray(
+							menuItems = MenuItemManager.getInstance().getAllAsArray(
 									"sidebar." + entry.getId());
 						}
 					}
 				}
 			}
-
-			MenuBuildUtils.addPluginMenuItems(menu_items, menu, false, true,
+			MenuBuildUtils.addPluginMenuItems(menuItems, menu, false, true,
 					new MenuBuildUtils.MenuItemPluginMenuControllerImpl(new Object[] {
 						entry
 					}));
-
 			MdiSWTMenuHackListener[] menuHackListeners = getMenuHackListeners();
 			for (MdiSWTMenuHackListener l : menuHackListeners) {
 				try {
@@ -976,12 +954,9 @@ public abstract class BaseMDI
 				}
 			}
 		}
-
-		menu_items = MenuItemManager.getInstance().getAllAsArray(menuID + "._end_");
-
-		if (menu_items.length > 0) {
-
-			MenuBuildUtils.addPluginMenuItems(menu_items, menu, false, true,
+		menuItems = MenuItemManager.getInstance().getAllAsArray(menuID + "._end_");
+		if (menuItems.length > 0) {
+			MenuBuildUtils.addPluginMenuItems(menuItems, menu, false, true,
 					new MenuBuildUtils.MenuItemPluginMenuControllerImpl(new Object[] {
 						entry
 					}));

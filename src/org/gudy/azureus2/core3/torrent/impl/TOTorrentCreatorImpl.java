@@ -35,45 +35,41 @@ import org.gudy.azureus2.core3.util.BDecoder;
 import org.gudy.azureus2.core3.util.Debug;
 import org.gudy.azureus2.core3.util.FileUtil;
 
-public class
-TOTorrentCreatorImpl
-	implements TOTorrentCreator
-{
-	private final File					torrent_base;
-	private URL						announce_url;
-	private boolean					add_other_hashes;
-	private long					piece_length;
-	private long 					piece_min_size;
-	private long 					piece_max_size;
-	private long 					piece_num_lower;
-	private long 					piece_num_upper;
+public class TOTorrentCreatorImpl implements TOTorrentCreator {
+	private final File				torrentBase;
+	private URL						announceUrl;
+	private boolean					addOtherHashes;
+	private long					pieceLength;
+	private long 					pieceMinSize;
+	private long 					pieceMaxSize;
+	private long 					pieceNumLower;
+	private long 					pieceNumUpper;
 
-	private boolean					is_desc;
+	private boolean					isDesc;
 
-	private final Map<String,File>		linkage_map		= new HashMap<String, File>();
-	private File					descriptor_dir;
+	private final Map<String,File>	linkageMap		= new HashMap<String, File>();
+	private File					descriptorDir;
 
 	private TOTorrentCreateImpl		torrent;
 
 	private final List<TOTorrentProgressListener>	listeners = new ArrayList<TOTorrentProgressListener>();
 
-	public TOTorrentCreatorImpl(
-		File						_torrent_base) {
-		torrent_base 		= _torrent_base;
+	public TOTorrentCreatorImpl(File _torrent_base) {
+		torrentBase = _torrent_base;
 	}
 
 	public TOTorrentCreatorImpl(
-		File						_torrent_base,
-		URL							_announce_url,
-		boolean						_add_other_hashes,
-		long						_piece_length )
+		File			_torrentBase,
+		URL				_announceUrl,
+		boolean			_addOtherHashes,
+		long			_pieceLength )
 
 		throws TOTorrentException
 	{
-		torrent_base 		= _torrent_base;
-		announce_url		= _announce_url;
-		add_other_hashes	= _add_other_hashes;
-		piece_length		= _piece_length;
+		torrentBase 	= _torrentBase;
+		announceUrl		= _announceUrl;
+		addOtherHashes	= _addOtherHashes;
+		pieceLength		= _pieceLength;
 	}
 
 	public TOTorrentCreatorImpl(
@@ -84,172 +80,116 @@ TOTorrentCreatorImpl
 		long						_piece_max_size,
 		long						_piece_num_lower,
 		long						_piece_num_upper )
-
 		throws TOTorrentException
 	{
-		torrent_base 		= _torrent_base;
-		announce_url		= _announce_url;
-		add_other_hashes	= _add_other_hashes;
-		piece_min_size		= _piece_min_size;
-		piece_max_size		= _piece_max_size;
-		piece_num_lower		= _piece_num_lower;
-		piece_num_upper		= _piece_num_upper;
+		torrentBase 	= _torrent_base;
+		announceUrl		= _announce_url;
+		addOtherHashes	= _add_other_hashes;
+		pieceMinSize	= _piece_min_size;
+		pieceMaxSize	= _piece_max_size;
+		pieceNumLower	= _piece_num_lower;
+		pieceNumUpper	= _piece_num_upper;
 	}
 
-	public void setFileIsLayoutDescriptor(
-		boolean		b) {
-		is_desc	= b;
+	public void setFileIsLayoutDescriptor(boolean b) {
+		isDesc = b;
 	}
 
-	public TOTorrent
-	create()
-
-		throws TOTorrentException
-	{
+	public TOTorrent create() throws TOTorrentException {
+		
 		try {
-			if (announce_url == null) {
-
+			if (announceUrl == null) {
 				throw (new TOTorrentException("Skeleton creator", TOTorrentException.RT_WRITE_FAILS));
 			}
-
-			File	base_to_use;
-
-			if (is_desc) {
-
-				base_to_use = createLayoutMap();
-
+			
+			File	baseToUse;
+			if (isDesc) {
+				baseToUse = createLayoutMap();
 			} else {
-
-				base_to_use = torrent_base;
+				baseToUse = torrentBase;
 			}
-
-			if (piece_length > 0) {
-
+			if (pieceLength > 0) {
 				torrent =
 					new TOTorrentCreateImpl(
-							linkage_map,
-							base_to_use,
-							announce_url,
-							add_other_hashes,
-							piece_length);
+							linkageMap,
+							baseToUse,
+							announceUrl,
+							addOtherHashes,
+							pieceLength);
 			} else {
-
 				torrent =
 					new TOTorrentCreateImpl(
-							linkage_map,
-							base_to_use,
-							announce_url,
-							add_other_hashes,
-							piece_min_size,
-							piece_max_size,
-							piece_num_lower,
-							piece_num_upper);
+							linkageMap,
+							baseToUse,
+							announceUrl,
+							addOtherHashes,
+							pieceMinSize,
+							pieceMaxSize,
+							pieceNumLower,
+							pieceNumUpper);
 			}
-
 			for (TOTorrentProgressListener l: listeners) {
-
 				torrent.addListener(l);
 			}
-
 			torrent.create();
-
 			return (torrent);
-
 		} finally {
-
-			if (is_desc) {
-
+			if (isDesc) {
 				destroyLayoutMap();
 			}
 		}
 	}
 
-	private List<DescEntry>
-	readDescriptor()
-
+	private List<DescEntry> readDescriptor()
 		throws TOTorrentException
 	{
 		try {
-			int		top_files		= 0;
-			int		top_entries		= 0;
-
-			String 	top_component 	= null;
-
-			Map	map = BDecoder.decode(FileUtil.readFileAsByteArray( torrent_base));
-
-			List<Map>	file_map = (List<Map>)map.get("file_map");
-
-			if (file_map == null) {
-
+			int		topFiles		= 0;
+			int		topEntries		= 0;
+			String 	topComponent 	= null;
+			Map	map = BDecoder.decode(FileUtil.readFileAsByteArray(torrentBase));
+			List<Map>	fileMap = (List<Map>)map.get("file_map");
+			if (fileMap == null) {
 				throw (new TOTorrentException("Invalid descriptor file", TOTorrentException.RT_READ_FAILS));
 			}
-
-			List<DescEntry>	desc_entries = new ArrayList<DescEntry>();
-
-			BDecoder.decodeStrings(file_map);
-
-			for (Map m: file_map) {
-
-				List<String>	logical_path 	= (List<String>)m.get("logical_path");
+			List<DescEntry>	descEntries = new ArrayList<DescEntry>();
+			BDecoder.decodeStrings(fileMap);
+			for (Map m: fileMap) {
+				List<String>	logicalPath 	= (List<String>)m.get("logical_path");
 				String			target			= (String)m.get("target");
-
-				if (logical_path == null || target == null) {
-
+				if (logicalPath == null || target == null) {
 					throw (new TOTorrentException("Invalid descriptor file: entry=" + m, TOTorrentException.RT_READ_FAILS));
 				}
-
-				if (logical_path.size() == 0) {
-
+				if (logicalPath.size() == 0) {
 					throw (new TOTorrentException("Logical path must have at least one entry: " + m, TOTorrentException.RT_READ_FAILS));
 				}
-
-				for (int i=0;i<logical_path.size();i++) {
-
-					logical_path.set( i, FileUtil.convertOSSpecificChars( logical_path.get(i), i < logical_path.size()-1));
+				for (int i=0;i<logicalPath.size();i++) {
+					logicalPath.set( i, FileUtil.convertOSSpecificChars( logicalPath.get(i), i < logicalPath.size()-1));
 				}
-
 				File	tf = new File(target);
-
 				if (!tf.exists()) {
-
 					throw (new TOTorrentException("Invalid descriptor file: file '" + tf + "' not found" + m, TOTorrentException.RT_READ_FAILS));
-
 				} else {
-
-					String str = logical_path.get(0);
-
-					if (logical_path.size() == 1) {
-
-						top_entries++;
+					String str = logicalPath.get(0);
+					if (logicalPath.size() == 1) {
+						topEntries++;
 					}
-
-					if (top_component != null && !top_component.equals( str)) {
-
+					if (topComponent != null && !topComponent.equals( str)) {
 						throw (new TOTorrentException("Invalid descriptor file: multiple top level elements specified", TOTorrentException.RT_READ_FAILS));
 					}
-
-					top_component = str;
+					topComponent = str;
 				}
-
-				desc_entries.add(new DescEntry( logical_path, tf));
+				descEntries.add(new DescEntry(logicalPath, tf));
 			}
-
-			if (top_entries > 1) {
-
+			if (topEntries > 1) {
 				throw (new TOTorrentException("Invalid descriptor file: exactly one top level entry required", TOTorrentException.RT_READ_FAILS));
 			}
-
-			if (desc_entries.isEmpty()) {
-
+			if (descEntries.isEmpty()) {
 				throw (new TOTorrentException("Invalid descriptor file: no mapping entries found", TOTorrentException.RT_READ_FAILS));
 			}
-
-			return (desc_entries);
-
+			return (descEntries);
 		} catch (IOException e) {
-
 			throw (new TOTorrentException("Invalid descriptor file: " + Debug.getNestedExceptionMessage( e ), TOTorrentException.RT_READ_FAILS));
-
 		}
 	}
 
@@ -261,58 +201,42 @@ TOTorrentCreatorImpl
 		throws IOException
 	{
 		File[]	files = target.listFiles();
-
 		for (File f: files) {
-
 			String	file_name = f.getName();
-
 			if (file_name.equals(".") || file_name.equals("..")) {
-
 				continue;
 			}
-
 			File t = new File( temp, file_name);
-
 			if (f.isDirectory()) {
-
 				if (!t.isDirectory()) {
-
 					t.mkdirs();
 				}
-
 				mapDirectory(prefix_length, f, t);
-
 			} else {
-
 				if (!t.exists()) {
-
 					t.createNewFile();
-
 				} else {
-
 					throw (new IOException("Duplicate file: " + t));
 				}
-
-				linkage_map.put(t.getAbsolutePath().substring( prefix_length ), f);
+				linkageMap.put(t.getAbsolutePath().substring( prefix_length ), f);
 			}
 		}
 	}
 
-	private File
-	createLayoutMap()
+	private File createLayoutMap()
 
 		throws TOTorrentException
 	{
 			// create a directory/file hierarchy that mirrors that prescribed by the descriptor
 			// along with a linkage map to be applied during construction
 
-		if (descriptor_dir != null) {
+		if (descriptorDir != null) {
 
-			return (descriptor_dir);
+			return (descriptorDir);
 		}
 
 		try {
-			descriptor_dir = AETemporaryFileHandler.createTempDir();
+			descriptorDir = AETemporaryFileHandler.createTempDir();
 
 			File	top_level_file = null;
 
@@ -323,9 +247,9 @@ TOTorrentCreatorImpl
 				List<String>	logical_path	= entry.getLogicalPath();
 				File			target			= entry.getTarget();
 
-				File temp = descriptor_dir;
+				File temp = descriptorDir;
 
-				int	prefix_length = descriptor_dir.getAbsolutePath().length() + 1;
+				int	prefix_length = descriptorDir.getAbsolutePath().length() + 1;
 
 				for (int i=0;i<logical_path.size();i++) {
 
@@ -369,7 +293,7 @@ TOTorrentCreatorImpl
 
 						temp.createNewFile();
 
-						linkage_map.put(temp.getAbsolutePath().substring( prefix_length ), target);
+						linkageMap.put(temp.getAbsolutePath().substring( prefix_length ), target);
 					}
 				}
 			}
@@ -387,11 +311,11 @@ TOTorrentCreatorImpl
 	}
 
 	private void destroyLayoutMap() {
-		if (descriptor_dir != null && descriptor_dir.exists()) {
+		if (descriptorDir != null && descriptorDir.exists()) {
 
-			if (!FileUtil.recursiveDelete( descriptor_dir)) {
+			if (!FileUtil.recursiveDelete( descriptorDir)) {
 
-				Debug.out("Failed to delete descriptor directory '" + descriptor_dir + "'");
+				Debug.out("Failed to delete descriptor directory '" + descriptorDir + "'");
 			}
 		}
 	}
@@ -400,7 +324,7 @@ TOTorrentCreatorImpl
 
 		throws TOTorrentException
 	{
-		if (is_desc) {
+		if (isDesc) {
 
 			List<DescEntry>	desc_entries	= readDescriptor();
 
@@ -415,7 +339,7 @@ TOTorrentCreatorImpl
 
 		} else {
 
-			return (getTorrentDataSizeFromFileOrDir( torrent_base));
+			return (getTorrentDataSizeFromFileOrDir( torrentBase));
 		}
 	}
 
