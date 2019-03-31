@@ -612,14 +612,10 @@ public class DHTView implements UISWTViewEventListener {
 
 	private String getTitleID() {
 		if (dhtType == DHT_TYPE_MAIN) {
-
 			return ("DHTView.title.full");
-
 		} else if (dhtType == DHT_TYPE_CVS) {
-
 			return ("DHTView.title.fullcvs");
 		} else {
-
 			return ("DHTView.title.full_v6");
 		}
 	}

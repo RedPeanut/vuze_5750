@@ -39,11 +39,11 @@ import com.aelitis.azureus.core.AzureusCoreRunningListener;
 import com.aelitis.azureus.core.dht.DHT;
 import com.aelitis.azureus.plugins.dht.DHTPlugin;
 
-public class DHTOpsView
-	implements UISWTViewEventListener
-{
+public class DHTOpsView implements UISWTViewEventListener {
+	
+	private static String TAG = DHTOpsView.class.getSimpleName();
+	
 	public static final int DHT_TYPE_MAIN   = DHT.NW_MAIN;
-
 	public static final String MSGID_PREFIX = "DHTOpsView";
 
 	DHT dht;

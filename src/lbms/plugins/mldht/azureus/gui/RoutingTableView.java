@@ -43,7 +43,7 @@ public class RoutingTableView implements UISWTViewEventListener {
 	private Runnable			updateCanvas;
 	private DHTtype				type;
 
-	public RoutingTableView (MlDHTPlugin plugin, DHTtype type) {
+	public RoutingTableView(MlDHTPlugin plugin, DHTtype type) {
 		this.type = type;
 		this.plugin = plugin;
 		updateCanvas = new SWTSafeRunnable() {
@@ -51,7 +51,7 @@ public class RoutingTableView implements UISWTViewEventListener {
 			 * @see lbms.plugins.mldht.azureus.gui.SWTSafeRunnable#runSafe()
 			 */
 			@Override
-			public void runSafe () {
+			public void runSafe() {
 				if (!isActivated) {
 					return;
 				}
@@ -108,7 +108,7 @@ public class RoutingTableView implements UISWTViewEventListener {
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.ui.swt.plugins.UISWTViewEventListener#eventOccurred(org.gudy.azureus2.ui.swt.plugins.UISWTViewEvent)
 	 */
-	public boolean eventOccurred (UISWTViewEvent event) {
+	public boolean eventOccurred(UISWTViewEvent event) {
 		switch (event.getType()) {
 
 		case UISWTViewEvent.TYPE_CREATE:

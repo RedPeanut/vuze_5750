@@ -69,7 +69,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 	private PluginInterface			pluginInterface;
 	private Map<DHTtype, DHT>		dhts;
 	private Tracker					tracker;
-	private BasicPluginConfigModel	config_model;
+	private BasicPluginConfigModel	configModel;
 
 	private BasicPluginViewModel	view_model;
 	private Logger					logger;
@@ -110,25 +110,25 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 		
 		locale_utils = pluginInterface.getUtilities().getLocaleUtilities();
 		
-		config_model = ui_manager.createBasicPluginConfigModel("plugins",
+		configModel = ui_manager.createBasicPluginConfigModel("plugins",
 				"plugin.mldht");
 
-		config_model.addBooleanParameter2("enable", "mldht.enable", true);
-		config_model.addIntParameter2("port", "mldht.port", 49001);
+		configModel.addBooleanParameter2("enable", "mldht.enable", true);
+		configModel.addIntParameter2("port", "mldht.port", 49001);
 
 		for (DHTtype type : DHTtype.values()) {
-			config_model.addBooleanParameter2("autoopen." + type.shortName,
+			configModel.addBooleanParameter2("autoopen." + type.shortName,
 					("mldht.autoopen." + type.shortName).toLowerCase(), false);
 		}
-		config_model.addBooleanParameter2("backupOnly", "mldht.backupOnly",
+		configModel.addBooleanParameter2("backupOnly", "mldht.backupOnly",
 				false);
-		config_model.addBooleanParameter2("onlyPeerBootstrap",
+		configModel.addBooleanParameter2("onlyPeerBootstrap",
 				"mldht.onlyPeerBootstrap", false);
-		config_model.addBooleanParameter2("alwaysRestoreID", "mldht.restoreID",
+		configModel.addBooleanParameter2("alwaysRestoreID", "mldht.restoreID",
 				true);
-		config_model.addBooleanParameter2("showStatusEntry",
+		configModel.addBooleanParameter2("showStatusEntry",
 				"mldht.showStatusEntry", true);
-		config_model.addBooleanParameter2("multihoming", "mldht.multihoming", false);
+		configModel.addBooleanParameter2("multihoming", "mldht.multihoming", false);
 
 		view_model = ui_manager.createBasicPluginViewModel("Mainline DHT Log");
 
@@ -368,7 +368,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 	 * 
 	 * @return boolean autoOpen
 	 */
-	public boolean isPluginAutoOpen (String dhtType) {
+	public boolean isPluginAutoOpen(String dhtType) {
 		return pluginInterface.getPluginconfig().getPluginBooleanParameter(
 				"autoopen." + dhtType, false);
 	}
@@ -421,9 +421,9 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 			view_model.destroy();
 		}
 		
-		if (config_model != null) {
+		if (configModel != null) {
 		
-			config_model.destroy();
+			configModel.destroy();
 		}
 		
 		if (logChannel != null) {

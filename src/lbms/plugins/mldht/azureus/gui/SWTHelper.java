@@ -52,7 +52,7 @@ public class SWTHelper implements UIHelper, UIManagerListener, PopulationListene
 	private UISWTInstance		swtInstance;
 	private MlDHTPlugin			plugin;
 	private List<DHTView>		views = new ArrayList<DHTView>();
-	private List<MenuItem>		menu_items = new ArrayList<MenuItem>();
+	private List<MenuItem>		menuItems = new ArrayList<MenuItem>();
 
 	public Image				dhtStatusEntryIcon;
 	public Display				display;
@@ -79,7 +79,7 @@ public class SWTHelper implements UIHelper, UIManagerListener, PopulationListene
 			dhtStatusEntryIcon = null;
 		}
 		
-		for (MenuItem mi: menu_items) {
+		for (MenuItem mi: menuItems) {
 			
 			mi.remove();
 		}
@@ -116,23 +116,20 @@ public class SWTHelper implements UIHelper, UIManagerListener, PopulationListene
 				
 				MenuContext menu_context = statusEntry.getMenuContext();
 				
-				MenuManager menu_manager = plugin.getPluginInterface().getUIManager().getMenuManager();
+				MenuManager menuManager = plugin.getPluginInterface().getUIManager().getMenuManager();
 				
 				for (final DHTtype type : DHTtype.values()) {
-				
-					MenuItem item = menu_manager.addMenuItem(menu_context, "Views.plugins." + DHTView.VIEWID+"."+type.shortName + ".title");
 
-					menu_items.add(item);
-					
-					item.addListener(
-						new MenuItemListener() {
-							public void 
-							selected(
-								MenuItem menu, Object target) 
-							{
-								swtInstance.openView(UISWTInstance.VIEW_MAIN, DHTView.VIEWID+"."+type.shortName,null);
-							}
-						});
+					MenuItem item = menuManager.addMenuItem(menu_context,
+							"Views.plugins." + DHTView.VIEWID + "." + type.shortName + ".title");
+
+					menuItems.add(item);
+
+					item.addListener(new MenuItemListener() {
+						public void selected(MenuItem menu, Object target) {
+							swtInstance.openView(UISWTInstance.VIEW_MAIN, DHTView.VIEWID + "." + type.shortName, null);
+						}
+					});
 				}
 				
 				

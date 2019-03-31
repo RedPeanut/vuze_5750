@@ -75,16 +75,14 @@ import com.aelitis.azureus.ui.swt.UIFunctionsManagerSWT;
 import com.aelitis.azureus.ui.swt.UIFunctionsSWT;
 
 @SuppressWarnings("unused")
-public class
-UISWTInstanceImpl
-	implements UIInstanceFactory, UISWTInstance, UIManagerEventListener
-{
+public class UISWTInstanceImpl
+	implements UIInstanceFactory, UISWTInstance, UIManagerEventListener {
 	private Map<BasicPluginConfigModel,BasicPluginConfigImpl> 	config_view_map = new WeakHashMap<BasicPluginConfigModel,BasicPluginConfigImpl>();
 
 	// Map<ParentId, Map<ViewId, Listener>>
 	private Map<String,Map<String,UISWTViewEventListenerHolder>> views = new HashMap<String,Map<String,UISWTViewEventListenerHolder>>();
 
-	private Map<PluginInterface,UIInstance>	plugin_map = new WeakHashMap<PluginInterface,UIInstance>();
+	private Map<PluginInterface,UIInstance>	pluginMap = new WeakHashMap<PluginInterface,UIInstance>();
 
 	private boolean bUIAttaching;
 
@@ -118,18 +116,12 @@ UISWTInstanceImpl
 		bUIAttaching = false;
 	}
 
-	public UIInstance
-	getInstance(
-		PluginInterface		plugin_interface) {
-		UIInstance	instance = plugin_map.get(plugin_interface);
-
+	public UIInstance getInstance(PluginInterface pluginInterface) {
+		UIInstance instance = pluginMap.get(pluginInterface);
 		if (instance == null) {
-
-			instance = new instanceWrapper(plugin_interface, uiFunctions, this);
-
-			plugin_map.put(plugin_interface, instance);
+			instance = new instanceWrapper(pluginInterface, uiFunctions, this);
+			pluginMap.put(pluginInterface, instance);
 		}
-
 		return (instance);
 	}
 

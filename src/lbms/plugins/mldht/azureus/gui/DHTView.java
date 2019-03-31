@@ -128,68 +128,38 @@ public class DHTView implements UISWTViewEventListener {
 								deactivate();
 								return;
 							}
-							peerCount.setText(String.valueOf(stats
-									.getNumPeers()));
-							taskCount.setText(String.valueOf(stats
-									.getNumTasks()));
-							keysCount.setText(String.valueOf(stats.getDbStats()
-									.getKeyCount()));
-							itemsCount.setText(String.valueOf(stats
-									.getDbStats().getItemCount()));
-							sentPacketCount.setText(String.valueOf(stats
-									.getNumSentPackets()));
-							receivedPacketCount.setText(String.valueOf(stats
-									.getNumReceivedPackets()));
-							activeRPCCount.setText(String.valueOf(stats
-									.getNumRpcCalls()));
+							peerCount.setText(String.valueOf(stats.getNumPeers()));
+							taskCount.setText(String.valueOf(stats.getNumTasks()));
+							keysCount.setText(String.valueOf(stats.getDbStats().getKeyCount()));
+							itemsCount.setText(String.valueOf(stats.getDbStats().getItemCount()));
+							sentPacketCount.setText(String.valueOf(stats.getNumSentPackets()));
+							receivedPacketCount.setText(String.valueOf(stats.getNumReceivedPackets()));
+							activeRPCCount.setText(String.valueOf(stats.getNumRpcCalls()));
 
 							RPCStats rpc = stats.getRpcStats();
 
-							receivedBytesTotal.setText(formatters
-									.formatByteCountToKiBEtc(rpc
-											.getReceivedBytes()));
-							sentBytesTotal
-									.setText(formatters
-											.formatByteCountToKiBEtc(rpc
-													.getSentBytes()));
-							receivedBytes.setText(formatters
-									.formatByteCountToKiBEtcPerSec(rpc
-											.getReceivedBytesPerSec()));
-							sentBytes.setText(formatters
-									.formatByteCountToKiBEtcPerSec(rpc
-											.getSentBytesPerSec()));
+							receivedBytesTotal.setText(formatters.formatByteCountToKiBEtc(rpc.getReceivedBytes()));
+							sentBytesTotal.setText(formatters.formatByteCountToKiBEtc(rpc.getSentBytes()));
+							receivedBytes.setText(formatters.formatByteCountToKiBEtcPerSec(rpc.getReceivedBytesPerSec()));
+							sentBytes.setText(formatters.formatByteCountToKiBEtcPerSec(rpc.getSentBytesPerSec()));
 
-							long uptimeSec = (System.currentTimeMillis() - stats
-									.getStartedTimestamp()) / 1000;
+							long uptimeSec = (System.currentTimeMillis() - stats.getStartedTimestamp()) / 1000;
 							if (uptimeSec == 0) {
 								uptimeSec = 1;
 							}
-							uptime.setText(formatters
-									.formatTimeFromSeconds(uptimeSec));
-							avgReceivedBytes.setText(formatters
-									.formatByteCountToKiBEtcPerSec(rpc
-											.getReceivedBytes()
-											/ uptimeSec));
-							avgSentBytes.setText(formatters
-									.formatByteCountToKiBEtcPerSec(rpc
-											.getSentBytes()
-											/ uptimeSec));
+							
+							uptime.setText(formatters.formatTimeFromSeconds(uptimeSec));
+							avgReceivedBytes.setText(formatters.formatByteCountToKiBEtcPerSec(rpc.getReceivedBytes() / uptimeSec));
+							avgSentBytes.setText(formatters.formatByteCountToKiBEtcPerSec(rpc.getSentBytes() / uptimeSec));
 
 							for (int i = 0; i < 4; i++) {
 								Method m = Method.values()[i];
 								Label[] messages = messageLabels[i];
-								messages[0].setText(String.valueOf(rpc
-										.getSentMessageCount(m, Type.REQ_MSG)));
-								messages[1].setText(String.valueOf(rpc
-										.getSentMessageCount(m, Type.RSP_MSG)));
-								messages[2].setText(String.valueOf(rpc
-										.getTimeoutMessageCount(m)));
-								messages[3].setText(String.valueOf(rpc
-										.getReceivedMessageCount(m,
-												Type.REQ_MSG)));
-								messages[4].setText(String.valueOf(rpc
-										.getReceivedMessageCount(m,
-												Type.RSP_MSG)));
+								messages[0].setText(String.valueOf(rpc.getSentMessageCount(m, Type.REQ_MSG)));
+								messages[1].setText(String.valueOf(rpc.getSentMessageCount(m, Type.RSP_MSG)));
+								messages[2].setText(String.valueOf(rpc.getTimeoutMessageCount(m)));
+								messages[3].setText(String.valueOf(rpc.getReceivedMessageCount(m, Type.REQ_MSG)));
+								messages[4].setText(String.valueOf(rpc.getReceivedMessageCount(m, Type.RSP_MSG)));
 							}
 							dhtStatsGroup.layout();
 							serverStatsGroup.layout();
@@ -204,11 +174,8 @@ public class DHTView implements UISWTViewEventListener {
 							if (tasks == null || tasks.length != size) {
 								tasks = new Task[size];
 							}
-							System
-									.arraycopy(active, 0, tasks, 0,
-											active.length);
-							System.arraycopy(queued, 0, tasks, active.length,
-									queued.length);
+							System.arraycopy(active, 0, tasks, 0, active.length);
+							System.arraycopy(queued, 0, tasks, active.length, queued.length);
 							taskTable.clearAll();
 							taskTable.setItemCount(size);
 						}

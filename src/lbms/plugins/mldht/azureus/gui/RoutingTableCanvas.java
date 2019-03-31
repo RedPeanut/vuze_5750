@@ -51,21 +51,16 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class RoutingTableCanvas {
 
-	private static final int	HEADER_HEIGHT			= 15;
+	private static final int HEADER_HEIGHT = 15;
 
-	private static final int	HIGHLIGHT_EVERY_X_LINE	= 5;
+	private static final int HIGHLIGHT_EVERY_X_LINE = 5;
 
-	private static final int	PEER_HEIGHT				= 15;
-	private static final int	X_SPACING				= 1;
-	private static final int	Y_SPACING				= 2;
+	private static final int PEER_HEIGHT = 15;
+	private static final int X_SPACING = 1;
+	private static final int Y_SPACING = 2;
 
-	private static final int	DEFAULT_WIDTH			= 1120;
-	private static final int	DEFAULT_HEIGHT			= (PEER_HEIGHT + Y_SPACING)
-																* 8
-																+ HEADER_HEIGHT
-																+ 5;
-	
-	
+	private static final int DEFAULT_WIDTH = 1120;
+	private static final int DEFAULT_HEIGHT = (PEER_HEIGHT + Y_SPACING) * 8 + HEADER_HEIGHT + 5;
 	
 	private static int BUCKET_SPACING = 4;
 	private static int BUCKET_PADDING = 2;
@@ -75,14 +70,14 @@ public class RoutingTableCanvas {
 	private int bucketXOffset = 0;
 	
 
-	private Canvas					canvas;
-	private Image					img;
-	private Display					display;
-	private Shell					toolTipShell;
-	private boolean					disposed;
-	private int						peerWidth;
-	private int						lineSpacing;
-	private Node					routingTable;
+	private Canvas			canvas;
+	private Image			img;
+	private Display			display;
+	private Shell			toolTipShell;
+	private boolean			disposed;
+	private int				peerWidth;
+	private int				lineSpacing;
+	private Node			routingTable;
 
 	public RoutingTableCanvas(Composite parent) {
 		this(parent, null);
@@ -249,10 +244,8 @@ public class RoutingTableCanvas {
 		String ver = bucketEntry.getVersion();
 		if (ver == null || ver.length() < 4)
 			ver = "";
-		else
-		{
-			try
-			{
+		else {
+			try {
 				byte[] raw = ver.getBytes("ISO-8859-1");
 				ver = ver.substring(0, 2) + " " + ((raw[2] & 0xFF) << 8 | (raw[3] & 0xFF));
 			} catch (UnsupportedEncodingException e1) {
@@ -273,7 +266,7 @@ public class RoutingTableCanvas {
 		return tip;
 	}
 
-	public void fullRepaint () {
+	public void fullRepaint() {
 		if (disposed) {
 			return;
 		}

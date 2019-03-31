@@ -49,8 +49,7 @@ import com.aelitis.azureus.core.dht.control.DHTControlActivity.ActivityNode;
 import com.aelitis.azureus.core.dht.control.DHTControlActivity.ActivityState;
 import com.aelitis.azureus.ui.swt.utils.ColorCache;
 
-public class
-DHTOpsPanel
+public class DHTOpsPanel
 	implements DHTControlListener
 {
 	private static final int ALPHA_FOCUS = 255;
@@ -64,7 +63,7 @@ DHTOpsPanel
 	Canvas canvas;
 	Scale scale;
 
-	private int		min_slots	= 8;
+	private int		minSlots	= 8;
 
 	private boolean	unavailable;
 
@@ -82,7 +81,7 @@ DHTOpsPanel
 	private DHT				current_dht;
 	private ActivityFilter	filter;
 
-	private Map<DHTControlActivity,ActivityDetail>	activity_map = new HashMap<DHTControlActivity,ActivityDetail>();
+	private Map<DHTControlActivity,ActivityDetail>	activityMap = new HashMap<DHTControlActivity,ActivityDetail>();
 
 	private TimerEventPeriodic timeout_timer;
 
@@ -285,9 +284,9 @@ DHTOpsPanel
 							return;
 						}
 
-						synchronized(activity_map) {
+						synchronized(activityMap) {
 
-							Iterator<ActivityDetail> it = activity_map.values().iterator();
+							Iterator<ActivityDetail> it = activityMap.values().iterator();
 
 							while (it.hasNext()) {
 
@@ -319,11 +318,11 @@ DHTOpsPanel
 			return;
 		}
 		
-		synchronized(activity_map) {
-			ActivityDetail details = activity_map.get(activity);
+		synchronized(activityMap) {
+			ActivityDetail details = activityMap.get(activity);
 			if (details == null) {
 				details = new ActivityDetail(activity);
-				activity_map.put(activity, details);
+				activityMap.put(activity, details);
 			}
 			if (type == DHTControlListener.CT_REMOVED) {
 				details.setComplete();
@@ -345,25 +344,17 @@ DHTOpsPanel
 			});
 	}
 
-	public void refreshView(
-		DHT		dht) {
+	public void refreshView(DHT dht) {
 		if (current_dht != dht) {
-
 			if (current_dht != null) {
-
 				current_dht.getControl().removeListener(this);
 			}
-
 			current_dht = dht;
-
-			synchronized(activity_map) {
-
-				activity_map.clear();
+			synchronized (activityMap) {
+				activityMap.clear();
 			}
-
 			dht.getControl().addListener(this);
 		}
-
 		refresh();
 	}
 
@@ -378,7 +369,7 @@ DHTOpsPanel
 
 	public void setMinimumSlots(
 		int		min) {
-		min_slots = min;
+		minSlots = min;
 	}
 
 	public void setScaleAndRotation(
@@ -396,127 +387,76 @@ DHTOpsPanel
 
 	public void refresh() {
 		if (canvas.isDisposed()) {
-
 			return;
 		}
-
 		Rectangle size = canvas.getBounds();
-
 		if (size.width <= 0 || size.height <= 0) {
-
 			return;
 		}
-
 		scale.width = size.width;
 		scale.height = size.height;
-
 		if (img != null && !img.isDisposed()) {
-
 			img.dispose();
 		}
-
 		img = new Image(display,size);
-
 		GC gc = new GC(img);
-
 		gc.setAdvanced(true);
-
 		gc.setAntialias(SWT.ON);
 		gc.setTextAntialias(SWT.ON);
-
 		Color white = ColorCache.getColor(display,255,255,255);
 		gc.setForeground(white);
 		gc.setBackground(white);
 		gc.fillRectangle(size);
-
 		List<ActivityDetail>	activities;
-
-		List<ActivityDetail>	to_remove = new ArrayList<ActivityDetail>();
-
-		synchronized(activity_map) {
-
-			activities = new ArrayList<ActivityDetail>( activity_map.values());
+		List<ActivityDetail>	toRemove = new ArrayList<ActivityDetail>();
+		synchronized(activityMap) {
+			activities = new ArrayList<ActivityDetail>(activityMap.values());
 		}
-
 		long	now = SystemTime.getMonotonousTime();
-
-		int	max_slot = Math.max(activities.size(), min_slots);
-
+		int	maxSlot = Math.max(activities.size(), minSlots);
 		for (ActivityDetail details: activities) {
-
-			max_slot = Math.max( max_slot, details.getSlot()+1);
-
-			long comp_at = details.getCompleteTime();
-
-			if (comp_at >= 0 && now - comp_at > FADE_OUT) {
-
-				to_remove.add(details);
+			maxSlot = Math.max(maxSlot, details.getSlot()+1);
+			long completeTime = details.getCompleteTime();
+			if (completeTime >= 0 && now - completeTime > FADE_OUT) {
+				toRemove.add(details);
 			}
 		}
-
-		boolean[]	slots_in_use = new boolean[max_slot];
-
+		boolean[]	slotsInUse = new boolean[maxSlot];
 		for (ActivityDetail details: activities) {
-
 			int	slot = details.getSlot();
-
 			if (slot != -1) {
-
-				slots_in_use[slot] = true;
+				slotsInUse[slot] = true;
 			}
 		}
-
 		int pos = 0;
-
 		for (ActivityDetail details: activities) {
-
 			int	slot = details.getSlot();
-
 			if (slot == -1) {
-
-				while (slots_in_use[pos]) {
-
+				while (slotsInUse[pos]) {
 					pos++;
 				}
-
 				details.setSlot(pos++);
 			}
 		}
-
-	 	int x_origin = scale.getX(0, 0);
-		int y_origin = scale.getY(0, 0);
-
-		double slice_angle = 2*Math.PI/max_slot;
-
+	 	int xOrigin = scale.getX(0, 0);
+		int yOrigin = scale.getY(0, 0);
+		double sliceAngle = 2*Math.PI/maxSlot;
 		for (ActivityDetail details: activities) {
-
-			details.draw(gc, x_origin, y_origin, slice_angle);
+			details.draw(gc, xOrigin, yOrigin, sliceAngle);
 		}
-
 		gc.setForeground(ColorCache.getColor( gc.getDevice(), 0, 0, 0));
-
 		if (activities.size() == 0) {
-
-			gc.drawText(MessageText.getString( DHTOpsView.MSGID_PREFIX + ".idle" ), x_origin, y_origin);
-
+			gc.drawText(MessageText.getString( DHTOpsView.MSGID_PREFIX + ".idle" ), xOrigin, yOrigin);
 		} else {
-
-			gc.drawLine(x_origin-5, y_origin, x_origin+5, y_origin);
-			gc.drawLine(x_origin, y_origin-5, x_origin, y_origin+5);
-
+			gc.drawLine(xOrigin-5, yOrigin, xOrigin+5, yOrigin);
+			gc.drawLine(xOrigin, yOrigin-5, xOrigin, yOrigin+5);
 		}
-
 		gc.dispose();
-
 		canvas.redraw();
-
-		if (to_remove.size() > 0) {
-
-			synchronized(activity_map) {
-
-				for (ActivityDetail detail: to_remove) {
-
-					activity_map.remove( detail.getActivity());
+		if (toRemove.size() > 0) {
+			synchronized(activityMap) {
+				for (ActivityDetail detail: toRemove) {
+					activityMap.remove( detail.getActivity());
 				}
 			}
 		}
@@ -554,201 +494,132 @@ DHTOpsPanel
 			current_dht = null;
 		}
 
-		synchronized(activity_map) {
+		synchronized(activityMap) {
 
-			activity_map.clear();
+			activityMap.clear();
 		}
 	}
 
-	private class
-	ActivityDetail
-	{
-		private DHTControlActivity		activity;
-		private long					complete_time = -1;
+	private class ActivityDetail {
+		
+		private DHTControlActivity activity;
+		private long completeTime = -1;
 
-		private int		slot	= -1;
+		private int slot = -1;
 
-		private int		draw_count	= 0;
-		private String	result_str	= "";
+		private int drawCount = 0;
+		private String resultStr = "";
 
-		private ActivityDetail(
-			DHTControlActivity		_act) {
-			activity	= _act;
+		private ActivityDetail(DHTControlActivity _act) {
+			activity = _act;
 		}
 
-		private DHTControlActivity
-		getActivity() {
+		private DHTControlActivity getActivity() {
 			return (activity);
 		}
 
 		private void setComplete() {
-			complete_time = SystemTime.getMonotonousTime();
+			completeTime = SystemTime.getMonotonousTime();
 		}
 
 		private long getCompleteTime() {
-			return (complete_time);
+			return (completeTime);
 		}
 
 		private boolean isComplete() {
-			return ( complete_time != -1 &&
-					SystemTime.getMonotonousTime() - complete_time > FADE_OUT);
+			return (completeTime != -1 && SystemTime.getMonotonousTime() - completeTime > FADE_OUT);
 		}
 
 		private int getSlot() {
 			return (slot);
 		}
 
-		private void setSlot(
-			int	_s) {
-			slot	= _s;
+		private void setSlot(int _s) {
+			slot = _s;
 		}
 
-		private void draw(
-			GC		gc,
-			int		x_origin,
-			int		y_origin,
-			double	slice_angle) {
-			draw_count++;
-
+		private void draw(GC gc, int xOrigin, int yOrigin, double sliceAngle) {
+			drawCount++;
 			setColour(gc);
-
-			double angle = slice_angle*slot;
-
-			ActivityState state_maybe_null = activity.getCurrentState();
-
-			if (state_maybe_null != null) {
-
-				int	depth = state_maybe_null.getDepth();
-
-				int	level_depth = 750/depth;
-
-				ActivityNode root = state_maybe_null.getRootNode();
-
-				List<Object[]> level_nodes = new ArrayList<Object[]>();
-
-				float x_start = (float)(50*Math.sin( angle));
-				float y_start = (float)(50*Math.cos( angle));
-
-				level_nodes.add(new Object[]{ root, x_start, y_start });
-
-				int	node_distance = 50;
-
+			double angle = sliceAngle * slot;
+			ActivityState stateMaybeNull = activity.getCurrentState();
+			if (stateMaybeNull != null) {
+				int depth = stateMaybeNull.getDepth();
+				int levelDepth = 750 / depth;
+				ActivityNode root = stateMaybeNull.getRootNode();
+				List<Object[]> levelNodes = new ArrayList<Object[]>();
+				float xStart = (float) (50 * Math.sin(angle));
+				float yStart = (float) (50 * Math.cos(angle));
+				levelNodes.add(new Object[] { root, xStart, yStart });
+				int nodeDistance = 50;
 				while (true) {
-
-					int	nodes_at_next_level = 0;
-
-					for (Object[] entry: level_nodes) {
-
-						nodes_at_next_level += ((ActivityNode)entry[0]).getChildren().size();
+					int nodesAtNextLevel = 0;
+					for (Object[] entry : levelNodes) {
+						nodesAtNextLevel += ((ActivityNode) entry[0]).getChildren().size();
 					}
-
-					if (nodes_at_next_level == 0) {
-
+					if (nodesAtNextLevel == 0) {
 						break;
 					}
-
-					node_distance += level_depth;
-
-					double node_slice_angle = slice_angle/nodes_at_next_level;
-
-					double current_angle = angle;
-
-					if (nodes_at_next_level > 1) {
-
-						current_angle = current_angle - (slice_angle/2);
-
-						current_angle += (slice_angle - node_slice_angle*(nodes_at_next_level-1))/2;
+					nodeDistance += levelDepth;
+					double nodeSliceAngle = sliceAngle / nodesAtNextLevel;
+					double currentAngle = angle;
+					if (nodesAtNextLevel > 1) {
+						currentAngle = currentAngle - (sliceAngle / 2);
+						currentAngle += (sliceAngle - nodeSliceAngle * (nodesAtNextLevel - 1)) / 2;
 					}
-
-					List<Object[]> next_level_nodes = new ArrayList<Object[]>();
-
-					for (Object[] entry: level_nodes) {
-
-						ActivityNode	node 	= (ActivityNode)entry[0];
-						float			node_x	= (Float)entry[1];
-						float			node_y	= (Float)entry[2];
-
-						int seg_start_x = scale.getX(node_x, node_y);
-						int seg_start_y = scale.getY(node_x, node_y);
-
+					List<Object[]> nextLevelNodes = new ArrayList<Object[]>();
+					for (Object[] entry : levelNodes) {
+						ActivityNode node = (ActivityNode) entry[0];
+						float nodeX = (Float) entry[1];
+						float nodeY = (Float) entry[2];
+						int segStartX = scale.getX(nodeX, nodeY);
+						int segStartY = scale.getY(nodeX, nodeY);
 						List<ActivityNode> kids = node.getChildren();
-
-						for (ActivityNode kid: kids) {
-
-							float	kid_x = (float)(node_distance*Math.sin( current_angle));
-							float	kid_y = (float)(node_distance*Math.cos( current_angle));
-
-							next_level_nodes.add(new Object[]{ kid, kid_x, kid_y });
-
-							current_angle += node_slice_angle;
-
-							int seg_end_x = scale.getX(kid_x, kid_y);
-							int seg_end_y = scale.getY(kid_x, kid_y);
-
-							gc.drawLine(seg_start_x, seg_start_y, seg_end_x, seg_end_y);
-
-							gc.drawOval(seg_end_x, seg_end_y, 1, 1);
+						for (ActivityNode kid : kids) {
+							float kidX = (float) (nodeDistance * Math.sin(currentAngle));
+							float kidY = (float) (nodeDistance * Math.cos(currentAngle));
+							nextLevelNodes.add(new Object[] { kid, kidX, kidY });
+							currentAngle += nodeSliceAngle;
+							int segEndX = scale.getX(kidX, kidY);
+							int segEndY = scale.getY(kidX, kidY);
+							gc.drawLine(segStartX, segStartY, segEndX, segEndY);
+							gc.drawOval(segEndX, segEndY, 1, 1);
 						}
 					}
-
-					level_nodes = next_level_nodes;
+					levelNodes = nextLevelNodes;
 				}
 			}
-
-			float x_end = (float)(850*Math.sin( angle));
-			float y_end = (float)(850*Math.cos( angle));
-
-		 	int text_x = scale.getX(x_end, y_end);
-			int text_y = scale.getY(x_end, y_end);
-
+			float xEnd = (float) (850 * Math.sin(angle));
+			float yEnd = (float) (850 * Math.cos(angle));
+			int textX = scale.getX(xEnd, yEnd);
+			int textY = scale.getY(xEnd, yEnd);
 			String desc = activity.getDescription();
-
-			if (complete_time >= 0 && result_str.length() == 0) {
-
-				if (state_maybe_null != null) {
-
-					result_str = (desc.length()==0?"":": ") + state_maybe_null.getResult();
+			if (completeTime >= 0 && resultStr.length() == 0) {
+				if (stateMaybeNull != null) {
+					resultStr = (desc.length() == 0 ? "" : ": ") + stateMaybeNull.getResult();
 				}
 			}
-
-			gc.drawText(desc + result_str, text_x, text_y);
-
+			gc.drawText(desc + resultStr, textX, textY);
 			//gc.drawLine(x_origin, y_origin, (int)x_end, (int)y_end);
-
 			gc.setAlpha(255);
 		}
 
-		private void setColour(
-			GC		gc) {
-			if (complete_time != -1 && draw_count > 1) {
-
-				int age = (int)(SystemTime.getMonotonousTime() - complete_time);
-
-				gc.setAlpha( Math.max( 0, 200 - (255*age/FADE_OUT)));
-
-				gc.setForeground(ColorCache.getColor( gc.getDevice(), 0, 0, 0));
-
+		private void setColour(GC gc) {
+			if (completeTime != -1 && drawCount > 1) {
+				int age = (int) (SystemTime.getMonotonousTime() - completeTime);
+				gc.setAlpha(Math.max(0, 200 - (255 * age / FADE_OUT)));
+				gc.setForeground(ColorCache.getColor(gc.getDevice(), 0, 0, 0));
 			} else {
-
 				gc.setAlpha(255);
-
 				int type = activity.getType();
-
 				if (type == DHTControlActivity.AT_EXTERNAL_GET) {
-
-					gc.setForeground(ColorCache.getColor( gc.getDevice(), 20, 200, 20));
-
+					gc.setForeground(ColorCache.getColor(gc.getDevice(), 20, 200, 20));
 				} else if (type == DHTControlActivity.AT_INTERNAL_GET) {
-
-					gc.setForeground(ColorCache.getColor( gc.getDevice(), 140, 160, 40));
-
+					gc.setForeground(ColorCache.getColor(gc.getDevice(), 140, 160, 40));
 				} else if (type == DHTControlActivity.AT_EXTERNAL_PUT) {
-
-					gc.setForeground(ColorCache.getColor( gc.getDevice(), 20, 20, 220));
-
+					gc.setForeground(ColorCache.getColor(gc.getDevice(), 20, 20, 220));
 				} else {
-
-					gc.setForeground(ColorCache.getColor( gc.getDevice(), 40, 140, 160));
+					gc.setForeground(ColorCache.getColor(gc.getDevice(), 40, 140, 160));
 				}
 			}
 		}

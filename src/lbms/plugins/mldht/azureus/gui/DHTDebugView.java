@@ -41,7 +41,7 @@ public class DHTDebugView implements UISWTViewEventListener {
 	private boolean				isActivated		= false;
 	private boolean				isRunning		= false;
 
-	public DHTDebugView (MlDHTPlugin _plugin) {
+	public DHTDebugView(MlDHTPlugin _plugin) {
 		this.plugin = _plugin;
 		//isRunning = plugin.getDHTs().isRunning();
 	}
@@ -49,7 +49,7 @@ public class DHTDebugView implements UISWTViewEventListener {
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.ui.swt.plugins.UISWTViewEventListener#eventOccurred(org.gudy.azureus2.ui.swt.plugins.UISWTViewEvent)
 	 */
-	public boolean eventOccurred (UISWTViewEvent event) {
+	public boolean eventOccurred(UISWTViewEvent event) {
 		switch (event.getType()) {
 
 		case UISWTViewEvent.TYPE_CREATE:
