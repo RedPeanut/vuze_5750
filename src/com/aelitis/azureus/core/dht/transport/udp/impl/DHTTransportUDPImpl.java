@@ -94,12 +94,6 @@ import com.aelitis.azureus.core.util.bloom.BloomFilterFactory;
 import com.aelitis.azureus.core.versioncheck.VersionCheckClient;
 import com.aelitis.net.udp.uc.PRUDPPacketHandler;
 
-import hello.util.Log;
-import hello.util.SingleCounter1;
-import hello.util.SingleCounter2;
-import hello.util.SingleCounter3;
-import hello.util.Util;
-
 /**
  * @author parg
  *
