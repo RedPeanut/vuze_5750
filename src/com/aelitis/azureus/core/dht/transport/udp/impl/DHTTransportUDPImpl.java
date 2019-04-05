@@ -116,15 +116,15 @@ public class DHTTransportUDPImpl
 	private String				external_address;
 	private int					min_address_change_period = MIN_ADDRESS_CHANGE_PERIOD_INIT_DEFAULT;
 
-	private final byte			protocol_version;
+	private final byte			protocolVersion;
 	private final int			network;
 	private final boolean		v6;
 	private final String		ip_override;
 	private int					port;
-	private final int			max_fails_for_live;
-	private final int			max_fails_for_unknown;
+	private final int			maxFailsForLive;
+	private final int			maxFailsForUnknown;
 	private long				requestTimeout;
-	private long				store_timeout;
+	private long				storeTimeout;
 	private boolean				reachable;
 	private boolean				reachable_accurate;
 	private final int			dhtSendDelay;
@@ -170,7 +170,7 @@ public class DHTTransportUDPImpl
 
 	private static final int RECENT_REPORTS_HISTORY_MAX = 32;
 
-	private final Map	recent_reports =
+	private final Map	recentReports =
 			new LinkedHashMap(RECENT_REPORTS_HISTORY_MAX,0.75f,true) {
 				protected boolean removeEldestEntry(
 			   		Map.Entry eldest) {
@@ -205,37 +205,36 @@ public class DHTTransportUDPImpl
 	private final DHTTransferHandler xferHandler;
 
 	public DHTTransportUDPImpl(
-		byte			_protocol_version,
+		byte			_protocolVersion,
 		int				_network,
 		boolean			_v6,
 		String			_ip,
-		String			_default_ip,
+		String			_defaultIp,
 		int				_port,
-		int				_max_fails_for_live,
-		int				_max_fails_for_unknown,
+		int				_maxFailsForLive,
+		int				_maxFailsForUnknown,
 		long			_timeout,
-		int				_dht_send_delay,
-		int				_dht_receive_delay,
-		boolean			_bootstrap_node,
-		boolean			_initial_reachability,
-		DHTLogger		_logger )
-
+		int				_dhtSendDelay,
+		int				_dhtReceiveDelay,
+		boolean			_bootstrapNode,
+		boolean			_initialReachability,
+		DHTLogger		_logger)
 		throws DHTTransportException
 	{
-		protocol_version		= _protocol_version;
+		protocolVersion			= _protocolVersion;
 		network					= _network;
 		v6						= _v6;
 		ip_override				= _ip;
 		port					= _port;
-		max_fails_for_live		= _max_fails_for_live;
-		max_fails_for_unknown	= _max_fails_for_unknown;
+		maxFailsForLive			= _maxFailsForLive;
+		maxFailsForUnknown		= _maxFailsForUnknown;
 		requestTimeout			= _timeout;
-		dhtSendDelay			= _dht_send_delay;
-		dhtReceiveDelay		= _dht_receive_delay;
-		bootstrapNode			= _bootstrap_node;
-		reachable				= _initial_reachability;
+		dhtSendDelay			= _dhtSendDelay;
+		dhtReceiveDelay			= _dhtReceiveDelay;
+		bootstrapNode			= _bootstrapNode;
+		reachable				= _initialReachability;
 		logger					= _logger;
-		store_timeout			= requestTimeout * STORE_TIMEOUT_MULTIPLIER;
+		storeTimeout			= requestTimeout * STORE_TIMEOUT_MULTIPLIER;
 		try {
 			random = RandomUtils.SECURE_RANDOM;
 		} catch (Throwable e) {
@@ -297,7 +296,7 @@ public class DHTTransportUDPImpl
 					checkAltContacts();
 				}
 			});
-		String default_ip = _default_ip==null?(v6?"::1":"127.0.0.1"):_default_ip;
+		String default_ip = _defaultIp==null?(v6?"::1":"127.0.0.1"):_defaultIp;
 		getExternalAddress(default_ip, logger);
 		InetSocketAddress address = new InetSocketAddress(external_address, port);
 		DHTNetworkPositionManager.addProviderListener(
@@ -334,7 +333,7 @@ public class DHTTransportUDPImpl
 		localContact = new DHTTransportUDPContactImpl(true, this, 
 				address, // transport
 				address, // external
-				protocol_version, random.nextInt(), 0, (byte)0);
+				protocolVersion, random.nextInt(), 0, (byte)0);
 	}
 
 	protected void createPacketHandler() throws DHTTransportException {
@@ -356,7 +355,7 @@ public class DHTTransportUDPImpl
 		packetHandler.setDelays(dhtSendDelay, dhtReceiveDelay, (int)requestTimeout);
 		statsStartTime = SystemTime.getCurrentTime();
 		if (stats == null) {
-			stats = new DHTTransportUDPStatsImpl(this, protocol_version, packetHandler.getStats());
+			stats = new DHTTransportUDPStatsImpl(this, protocolVersion, packetHandler.getStats());
 		} else {
 			stats.setStats(packetHandler.getStats());
 		}
@@ -468,7 +467,7 @@ public class DHTTransportUDPImpl
 
 	public byte
 	getProtocolVersion() {
-		return (protocol_version);
+		return (protocolVersion);
 	}
 
 	public byte
@@ -501,7 +500,7 @@ public class DHTTransportUDPImpl
 			return;
 		}
 		requestTimeout = timeout;
-		store_timeout   = requestTimeout * STORE_TIMEOUT_MULTIPLIER;
+		storeTimeout   = requestTimeout * STORE_TIMEOUT_MULTIPLIER;
 		packetHandler.setDelays(dhtSendDelay, dhtReceiveDelay, (int)requestTimeout);
 	}
 
@@ -539,7 +538,7 @@ public class DHTTransportUDPImpl
 
 		throws DHTTransportException
 	{
-		localContact = new DHTTransportUDPContactImpl(true, this, localContact.getTransportAddress(), localContact.getExternalAddress(), protocol_version, random.nextInt(), 0, (byte)0);
+		localContact = new DHTTransportUDPContactImpl(true, this, localContact.getTransportAddress(), localContact.getExternalAddress(), protocolVersion, random.nextInt(), 0, (byte)0);
 	}
 
 	public void testTransportIDChange()
@@ -552,7 +551,7 @@ public class DHTTransportUDPImpl
 			external_address = "127.0.0.1";
 		}
 		InetSocketAddress	address = new InetSocketAddress(external_address, port);
-		localContact = new DHTTransportUDPContactImpl(true, this, address, address, protocol_version, localContact.getInstanceID(), 0, (byte)0);
+		localContact = new DHTTransportUDPContactImpl(true, this, address, address, protocolVersion, localContact.getInstanceID(), 0, (byte)0);
 		for (int i=0;i<listeners.size();i++) {
 			try {
 				((DHTTransportListener)listeners.get(i)).localContactChanged(localContact);
@@ -1002,11 +1001,11 @@ public class DHTTransportUDPImpl
 	}
 
 	protected int getMaxFailForLiveCount() {
-		return (max_fails_for_live);
+		return (maxFailsForLive);
 	}
 
 	protected int getMaxFailForUnknownCount() {
-		return (max_fails_for_unknown);
+		return (maxFailsForUnknown);
 	}
 
 	public DHTTransportContact
@@ -1017,7 +1016,7 @@ public class DHTTransportUDPImpl
 	protected void setLocalContact() {
 		InetSocketAddress	s_address = new InetSocketAddress(external_address, port);
 		try {
-			localContact = new DHTTransportUDPContactImpl(true, DHTTransportUDPImpl.this, s_address, s_address, protocol_version, random.nextInt(), 0, (byte)0);
+			localContact = new DHTTransportUDPContactImpl(true, DHTTransportUDPImpl.this, s_address, s_address, protocolVersion, random.nextInt(), 0, (byte)0);
 			logger.log("External address changed: " + s_address);
 			Debug.out("DHTTransport: address changed to " + s_address);
 			for (int i=0;i<listeners.size();i++) {
@@ -1376,6 +1375,7 @@ public class DHTTransportUDPImpl
 							error(new DHTUDPPacketHandlerException("send key block failed", e));
 						}
 					}
+					
 					public void error(
 						DHTUDPPacketHandlerException	e) {
 						stats.keyBlockFailed();
@@ -1626,7 +1626,7 @@ public class DHTTransportUDPImpl
 							}
 						}
 					},
-					store_timeout,
+					storeTimeout,
 					priority);
 			}
 		} catch (Throwable e) {
@@ -1981,35 +1981,28 @@ outer:
 		xferHandler.unregisterTransferHandler(handler_key, handler);
 	}
 
-	public byte[]
-	readTransfer(
+	public byte[] readTransfer(
 		DHTTransportProgressListener	listener,
 		DHTTransportContact				target,
-		byte[]							handler_key,
+		byte[]							handlerKey,
 		byte[]							key,
 		long							timeout )
-
-		throws DHTTransportException
-	{
+		throws DHTTransportException {
 		InetAddress ia = target.getAddress().getAddress();
-
 		if (	(ia instanceof Inet4Address && v6) ||
 				(ia instanceof Inet6Address && !v6)) {
-
 			throw (new DHTTransportException("Incompatible address"));
 		}
-
-		return (xferHandler.readTransfer( listener, target, handler_key, key, timeout));
+		return (xferHandler.readTransfer(listener, target, handlerKey, key, timeout));
 	}
 
 	public void writeTransfer(
 		DHTTransportProgressListener	listener,
 		DHTTransportContact				target,
-		byte[]							handler_key,
+		byte[]							handlerKey,
 		byte[]							key,
 		byte[]							data,
 		long							timeout )
-
 		throws DHTTransportException
 	{
 		InetAddress ia = target.getAddress().getAddress();
@@ -2020,14 +2013,13 @@ outer:
 			throw (new DHTTransportException("Incompatible address"));
 		}
 
-		xferHandler.writeTransfer(listener, target, handler_key, key, data, timeout);
+		xferHandler.writeTransfer(listener, target, handlerKey, key, data, timeout);
 	}
 
-	public byte[]
-	writeReadTransfer(
+	public byte[] writeReadTransfer(
 		DHTTransportProgressListener	listener,
 		DHTTransportContact				target,
-		byte[]							handler_key,
+		byte[]							handlerKey,
 		byte[]							data,
 		long							timeout )
 
@@ -2041,12 +2033,13 @@ outer:
 			throw (new DHTTransportException("Incompatible address"));
 		}
 
-		return (xferHandler.writeReadTransfer( listener, target, handler_key, data, timeout));
+		return (xferHandler.writeReadTransfer( listener, target, handlerKey, data, timeout));
 	}
 
 	protected void dataRequest(
 		final DHTTransportUDPContactImpl	originator,
 		final DHTUDPPacketData				req) {
+		
 		stats.dataReceived();
 
 		xferHandler.receivePacket(
@@ -2080,12 +2073,12 @@ outer:
 		
 		try {
 			stats.incomingRequestReceived(request, alien);
-			InetSocketAddress transport_address = request.getAddress();
+			InetSocketAddress transportAddress = request.getAddress();
 			DHTTransportUDPContactImpl originatingContact =
 				new DHTTransportUDPContactImpl(
 						false,
 						this,
-						transport_address,
+						transportAddress,
 						request.getOriginatorAddress(),
 						request.getOriginatorVersion(),
 						request.getOriginatorInstanceID(),
@@ -2103,8 +2096,8 @@ outer:
 			// as the details will help the sender discover their correct ID (hopefully)
 			if (bad_originator && !bootstrapNode) {
 				String	contact_string = originatingContact.getString();
-				if (recent_reports.get(contact_string) == null) {
-					recent_reports.put(contact_string, "");
+				if (recentReports.get(contact_string) == null) {
+					recentReports.put(contact_string, "");
 					logger.log("Node " + contact_string + " has incorrect ID, reporting it to them");
 				}
 				DHTUDPPacketReplyError reply =
@@ -2125,8 +2118,8 @@ outer:
 						new DHTTransportUDPContactImpl(
 								false,
 								this,
-								transport_address,
-								transport_address, 		// set originator address to transport
+								transportAddress,
+								transportAddress, 		// set originator address to transport
 								request.getOriginatorVersion(),
 								request.getOriginatorInstanceID(),
 								request.getClockSkew(),
@@ -2256,39 +2249,38 @@ outer:
 					requestReceiveReplyProcessor(originatingContact, reply);
 					packetHandlerStub.send( reply, request.getAddress());
 				} else if (request instanceof DHTUDPPacketRequestFindNode) {
-					DHTUDPPacketRequestFindNode	find_request = (DHTUDPPacketRequestFindNode)request;
+					DHTUDPPacketRequestFindNode	findRequest = (DHTUDPPacketRequestFindNode)request;
 					boolean	acceptable;
-						// as a bootstrap node we only accept find-node requests for the originator's
-						// ID
+					// as a bootstrap node we only accept find-node requests for the originator's ID
 					if (bootstrapNode) {
-							// log(originating_contact);
-							// let bad originators through to aid bootstrapping with bad IP
-						acceptable = bad_originator || Arrays.equals( find_request.getID(), originatingContact.getID());
+						// log(originating_contact);
+						// let bad originators through to aid bootstrapping with bad IP
+						acceptable = bad_originator || Arrays.equals(findRequest.getID(), originatingContact.getID());
 					} else {
 						acceptable	= true;
 					}
 					
 					if (acceptable) {
-						if (find_request.getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_MORE_NODE_STATUS) {
-							updateContactStatus(originatingContact, find_request.getNodeStatus(), true);
-							requestHandler.setTransportEstimatedDHTSize( find_request.getEstimatedDHTSize());
+						if (findRequest.getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_MORE_NODE_STATUS) {
+							updateContactStatus(originatingContact, findRequest.getNodeStatus(), true);
+							requestHandler.setTransportEstimatedDHTSize(findRequest.getEstimatedDHTSize());
 						}
-						DHTTransportContact[]	res =
+						DHTTransportContact[] res =
 							requestHandler.findNodeRequest(
 										originatingContact,
-										find_request.getID());
+										findRequest.getID());
 						DHTUDPPacketReplyFindNode	reply =
 							new DHTUDPPacketReplyFindNode(
 									this,
-									find_request,
+									findRequest,
 									localContact,
 									originatingContact);
-						reply.setRandomID( originatingContact.getRandomID());
-						reply.setNodeStatus( getNodeStatus());
+						reply.setRandomID(originatingContact.getRandomID());
+						reply.setNodeStatus(getNodeStatus());
 						reply.setEstimatedDHTSize( requestHandler.getTransportEstimatedDHTSize());
 						reply.setContacts(res);
 						requestReceiveReplyProcessor(originatingContact, reply);
-						packetHandlerStub.send( reply, request.getAddress());
+						packetHandlerStub.send(reply, request.getAddress());
 					}
 				} else if (request instanceof DHTUDPPacketRequestFindValue) {
 					if (!bootstrapNode) {
@@ -2384,48 +2376,48 @@ outer:
 	}
 
 	// the _state networks are populated via ping requests to other peers
-	private final Map<Integer, DHTTransportAlternativeNetworkImpl>	alt_net_states 		= new HashMap<Integer, DHTTransportAlternativeNetworkImpl>();
+	private final Map<Integer, DHTTransportAlternativeNetworkImpl>	altNetStates 		= new HashMap<Integer, DHTTransportAlternativeNetworkImpl>();
 	
 	// the _providers represent a local source of contacts that are used as a primary
 	// source of contacts for replying to other peers ping requests
-	private volatile Map<Integer, DHTTransportAlternativeNetwork>		alt_net_providers	= new HashMap<Integer, DHTTransportAlternativeNetwork>();
-	private final Object	alt_net_providers_lock = new Object();
+	private volatile Map<Integer, DHTTransportAlternativeNetwork>	altNetProviders	= new HashMap<Integer, DHTTransportAlternativeNetwork>();
+	private final Object											altNetProvidersLock = new Object();
 	{
 		for (Integer net: DHTTransportAlternativeNetwork.AT_ALL) {
-			alt_net_states.put(net, new DHTTransportAlternativeNetworkImpl( net));
+			altNetStates.put(net, new DHTTransportAlternativeNetworkImpl( net));
 		}
 	}
 
 	public DHTTransportAlternativeNetwork getAlternativeNetwork(int network_type) {
-		return (alt_net_states.get(network_type));
+		return (altNetStates.get(network_type));
 	}
 
 	public void registerAlternativeNetwork(
 		DHTTransportAlternativeNetwork		network) {
-		synchronized(alt_net_providers_lock) {
-			Map<Integer, DHTTransportAlternativeNetwork> new_providers = new HashMap<Integer, DHTTransportAlternativeNetwork>(alt_net_providers);
+		synchronized(altNetProvidersLock) {
+			Map<Integer, DHTTransportAlternativeNetwork> new_providers = new HashMap<Integer, DHTTransportAlternativeNetwork>(altNetProviders);
 			new_providers.put(network.getNetworkType(), network);
-			alt_net_providers = new_providers;
+			altNetProviders = new_providers;
 		}
 	}
 
 	public void unregisterAlternativeNetwork(
 		DHTTransportAlternativeNetwork		network) {
-		synchronized(alt_net_providers_lock) {
-			Map<Integer, DHTTransportAlternativeNetwork> new_providers = new HashMap<Integer, DHTTransportAlternativeNetwork>(alt_net_providers);
+		synchronized(altNetProvidersLock) {
+			Map<Integer, DHTTransportAlternativeNetwork> new_providers = new HashMap<Integer, DHTTransportAlternativeNetwork>(altNetProviders);
 			Iterator< Map.Entry<Integer, DHTTransportAlternativeNetwork>> it = new_providers.entrySet().iterator();
 			while (it.hasNext()) {
 				if (it.next().getValue() == network) {
 					it.remove();
 				}
 			}
-			alt_net_providers = new_providers;
+			altNetProviders = new_providers;
 		}
 	}
 
 	private void checkAltContacts() {
 		int	total_required = 0;
-		for ( DHTTransportAlternativeNetworkImpl net: alt_net_states.values()) {
+		for ( DHTTransportAlternativeNetworkImpl net: altNetStates.values()) {
 			total_required += net.getRequiredContactCount();
 		}
 		if (total_required > 0) {
@@ -2462,14 +2454,14 @@ outer:
 			int[] 	counts 		= request.getAltNetworkCounts();
 			if (alt_nets.length > 0) {
 				List<DHTTransportAlternativeContact>	alt_contacts = new ArrayList<DHTTransportAlternativeContact>();
-				Map<Integer, DHTTransportAlternativeNetwork> providers = alt_net_providers;
+				Map<Integer, DHTTransportAlternativeNetwork> providers = altNetProviders;
 				for ( int i=0; i<alt_nets.length;i++) {
 					int	count = counts[i];
 					if (count == 0) {
 						continue;
 					}
 					int	net = alt_nets[i];
-					DHTTransportAlternativeNetworkImpl local = alt_net_states.get(net);
+					DHTTransportAlternativeNetworkImpl local = altNetStates.get(net);
 					if (local == null) {
 						continue;
 					}
@@ -2497,7 +2489,7 @@ outer:
 		if (request.getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_ALT_CONTACTS) {
 				// see if we could do with any more alt contacts
 			List<int[]> wanted = null;
-			for ( DHTTransportAlternativeNetworkImpl net: alt_net_states.values()) {
+			for ( DHTTransportAlternativeNetworkImpl net: altNetStates.values()) {
 				int req = net.getRequiredContactCount();
 				if (req > 0) {
 					int net_type = net.getNetworkType();
@@ -2505,7 +2497,7 @@ outer:
 						req = Math.min(2, req);
 					}
 					if (wanted == null) {
-						wanted = new ArrayList<int[]>( alt_net_states.size());
+						wanted = new ArrayList<int[]>( altNetStates.size());
 					}
 					wanted.add(new int[]{ net_type, req });
 				}
@@ -2528,7 +2520,7 @@ outer:
 	private void receiveAltContacts(DHTUDPPacketReplyPing reply) {
 		if (reply.getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_ALT_CONTACTS) {
 			for ( DHTTransportAlternativeContact contact: reply.getAltContacts()) {
-				DHTTransportAlternativeNetworkImpl net = alt_net_states.get( contact.getNetworkType());
+				DHTTransportAlternativeNetworkImpl net = altNetStates.get( contact.getNetworkType());
 				if (net != null) {
 					net.addContactFromReply(contact);
 				}
@@ -2548,7 +2540,7 @@ outer:
 		
 		// called before sending reply to request
 		int	action = reply.getAction();
-
+		
 		if (	action == DHTUDPPacketHelper.ACT_REPLY_PING ||
 				action == DHTUDPPacketHelper.ACT_REPLY_FIND_NODE ||
 				action == DHTUDPPacketHelper.ACT_REPLY_FIND_VALUE) {
@@ -2569,50 +2561,50 @@ outer:
 	 * @return
 	 */
 	protected void requestSendReplyProcessor(
-		DHTTransportUDPContactImpl	remote_contact,
+		DHTTransportUDPContactImpl	remoteContact,
 		DHTTransportReplyHandler	handler,
 		DHTUDPPacketReply			reply,
-		long						elapsed_time )
+		long						elapsedTime)
 		throws DHTUDPPacketHandlerException
 	{
 		// called after receiving reply to request
-		// System.out.println("request:" + contact.getAddress() + " = " + elapsed_time);
-		DHTNetworkPosition[] remote_nps = reply.getNetworkPositions();
-		if (remote_nps != null) {
+		//System.out.println("request:" + contact.getAddress() + " = " + elapsedTime);
+		DHTNetworkPosition[] remoteNps = reply.getNetworkPositions();
+		if (remoteNps != null) {
 			long	proc_time = reply.getProcessingTime();
 			if (proc_time > 0) {
-				//System.out.println(elapsed_time + "/" + proc_time);
-				long rtt = elapsed_time - proc_time;
+				//System.out.println(elapsedTime + "/" + procTime);
+				long rtt = elapsedTime - proc_time;
 				if (rtt < 0) {
 					rtt = 0;
 				}
 				// save current position of target
-				remote_contact.setNetworkPositions(remote_nps);
+				remoteContact.setNetworkPositions(remoteNps);
 				// update local positions
-				DHTNetworkPositionManager.update(localContact.getNetworkPositions(), remote_contact.getID(), remote_nps, (float)rtt);
+				DHTNetworkPositionManager.update(localContact.getNetworkPositions(), remoteContact.getID(), remoteNps, (float)rtt);
 			}
 		}
-		remote_contact.setGenericFlags( reply.getGenericFlags());
+		remoteContact.setGenericFlags(reply.getGenericFlags());
 		if (reply.getAction() == DHTUDPPacketHelper.ACT_REPLY_ERROR) {
 			DHTUDPPacketReplyError	error = (DHTUDPPacketReplyError)reply;
 			switch(error.getErrorType()) {
 				case DHTUDPPacketReplyError.ET_ORIGINATOR_ADDRESS_WRONG: {
 					try {
-						externalAddressChange(remote_contact, error.getOriginatingAddress(), false);
+						externalAddressChange(remoteContact, error.getOriginatingAddress(), false);
 					} catch (DHTTransportException e) {
 						Debug.printStackTrace(e);
 					}
 					throw (new DHTUDPPacketHandlerException("address changed notification"));
 				}
 				case DHTUDPPacketReplyError.ET_KEY_BLOCKED: {
-					handler.keyBlockRequest( remote_contact, error.getKeyBlockRequest(), error.getKeyBlockSignature());
-					contactAlive(remote_contact);
+					handler.keyBlockRequest( remoteContact, error.getKeyBlockRequest(), error.getKeyBlockSignature());
+					contactAlive(remoteContact);
 					throw (new DHTUDPPacketHandlerException("key blocked"));
 				}
 			}
 			throw (new DHTUDPPacketHandlerException("unknown error type " + error.getErrorType()));
 		} else {
-			contactAlive(remote_contact);
+			contactAlive(remoteContact);
 		}
 	}
 

@@ -197,6 +197,10 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 		InetAddress			_bindIp,
 		PacketTransformer	_packetTransformer) {
 		
+		int count = SingleCounter0.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format("how many times is this called... #%d", count));
+		Log.d(TAG, "and where -->");
+		new Throwable().printStackTrace();
 		/*Log.d(TAG, "<init>() is called...");
 		new Throwable().printStackTrace();*/
 		

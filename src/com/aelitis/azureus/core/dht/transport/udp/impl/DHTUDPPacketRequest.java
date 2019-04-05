@@ -39,8 +39,8 @@ import com.aelitis.net.udp.uc.PRUDPPacketRequest;
 
 public class DHTUDPPacketRequest
 	extends 	PRUDPPacketRequest
-	implements 	DHTUDPPacket
-{
+	implements 	DHTUDPPacket {
+	
 	public static final int	DHT_HEADER_SIZE	=
 		PRUDPPacketRequest.PR_HEADER_SIZE +
 		1 + 		// protocol version

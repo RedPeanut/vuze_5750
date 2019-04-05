@@ -31,10 +31,8 @@ import com.aelitis.azureus.core.dht.transport.udp.impl.packethandler.DHTUDPPacke
  *
  */
 
-public class
-DHTUDPPacketRequestFindValue
-	extends DHTUDPPacketRequest
-{
+public class DHTUDPPacketRequestFindValue extends DHTUDPPacketRequest {
+	
 	private byte[]		id;
 	private byte		flags;
 	private byte		maximum_values;
@@ -52,64 +50,43 @@ DHTUDPPacketRequestFindValue
 		DataInputStream					is,
 		long							con_id,
 		int								trans_id )
-
-		throws IOException
-	{
+		throws IOException {
 		super(network_handler, is,  DHTUDPPacketHelper.ACT_REQUEST_FIND_VALUE, con_id, trans_id);
-
 		id = DHTUDPUtils.deserialiseByteArray(is, 64);
-
 		flags = is.readByte();
-
 		maximum_values	= is.readByte();
-
 		super.postDeserialise(is);
 	}
 
-	public void serialise(
-		DataOutputStream	os )
-
-		throws IOException
-	{
+	public void serialise(DataOutputStream os) throws IOException {
 		super.serialise(os);
-
 		DHTUDPUtils.serialiseByteArray(os, id, 64);
-
 		os.writeByte(flags);
-
 		os.writeByte(maximum_values);
-
 		super.postSerialise(os);
 	}
 
-	protected void setID(
-		byte[]	_id) {
-		id	= _id;
+	protected void setID(byte[] _id) {
+		id = _id;
 	}
 
-	protected byte[]
-	getID() {
+	protected byte[] getID() {
 		return (id);
 	}
 
-	protected byte
-	getFlags() {
+	protected byte getFlags() {
 		return (flags);
 	}
 
-	protected void setFlags(
-		byte		_flags) {
-		flags	= _flags;
+	protected void setFlags(byte _flags) {
+		flags = _flags;
 	}
 
-	protected void setMaximumValues(
-		int		max) {
+	protected void setMaximumValues(int max) {
 		if (max > 255) {
-
-			max	= 255;
+			max = 255;
 		}
-
-		maximum_values	= (byte)max;
+		maximum_values = (byte) max;
 	}
 
 	protected int getMaximumValues() {

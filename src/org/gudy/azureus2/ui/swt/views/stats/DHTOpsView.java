@@ -52,7 +52,7 @@ public class DHTOpsView implements UISWTViewEventListener {
 	private final boolean autoAlpha;
 	private final boolean autoDHT;
 
-	private int dht_type;
+	private int dhtType;
 	private AzureusCore core;
 	private UISWTView swtView;
 
@@ -65,62 +65,49 @@ public class DHTOpsView implements UISWTViewEventListener {
 	}
 
 	public DHTOpsView(boolean autoAlpha, boolean autoDHT) {
-		this.autoAlpha = autoAlpha;
+		this.autoAlpha	= autoAlpha;
 		this.autoDHT	= autoDHT;
 	}
 
 	private void init(AzureusCore core) {
 		try {
-			PluginInterface dht_pi = core.getPluginManager().getPluginInterfaceByClass(DHTPlugin.class);
-
-			if (dht_pi == null) {
-
+			PluginInterface dhtPI = core.getPluginManager().getPluginInterfaceByClass(DHTPlugin.class);
+			if (dhtPI == null) {
 				if (drawPanel != null) {
-
 					drawPanel.setUnavailable();
 				}
-
 				return;
 			}
-
-			DHTPlugin dht_plugin = (DHTPlugin)dht_pi.getPlugin();
-
-			DHT[] dhts = dht_plugin.getDHTs();
-
+			DHTPlugin dhtPlugin = (DHTPlugin)dhtPI.getPlugin();
+			DHT[] dhts = dhtPlugin.getDHTs();
 			for (int i=0;i<dhts.length;i++) {
-				if (dhts[i].getTransport().getNetwork() == dht_type) {
+				if (dhts[i].getTransport().getNetwork() == dhtType) {
 					dht = dhts[i];
 					break;
 				}
 			}
-
+			
 			if (drawPanel != null) {
-
-				if (	dht == null &&
-						!dht_plugin.isInitialising()) {
-
+				if (dht == null && !dhtPlugin.isInitialising()) {
 					drawPanel.setUnavailable();
 				}
 			}
-
-			if (dht == null) {
+			
+			if (dht == null)
 				return;
-			}
 
 		} catch (Exception e) {
 			Debug.printStackTrace(e);
 		}
 	}
 
-	public void setDHT(
-		DHT		_dht) {
-		dht	= _dht;
+	public void setDHT(DHT _dht) {
+		dht = _dht;
 	}
 
 	public void initialize(Composite composite) {
 		if (autoDHT) {
 			AzureusCoreFactory.addCoreRunningListener(new AzureusCoreRunningListener() {
-
 				public void azureusCoreRunning(AzureusCore core) {
 					DHTOpsView.this.core = core;
 					init(core);
@@ -157,8 +144,7 @@ public class DHTOpsView implements UISWTViewEventListener {
 		return (MSGID_PREFIX + ".title.full");
 	}
 
-	public
-	void delete() {
+	public void delete() {
 		if (drawPanel != null) {
 			drawPanel.delete();
 		}
@@ -166,41 +152,41 @@ public class DHTOpsView implements UISWTViewEventListener {
 
 	public boolean eventOccurred(UISWTViewEvent event) {
 		switch (event.getType()) {
-		case UISWTViewEvent.TYPE_CREATE:
-			swtView = (UISWTView)event.getData();
-			swtView.setTitle(MessageText.getString(getTitleID()));
-			break;
-
-		case UISWTViewEvent.TYPE_DESTROY:
-			delete();
-			break;
-
-		case UISWTViewEvent.TYPE_INITIALIZE:
-			initialize((Composite)event.getData());
-			break;
-
-		case UISWTViewEvent.TYPE_LANGUAGEUPDATE:
-			Messages.updateLanguageForControl(getComposite());
-			if (swtView != null) {
+			case UISWTViewEvent.TYPE_CREATE:
+				swtView = (UISWTView)event.getData();
 				swtView.setTitle(MessageText.getString(getTitleID()));
-			}
-			break;
-
-		case UISWTViewEvent.TYPE_DATASOURCE_CHANGED:
-			if (event.getData() instanceof Number) {
-				dht_type = ((Number) event.getData()).intValue();
+				break;
+	
+			case UISWTViewEvent.TYPE_DESTROY:
+				delete();
+				break;
+	
+			case UISWTViewEvent.TYPE_INITIALIZE:
+				initialize((Composite)event.getData());
+				break;
+	
+			case UISWTViewEvent.TYPE_LANGUAGEUPDATE:
+				Messages.updateLanguageForControl(getComposite());
 				if (swtView != null) {
 					swtView.setTitle(MessageText.getString(getTitleID()));
 				}
-			}
-			break;
-
-		case UISWTViewEvent.TYPE_FOCUSGAINED:
-			break;
-
-		case UISWTViewEvent.TYPE_REFRESH:
-			refresh();
-			break;
+				break;
+	
+			case UISWTViewEvent.TYPE_DATASOURCE_CHANGED:
+				if (event.getData() instanceof Number) {
+					dhtType = ((Number) event.getData()).intValue();
+					if (swtView != null) {
+						swtView.setTitle(MessageText.getString(getTitleID()));
+					}
+				}
+				break;
+	
+			case UISWTViewEvent.TYPE_FOCUSGAINED:
+				break;
+	
+			case UISWTViewEvent.TYPE_REFRESH:
+				refresh();
+				break;
 		}
 
 		return true;

@@ -550,7 +550,7 @@ public class DHT implements DHTBase {
 				} catch (Throwable e) {
 					log(e, LogLevel.Fatal);
 				}
-			}	
+			}
 		}, 5000, DHTConstants.DHT_UPDATE_INTERVAL, TimeUnit.MILLISECONDS));
 
 		// initialize as many RPC servers as we need 

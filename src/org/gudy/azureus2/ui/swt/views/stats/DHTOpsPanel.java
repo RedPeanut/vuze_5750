@@ -49,9 +49,8 @@ import com.aelitis.azureus.core.dht.control.DHTControlActivity.ActivityNode;
 import com.aelitis.azureus.core.dht.control.DHTControlActivity.ActivityState;
 import com.aelitis.azureus.ui.swt.utils.ColorCache;
 
-public class DHTOpsPanel
-	implements DHTControlListener
-{
+public class DHTOpsPanel implements DHTControlListener {
+	
 	private static final int ALPHA_FOCUS = 255;
 	private static final int ALPHA_NOFOCUS = 150;
 
@@ -78,7 +77,7 @@ public class DHTOpsPanel
 
 	private boolean autoAlpha = false;
 
-	private DHT				current_dht;
+	private DHT				currentDht;
 	private ActivityFilter	filter;
 
 	private Map<DHTControlActivity,ActivityDetail>	activityMap = new HashMap<DHTControlActivity,ActivityDetail>();
@@ -240,13 +239,9 @@ public class DHTOpsPanel
 				}
 
 				if (do_refresh) {
-
 					long now = SystemTime.getMonotonousTime();
-
 					if (now - last_refresh >= 250) {
-
 						last_refresh = now;
-
 						refresh();
 					}
 				}
@@ -278,22 +273,14 @@ public class DHTOpsPanel
 					public void perform(
 						TimerEvent event) {
 						if (canvas.isDisposed()) {
-
 							timeout_timer.cancel();
-
 							return;
 						}
-
 						synchronized(activityMap) {
-
 							Iterator<ActivityDetail> it = activityMap.values().iterator();
-
 							while (it.hasNext()) {
-
 								ActivityDetail act = it.next();
-
 								if (act.isComplete()) {
-
 									it.remove();
 								}
 							}
@@ -335,9 +322,7 @@ public class DHTOpsPanel
 			new Runnable() {
 				public void run() {
 					unavailable = true;
-
 					if (!canvas.isDisposed()) {
-
 						canvas.redraw();
 					}
 				}
@@ -345,11 +330,11 @@ public class DHTOpsPanel
 	}
 
 	public void refreshView(DHT dht) {
-		if (current_dht != dht) {
-			if (current_dht != null) {
-				current_dht.getControl().removeListener(this);
+		if (currentDht != dht) {
+			if (currentDht != null) {
+				currentDht.getControl().removeListener(this);
 			}
-			current_dht = dht;
+			currentDht = dht;
 			synchronized (activityMap) {
 				activityMap.clear();
 			}
@@ -358,17 +343,14 @@ public class DHTOpsPanel
 		refresh();
 	}
 
-	public void setFilter(
-		ActivityFilter		f) {
+	public void setFilter(ActivityFilter f) {
 		filter = f;
 	}
 
-		/**
-		 * @param min things don't work well for < 4...
-		 */
-
-	public void setMinimumSlots(
-		int		min) {
+	/**
+	 * @param min things don't work well for < 4...
+	 */
+	public void setMinimumSlots(int min) {
 		minSlots = min;
 	}
 
@@ -444,7 +426,7 @@ public class DHTOpsPanel
 		for (ActivityDetail details: activities) {
 			details.draw(gc, xOrigin, yOrigin, sliceAngle);
 		}
-		gc.setForeground(ColorCache.getColor( gc.getDevice(), 0, 0, 0));
+		gc.setForeground(ColorCache.getColor(gc.getDevice(), 0, 0, 0));
 		if (activities.size() == 0) {
 			gc.drawText(MessageText.getString( DHTOpsView.MSGID_PREFIX + ".idle" ), xOrigin, yOrigin);
 		} else {
@@ -461,8 +443,6 @@ public class DHTOpsPanel
 			}
 		}
 	}
-
-
 
 	public int getAlpha() {
 		return alpha;
@@ -486,16 +466,11 @@ public class DHTOpsPanel
 		if (img != null && !img.isDisposed()) {
 			img.dispose();
 		}
-
-		if (current_dht != null) {
-
-			current_dht.getControl().removeListener(this);
-
-			current_dht = null;
+		if (currentDht != null) {
+			currentDht.getControl().removeListener(this);
+			currentDht = null;
 		}
-
-		synchronized(activityMap) {
-
+		synchronized (activityMap) {
 			activityMap.clear();
 		}
 	}
@@ -625,10 +600,7 @@ public class DHTOpsPanel
 		}
 	}
 
-	public interface
-	ActivityFilter
-	{
-		public boolean accept(
-			DHTControlActivity		activity);
+	public interface ActivityFilter {
+		public boolean accept(DHTControlActivity activity);
 	}
 }

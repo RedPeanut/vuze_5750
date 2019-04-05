@@ -828,8 +828,8 @@ public class DHTRouterImpl implements DHTRouter {
 		// this function called once
 		Log.d(TAG, String.format("seedSupport() is called..."));
 		
-		Log.d(TAG, ">>> before...");
-		print();
+		//Log.d(TAG, ">>> before...");
+		//print();
 		
 		// refresh all buckets apart from closest neighbour
 		byte[]	path = new byte[routerNodeId.length];
@@ -841,8 +841,8 @@ public class DHTRouterImpl implements DHTRouter {
 			monitor.exit();
 		}
 		
-		Log.d(TAG, ">>> after...");
-		print();
+		//Log.d(TAG, ">>> after...");
+		//print();
 		
 		Log.d(TAG, ">>> ids.size() = " + ids.size());
 		for (int i=0;i<ids.size();i++) {

@@ -430,9 +430,9 @@ public class COConfigurationManager {
 		for (int i=0;i<parameters.length;i++) {
 			ConfigurationManager.getInstance().addParameterListener(parameters[i], listener);
 		}
-
 		listener.parameterChanged(null);
 	}
+	
 	public static void removeParameterListener(String parameter, ParameterListener listener) {
 		ConfigurationManager.getInstance().removeParameterListener(parameter, listener);
 	}

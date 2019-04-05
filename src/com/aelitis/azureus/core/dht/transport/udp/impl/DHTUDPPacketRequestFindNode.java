@@ -67,8 +67,7 @@ public class DHTUDPPacketRequestFindNode extends DHTUDPPacketRequest {
 	}
 
 	public void serialise(DataOutputStream os)
-		throws IOException
-	{
+		throws IOException {
 		super.serialise(os);
 		DHTUDPUtils.serialiseByteArray(os, id, 64);
 		if (getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_MORE_NODE_STATUS) {

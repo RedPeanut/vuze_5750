@@ -421,14 +421,14 @@ public class RPCServer implements Runnable, RPCServerBase {
 	 */
 	public void sendMessage(MessageBase msg) {
 		
-		if (msg instanceof FindNodeRequest)
+		/*if (msg instanceof FindNodeRequest)
 			Log.d(TAG, "FindNodeRequest is sent...");
 		else if (msg instanceof AnnounceRequest)
 			Log.d(TAG, "AnnounceRequest is sent...");
 		else if (msg instanceof GetPeersRequest)
 			Log.d(TAG, "GetPeersRequest is sent...");
 		else if (msg instanceof PingRequest)
-			Log.d(TAG, "PingRequest is sent...");
+			Log.d(TAG, "PingRequest is sent...");*/
 		
 		if (SingleCounter9.getInstance().getAndIncreaseCount() == 1)
 			new Throwable().printStackTrace();

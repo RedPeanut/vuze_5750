@@ -147,13 +147,13 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	private final int	cache_at_closest_n;
 	final int			K;
 	private final int	B;
-	private final int	max_rep_per_node;
+	private final int	maxRepPerNode;
 
 	private final boolean	encode_keys;
 	private final boolean	enable_random_poking;
 
-	private long		router_start_time;
-	private int			router_count;
+	private long		routerStartTime;
+	private int			routerCount;
 
 	final ThreadPool internalLookupPool;
 	final ThreadPool externalLookupPool;
@@ -171,25 +171,26 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			"DHTControl:listenDispatcher",
 			new ListenerManagerDispatcher<DHTControlListener>() {
 				public void dispatch(
-					DHTControlListener		listener,
-					int			type,
-					Object		value) {
+					DHTControlListener	listener,
+					int					type,
+					Object				value) {
 					listener.activityChanged((DHTControlActivity)value, type);
 				}
-			});
+			}
+	);
 
 	final List		activities		= new ArrayList();
 	final AEMonitor	activityMonitor	= new AEMonitor("DHTControl:activities");
 
 	protected final AEMonitor	estimateMon		= new AEMonitor("DHTControl:estimate");
-	private long		last_dht_estimate_time;
-	private long		local_dht_estimate;
-	private long		combined_dht_estimate;
-	private int			combined_dht_estimate_mag;
+	private long		lastDhtEstimateTime;
+	private long		localDhtEstimate;
+	private long		combinedDhtEstimate;
+	private int			combinedDhtEstimateMag;
 
 	private static final int	LOCAL_ESTIMATE_HISTORY	= 32;
 
-	private final Map	local_estimate_values =
+	private final Map	localEstimateValues =
 		new LinkedHashMap(LOCAL_ESTIMATE_HISTORY, 0.75f, true) {
 			protected boolean  removeEldestEntry(Map.Entry eldest)  {
 				return (size() > LOCAL_ESTIMATE_HISTORY);
@@ -198,9 +199,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 	private static final int	REMOTE_ESTIMATE_HISTORY	= 128;
 
-	private final List	remote_estimate_values = new LinkedList();
+	private final List	remoteEstimateValues = new LinkedList();
 
-	protected final AEMonitor	spoof_mon		= new AEMonitor("DHTControl:spoof");
+	protected final AEMonitor	spoofMon		= new AEMonitor("DHTControl:spoof");
 
 	//private Cipher 			spoof_cipher;
 	//private SecretKey		spoof_key;
@@ -209,14 +210,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 	private static final int	SPOOF_GEN_HISTORY_SIZE	= 256;
 
-	private final Map<InetAddress,Integer>	spoof_gen_history =
+	private final Map<InetAddress,Integer>	spoofGenHistory =
 		new LinkedHashMap<InetAddress,Integer>(SPOOF_GEN_HISTORY_SIZE, 0.75f, true) {
 			protected boolean  removeEldestEntry(Map.Entry<InetAddress,Integer> eldest) {
 				return (size() > SPOOF_GEN_HISTORY_SIZE);
 			}
 		};
 
-	private final Map<HashWrapper,byte[]> spoof_gen_history2 =
+	private final Map<HashWrapper,byte[]> spoofGenHistory2 =
 			new LinkedHashMap<HashWrapper,byte[]>(SPOOF_GEN_HISTORY_SIZE,0.75f,true) {
 				protected boolean  removeEldestEntry(Map.Entry<HashWrapper,byte[]> eldest) {
 					return (size() > SPOOF_GEN_HISTORY_SIZE);
@@ -225,11 +226,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 	private final static int SPOOF_ID2_SIZE	= 8;
 
-	private long			last_node_add_check;
-	private byte[]			node_add_check_uninteresting_limit;
+	private long			lastNodeAddCheck;
+	private byte[]			nodeAddCheckUninterestingLimit;
 
-	private long			rbs_time;
-	private byte[]			rbs_id	= {};
+	private long			rbsTime;
+	private byte[]			rbsId	= {};
 
 	private boolean			sleeping;
 	private boolean			suspended;
@@ -259,7 +260,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 		K								= _K;
 		B								= _B;
-		max_rep_per_node				= _max_rep_per_node;
+		maxRepPerNode				= _max_rep_per_node;
 		searchConcurrency				= _search_concurrency;
 		lookupConcurrency				= _lookup_concurrency;
 		cache_at_closest_n				= _cache_at_closest_n;
@@ -268,7 +269,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 		// set this so we don't do initial calculation until reasonably populated
 
-		last_dht_estimate_time	= SystemTime.getCurrentTime();
+		lastDhtEstimateTime	= SystemTime.getCurrentTime();
 
 		database = DHTDBFactory.create(
 						adapter.getStorageAdapter(),
@@ -436,7 +437,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 		K						= _K;
 		B						= _B;
-		max_rep_per_node		= _max_rep_per_node;
+		maxRepPerNode		= _max_rep_per_node;
 		searchConcurrency		= _searchConcurrency;
 		lookupConcurrency		= _lookupConcurrency;
 		cache_at_closest_n		= _cache_at_closest_n;
@@ -444,7 +445,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		enable_random_poking	= _enable_random_poking;
 
 		// set this so we don't do initial calculation until reasonably populated
-		last_dht_estimate_time	= SystemTime.getCurrentTime();
+		lastDhtEstimateTime	= SystemTime.getCurrentTime();
 
 		database = _database;
 
@@ -456,7 +457,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		externalPutPool = new ThreadPool("DHTControl:puts", EXTERNAL_PUT_CONCURRENCY, true);
 
 		router				= _router;
-		router_start_time	= SystemTime.getCurrentTime();
+		routerStartTime	= SystemTime.getCurrentTime();
 
 		localContact = transport.getLocalContact();
 		database.setControl(this);
@@ -493,14 +494,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		Throwable t = new Throwable();
 		t.printStackTrace();*/
 		
-		router_start_time	= SystemTime.getCurrentTime();
-		router_count++;
+		routerStartTime	= SystemTime.getCurrentTime();
+		routerCount++;
 		localContact = _local_contact;
 		if (router != null) {
 			router.destroy();
 		}
 		router = DHTRouterFactory.create(
-					K, B, max_rep_per_node,
+					K, B, maxRepPerNode,
 					localContact.getID(),
 					new DHTControlContactImpl(localContact),
 					logger);
@@ -515,6 +516,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				public void requestPing(DHTRouterContact contact) {
 					//Log.d(TAG, "requestPing() is called...");
 					DHTControlImpl.this.requestPing(contact);
+					//requestPing(contact);
 				}
 				
 				public void requestLookup(
@@ -557,14 +559,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 	public long getRouterUptime() {
 		long	now = SystemTime.getCurrentTime();
-		if (now < router_start_time) {
-			router_start_time	= now;
+		if (now < routerStartTime) {
+			routerStartTime	= now;
 		}
-		return ( now - router_start_time);
+		return ( now - routerStartTime);
 	}
 
 	public int getRouterCount() {
-		return (router_count);
+		return (routerCount);
 	}
 
 	public void	setSleeping(boolean	asleep) {
@@ -1394,12 +1396,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	protected int getMaxDivDepth() {
-		if (combined_dht_estimate == 0) {
+		if (combinedDhtEstimate == 0) {
 
 			getEstimatedDHTSize();
 		}
 
-		int max = Math.max(2, combined_dht_estimate_mag);
+		int max = Math.max(2, combinedDhtEstimateMag);
 
 		// System.out.println("net:" + transport.getNetwork() + " - max_div_depth=" + max);
 
@@ -2149,7 +2151,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 									if (DHTLog.isOn()) {
 										DHTLog.log("lookup: terminates - we've searched the closest " + searchAccuracy + " contacts");
 									}
-									Log.d(TAG, "lookup: terminates - we've searched the closest " + searchAccuracy + " contacts");
+									//Log.d(TAG, "lookup: terminates - we've searched the closest " + searchAccuracy + " contacts");
 									terminate = true;
 									break;
 								}
@@ -2714,7 +2716,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				boolean store_it = true;
 				if (cache_forward) {
 					long	now = SystemTime.getMonotonousTime();
-					if (now - rbs_time < 10*1000 && Arrays.equals( originator_id, rbs_id)) {
+					if (now - rbsTime < 10*1000 && Arrays.equals( originator_id, rbsId)) {
 						// System.out.println("contact too far away - repeat");
 						store_it = false;
 					} else {
@@ -2722,8 +2724,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 						List<DHTTransportContact>closest_contacts = getClosestContactsList(my_id, c_factor, true);
 						DHTTransportContact	furthest = closest_contacts.get( closest_contacts.size()-1);
 						if (computeAndCompareDistances(furthest.getID(), originator_id, my_id) < 0) {
-							rbs_id 		= originator_id;
-							rbs_time	= now;
+							rbsId 		= originator_id;
+							rbsTime	= now;
 							// System.out.println("contact too far away");
 							if (DHTLog.isOn()) {
 								DHTLog.log("Not storing keys as cache forward and sender too far away");
@@ -2940,15 +2942,15 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		
 		// see if we're one of the K closest to the new node
 		// optimise to avoid calculating for things obviously too far away
-		boolean	perform_closeness_check = true;
+		boolean	performClosenessCheck = true;
 		byte[] routerId 	= router.getID();
 		byte[] contactId	= newContact.getID();
 		byte[] distance = computeDistance(routerId, contactId);
 		long now = SystemTime.getCurrentTime();
-		byte[] nacul = node_add_check_uninteresting_limit;
+		byte[] nacul = nodeAddCheckUninterestingLimit;
 		
 		// time limit to pick up router changes caused by contacts being deleted
-		if (now - last_node_add_check < 30*1000 && nacul != null) {
+		if (now - lastNodeAddCheck < 30*1000 && nacul != null) {
 			int res = compareDistances(nacul, distance);
 			/*
 			System.out.println(
@@ -2959,45 +2961,46 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				",r=" + res);
 			*/
 			if (res < 0) {
-				perform_closeness_check = false;
+				performClosenessCheck = false;
 			}
 		} else {
-			last_node_add_check					= now;
-			node_add_check_uninteresting_limit 	= nacul = null;
+			lastNodeAddCheck				= now;
+			nodeAddCheckUninterestingLimit 	= nacul = null;
 		}
 		boolean	close	= false;
-		if (perform_closeness_check) {
-			List	closest_contacts = getClosestKContactsList(newContact.getID(), false);
-			for (int i=0;i<closest_contacts.size();i++) {
-				if (router.isID(((DHTTransportContact)closest_contacts.get(i)).getID())) {
+		if (performClosenessCheck) {
+			List	closestContacts = getClosestKContactsList(newContact.getID(), false);
+			for (int i=0;i<closestContacts.size();i++) {
+				if (router.isID(((DHTTransportContact)closestContacts.get(i)).getID())) {
 					close	= true;
 					break;
 				}
 			}
 			if (!close) {
 				if (nacul == null) {
-					node_add_check_uninteresting_limit = distance;
+					nodeAddCheckUninterestingLimit = distance;
 				} else {
 					if (compareDistances(nacul, distance) > 0) {
-						node_add_check_uninteresting_limit = distance;
+						nodeAddCheckUninterestingLimit = distance;
 					}
 				}
 			}
 		}
+		
 		if (!close) {
 			if (!newContact.hasBeenAlive()) {
 				requestPing(newContact);
 			}
 			return;
 		}
-		// System.out.println("Node added to router: id=" + ByteFormatter.encodeString( contact_id));
+		// System.out.println("Node added to router: id=" + ByteFormatter.encodeString(contact_id));
 		
 		// ok, we're close enough to worry about transferring values
 		Iterator	it = database.getKeys();
 		while (it.hasNext()) {
 			HashWrapper	key		= (HashWrapper)it.next();
-			byte[]	encoded_key		= key.getHash();
-			if (database.isKeyBlocked( encoded_key)) {
+			byte[]	encodedKey	= key.getHash();
+			if (database.isKeyBlocked(encodedKey)) {
 				continue;
 			}
 			DHTDBLookupResult	result = database.get(null, key, 0, (byte)0, false);
@@ -3017,16 +3020,16 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			// we don't consider any cached further away than the initial location, for transfer
 			// however, we *do* include ones we originate as, if we're the closest, we have to
 			// take responsibility for xfer (as others won't)
-			List		sorted_contacts	= getClosestKContactsList(encoded_key, false);
+			List		sorted_contacts	= getClosestKContactsList(encodedKey, false);
 			// if we're closest to the key, or the new node is closest and
 			// we're second closest, then we take responsibility for storing
 			// the value
 			boolean	store_it	= false;
 			if (sorted_contacts.size() > 0) {
 				DHTTransportContact	first = (DHTTransportContact)sorted_contacts.get(0);
-				if (router.isID( first.getID())) {
+				if (router.isID(first.getID())) {
 					store_it = true;
-				} else if (Arrays.equals( first.getID(), newContact.getID()) && sorted_contacts.size() > 1) {
+				} else if (Arrays.equals(first.getID(), newContact.getID()) && sorted_contacts.size() > 1) {
 					store_it = router.isID(((DHTTransportContact)sorted_contacts.get(1)).getID());
 				}
 			}
@@ -3131,10 +3134,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				final DHTStorageBlock	keyBlock = direct_key_blocks[i];
 				List	contacts = getClosestKContactsList(keyBlock.getKey(), false);
 				boolean	forward_it = false;
-					// ensure that the key is close enough to us
+				
+				// ensure that the key is close enough to us
 				for (int j=0;j<contacts.size();j++) {
 					final DHTTransportContact	contact = (DHTTransportContact)contacts.get(j);
-					if (router.isID( contact.getID())) {
+					if (router.isID(contact.getID())) {
 						forward_it	= true;
 						break;
 					}
@@ -3370,9 +3374,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		if (size > 0) {
 			try {
 				estimateMon.enter();
-				remote_estimate_values.add(new Integer( size));
-				if (remote_estimate_values.size() > REMOTE_ESTIMATE_HISTORY) {
-					remote_estimate_values.remove(0);
+				remoteEstimateValues.add(new Integer( size));
+				if (remoteEstimateValues.size() > REMOTE_ESTIMATE_HISTORY) {
+					remoteEstimateValues.remove(0);
 				}
 			} finally {
 				estimateMon.exit();
@@ -3382,13 +3386,13 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	public int getTransportEstimatedDHTSize() {
-		return ((int)local_dht_estimate);
+		return ((int)localDhtEstimate);
 	}
 
 	public int getEstimatedDHTSize() {
 		// public method, trigger actual computation periodically
 		long now = SystemTime.getCurrentTime();
-		long diff = now - last_dht_estimate_time;
+		long diff = now - lastDhtEstimateTime;
 		if (diff < 0 || diff > 60*1000) {
 			estimateDHTSize(router.getID(), null, router.getK());
 		}
@@ -3400,10 +3404,10 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 		// current assumption is that around 50% are firewalled, so if less (at least during migration) assume unusable
 		if (percent < 25) {
-			return ((int)combined_dht_estimate);
+			return ((int)combinedDhtEstimate);
 		}
 		double mult = 100.0 / percent;
-		return ((int)(mult * combined_dht_estimate));
+		return ((int)(mult * combinedDhtEstimate));
 	}
 
 	protected void estimateDHTSize(
@@ -3413,13 +3417,13 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 		// if called with contacts then this is in internal estimation based on lookup values
 		long now = SystemTime.getCurrentTime();
-		long diff = now - last_dht_estimate_time;
+		long diff = now - lastDhtEstimateTime;
 
 		// 5 second limiter here
 		if (diff < 0 || diff > 5*1000) {
 			try {
 				estimateMon.enter();
-				last_dht_estimate_time	= now;
+				lastDhtEstimateTime	= now;
 				List	l;
 				if (contacts == null) {
 					l = getClosestKContactsList(id, false);
@@ -3474,21 +3478,21 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					if (this_estimate < 1) {
 						this_estimate	= 1;
 					}
-					local_estimate_values.put(new HashWrapper( id ), new Long( this_estimate));
+					localEstimateValues.put(new HashWrapper( id ), new Long( this_estimate));
 					long	new_estimate	= 0;
-					Iterator	it = local_estimate_values.values().iterator();
+					Iterator	it = localEstimateValues.values().iterator();
 					String	sizes = "";
 					while (it.hasNext()) {
 						long	estimate = ((Long)it.next()).longValue();
 						sizes += (sizes.length()==0?"":",") + estimate;
 						new_estimate += estimate;
 					}
-					local_dht_estimate = new_estimate/local_estimate_values.size();
+					localDhtEstimate = new_estimate/localEstimateValues.size();
 					// System.out.println("getEstimatedDHTSize: " + sizes + "->" + dht_estimate + " (id=" + DHTLog.getString2(id) + ",cont=" + (contacts==null?"null":(""+contacts.size())) + ",use=" + contacts_to_use);
 				}
-				List rems = new ArrayList(new TreeSet(remote_estimate_values));
+				List rems = new ArrayList(new TreeSet(remoteEstimateValues));
 				// ignore largest and smallest few values
-				long	rem_average = local_dht_estimate;
+				long	rem_average = localDhtEstimate;
 				int		rem_vals	= 1;
 				for (int i=3;i<rems.size()-3;i++) {
 					rem_average += ((Integer)rems.get(i)).intValue();
@@ -3496,14 +3500,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				}
 				long[] router_stats = router.getStats().getStats();
 				long router_contacts = router_stats[DHTRouterStats.ST_CONTACTS] + router_stats[DHTRouterStats.ST_REPLACEMENTS];
-				combined_dht_estimate = Math.max(rem_average / rem_vals, router_contacts);
+				combinedDhtEstimate = Math.max(rem_average / rem_vals, router_contacts);
 				long	test_val 	= 10;
 				int		test_mag	= 1;
-				while (test_val < combined_dht_estimate) {
+				while (test_val < combinedDhtEstimate) {
 					test_val *= 10;
 					test_mag++;
 				}
-				combined_dht_estimate_mag = test_mag+1;
+				combinedDhtEstimateMag = test_mag+1;
 				// System.out.println("estimateDHTSize: loc =" + local_dht_estimate + ", comb = " + combined_dht_estimate + " [" + remote_estimate_values.size() + "]");
 			} finally {
 				estimateMon.exit();
@@ -3536,12 +3540,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		InetAddress iad = contact.getAddress().getAddress();
 
 		try {
-			spoof_mon.enter();
+			spoofMon.enter();
 
 				// during cache forwarding we get a lot of consecutive requests from the
 				// same contact so we can save CPU by caching the latest result and optimising for this
 
-			Integer existing = spoof_gen_history.get(iad);
+			Integer existing = spoofGenHistory.get(iad);
 
 			if (existing != null) {
 
@@ -3570,7 +3574,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 			//System.out.println("anti-spoof: generating " + res + " for " + contact.getAddress() + " - total=" + spoof_gen_history.size());
 
-			spoof_gen_history.put(iad, res);
+			spoofGenHistory.put(iad, res);
 
 			return (res);
 
@@ -3580,7 +3584,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 		} finally {
 
-			spoof_mon.exit();
+			spoofMon.exit();
 		}
 
 		return (0);
@@ -3594,10 +3598,10 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		}
 		HashWrapper cid = new HashWrapper( contact.getID());
 		try {
-			spoof_mon.enter();
+			spoofMon.enter();
 				// during cache forwarding we get a lot of consecutive requests from the
 				// same contact so we can save CPU by caching the latest result and optimising for this
-			byte[] existing = spoof_gen_history2.get(cid);
+			byte[] existing = spoofGenHistory2.get(cid);
 			if (existing != null) {
 				//System.out.println("anti-spoof: cached " + existing + " for " + contact.getAddress() + " - total=" + spoof_gen_history.size());
 				return (existing);
@@ -3614,12 +3618,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			byte[] res = new byte[SPOOF_ID2_SIZE];
 			System.arraycopy(data_out, 0, res, 0, SPOOF_ID2_SIZE);
 			//System.out.println("anti-spoof: generating " + res + " for " + contact.getAddress() + " - total=" + spoof_gen_history.size());
-			spoof_gen_history2.put(cid, res);
+			spoofGenHistory2.put(cid, res);
 			return (res);
 		} catch (Throwable e) {
 			logger.log(e);
 		} finally {
-			spoof_mon.exit();
+			spoofMon.exit();
 		}
 		return (new byte[ SPOOF_ID2_SIZE ]);
 	}

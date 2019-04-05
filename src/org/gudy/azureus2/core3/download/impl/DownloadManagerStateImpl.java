@@ -2903,10 +2903,10 @@ DownloadManagerStateImpl
 			Map					_cache,
 			boolean				_force_piece_discard) {
 			
-			if (SingleCounter0.getInstance().getAndIncreaseCount() == 1) {
+			/*if (SingleCounter0.getInstance().getAndIncreaseCount() == 1) {
 				Log.d(TAG, "<init>() is called...");
 				new Throwable().printStackTrace();
-			}
+			}*/
 			
 			downloadManager = _downloadManager;
 			torrentFile = _torrentFile;
