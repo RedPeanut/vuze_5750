@@ -275,7 +275,7 @@ public class Messages {
 				((DoubleBufferedLabel) widget).setText(message);
 			else if (widget instanceof Canvas)
 				; // get a few of these
-			else{
+			else {
 				Debug.out("No cast for " + widget.getClass().getName());
 			}
 		}

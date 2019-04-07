@@ -293,12 +293,10 @@ public class UISWTViewImpl
 	}
 
 	private static String padRight(String s, int n) {
-    return String.format("%1$-" + n + "s", s);
+		return String.format("%1$-" + n + "s", s);
 	}
 
 	private boolean triggerBooleanEvent(int eventType, Object data) {
-		
-		
 		
 		if (DEBUG_TRIGGERS) {
 			if (eventListener == null || eventType != UISWTViewEvent.TYPE_REFRESH) {
@@ -319,7 +317,6 @@ public class UISWTViewImpl
 		if (eventType == UISWTViewEvent.TYPE_LANGUAGEUPDATE) {
 
 			// put it back to how it was constructed
-
 			this.titleID = CFG_PREFIX + this.id + ".title";
 			if (!MessageText.keyExists(titleID) && MessageText.keyExists(this.id)) {
 				this.titleID = id;
@@ -328,8 +325,7 @@ public class UISWTViewImpl
 			}
 			title = null;
 
-				// replay any explicit sets
-
+			// replay any explicit sets
 			if (setTitleID != null) {
 				setTitleID(setTitleID);
 			}
@@ -343,7 +339,6 @@ public class UISWTViewImpl
 
 		if (	eventListener == null &&
 				eventType != UISWTViewEvent.TYPE_DATASOURCE_CHANGED) {
-
 			return false;
 		}
 

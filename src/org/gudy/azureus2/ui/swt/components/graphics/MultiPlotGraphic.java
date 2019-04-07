@@ -223,7 +223,7 @@ MultiPlotGraphic
 	private void addIntsValue(
 		int[] new_values) {
 	    try {
-	    	this_mon.enter();
+	    	thisMon.enter();
 
 	    	if (all_values.length < new_values.length) {
 
@@ -256,7 +256,7 @@ MultiPlotGraphic
 
 	    } finally {
 
-	    	this_mon.exit();
+	    	thisMon.exit();
 	    }
 
 	    if (update_outstanding) {
@@ -292,7 +292,7 @@ MultiPlotGraphic
 		if (bounds.width > maxEntries) {
 
 			try {
-				this_mon.enter();
+				thisMon.enter();
 
 				while (maxEntries < bounds.width) {
 
@@ -309,7 +309,7 @@ MultiPlotGraphic
 				}
 			} finally {
 
-				this_mon.exit();
+				thisMon.exit();
 			}
 		}
 
@@ -350,7 +350,7 @@ MultiPlotGraphic
 		GC gcImage = null;
 
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			drawScale(sizeChanged);
 
@@ -698,7 +698,7 @@ MultiPlotGraphic
 				gcImage.dispose();
 			}
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 

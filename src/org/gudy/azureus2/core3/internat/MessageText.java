@@ -63,17 +63,26 @@ public class MessageText {
 	private static final Map pluginLocalizationPaths = new HashMap();
 	private static final Collection pluginResourceBundles = new ArrayList();
 	private static IntegratedResourceBundle RESOURCE_BUNDLE;
-	private static Set			platformSpecificKeys	= new HashSet();
+	private static Set platformSpecificKeys	= new HashSet();
 	private static final Pattern PAT_PARAM_ALPHA = Pattern.compile("\\{([^0-9].+?)\\}");
 
-
-	private static int bundle_fail_count	= 0;
+	private static int bundleFailCount	= 0;
 
 	private static final List listeners = new ArrayList();
 
 	// preload default language w/o plugins
 	static {
-		setResourceBundle(new IntegratedResourceBundle(getResourceBundle(BUNDLE_NAME, LOCALE_DEFAULT, MessageText.class.getClassLoader()), pluginLocalizationPaths, null, 4000, true));
+		setResourceBundle(new IntegratedResourceBundle(
+				getResourceBundle(BUNDLE_NAME, 
+						LOCALE_DEFAULT, 
+						MessageText.class.getClassLoader()
+				),
+				pluginLocalizationPaths,
+				null,
+				4000, 
+				true
+			)
+		);
 	}
 
 	// grab a reference to the default bundle
@@ -147,54 +156,54 @@ public class MessageText {
 		listeners.remove(listener);
 	}
 
-	static ResourceBundle
-		getResourceBundle(
-		String		name,
-		Locale		loc,
-		ClassLoader	cl ) {
+	static ResourceBundle getResourceBundle(
+			String		name,
+			Locale		loc,
+			ClassLoader	cl) {
+		
 		try {
-		 return (ResourceBundle.getBundle(name, loc, cl));
+			return (ResourceBundle.getBundle(name, loc, cl));
 		} catch (Throwable e) {
-			bundle_fail_count++;
-			if (bundle_fail_count == 1) {
+			bundleFailCount++;
+			if (bundleFailCount == 1) {
 				e.printStackTrace();
 				Logger.log(new LogAlert(LogAlert.REPEATABLE, LogAlert.AT_ERROR,
 						"Failed to load resource bundle. One possible cause is "
 								+ "that you have installed " + Constants.APP_NAME + " into a directory "
 								+ "with a '!' in it. If so, please remove the '!'."));
 			}
-			return (
-				new ResourceBundle() {
-					public Locale
-					getLocale() {
+			return (new ResourceBundle() {
+				public Locale getLocale() {
 					return (LOCALE_DEFAULT);
-					}
-					protected Object handleGetObject(String key) {
-						return (null);
-					}
-					public Enumeration
-					getKeys() {
+				}
+
+				protected Object handleGetObject(String key) {
+					return (null);
+				}
+
+				public Enumeration getKeys() {
 					return (new Vector().elements());
-					}
-				});
+				}
+			});
 		}
 	}
 
 	private static void setResourceBundle(IntegratedResourceBundle bundle) {
-		
-		RESOURCE_BUNDLE	= bundle;
-		Iterator	keys = RESOURCE_BUNDLE.getKeysLight();
-		String ui_suffix = getUISuffix();
-		String	platform_suffix = getPlatformSuffix();
+
+		RESOURCE_BUNDLE = bundle;
+		Iterator keys = RESOURCE_BUNDLE.getKeysLight();
+		String uiSuffix = getUISuffix();
+		String platformSuffix = getPlatformSuffix();
 		Set platformKeys = new HashSet();
 		while (keys.hasNext()) {
-			String	key = (String)keys.next();
-			if (key.endsWith( platform_suffix))
+			String key = (String) keys.next();
+			if (key.endsWith(platformSuffix))
 				platformKeys.add(key);
-			else if (key.endsWith(ui_suffix)) {
+			else if (key.endsWith(uiSuffix)) {
 				RESOURCE_BUNDLE.addString(
-						key.substring(0, key.length() - ui_suffix.length()),
-						RESOURCE_BUNDLE.getString(key));
+						key.substring(0, key.length() - uiSuffix.length()),
+						RESOURCE_BUNDLE.getString(key)
+				);
 			}
 		}
 		platformSpecificKeys = platformKeys;
@@ -243,6 +252,7 @@ public class MessageText {
 	public static String getString(String key) {
 		if (key == null)
 			return "";
+		
 		String	targetKey = key + getPlatformSuffix();
 		if (!platformSpecificKeys.contains(targetKey)) {
 			targetKey	= key;
@@ -582,8 +592,8 @@ public class MessageText {
 	}
 
 	private static boolean changeLocale(Locale newLocale, boolean force) {
-	// set locale for startup (will override immediately it on locale change anyway)
-	Locale.setDefault(newLocale);
+		// set locale for startup (will override immediately it on locale change anyway)
+		Locale.setDefault(newLocale);
 
 		if (!isCurrentLocale(newLocale) || force) {
 			Locale.setDefault(LOCALE_DEFAULT);

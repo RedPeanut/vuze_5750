@@ -121,13 +121,11 @@ public class SWTSkinObjectContainer
 		parentComposite.setLayout(new FormLayout());
 		control = parentComposite;
 		if (properties.getBooleanValue(sConfigID + ".auto.defer.layout", false)) {
-			Listener showHideListener =
-				new Listener() {
-					public void handleEvent(
-						Event event ) {
-						parentComposite.setLayoutDeferred(event.type == SWT.Hide);
-					}
-				};
+			Listener showHideListener = new Listener() {
+				public void handleEvent(Event event) {
+					parentComposite.setLayoutDeferred(event.type == SWT.Hide);
+				}
+			};
 			parentComposite.addListener(SWT.Show, showHideListener);
 			parentComposite.addListener(SWT.Hide, showHideListener);
 		}

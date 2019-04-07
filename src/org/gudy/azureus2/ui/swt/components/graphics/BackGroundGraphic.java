@@ -38,12 +38,16 @@ import org.gudy.azureus2.ui.swt.mainwindow.Colors;
 
 import com.aelitis.azureus.ui.swt.utils.ColorCache;
 
+import hello.util.Log;
+
 /**
  * @author Olivier
  *
  */
 public class BackGroundGraphic implements Graphic {
 
+	private static String TAG = BackGroundGraphic.class.getSimpleName();
+	
 	protected Canvas drawCanvas;
 
 	protected Image bufferBackground;
@@ -52,7 +56,7 @@ public class BackGroundGraphic implements Graphic {
 	protected Color lightGrey2;
 	protected Color colorWhite;
 
-	protected AEMonitor	this_mon	= new AEMonitor("BackGroundGraphic");
+	protected AEMonitor	thisMon	= new AEMonitor("BackGroundGraphic");
 
 	private boolean	isSIIECSensitive;
 
@@ -99,13 +103,15 @@ public class BackGroundGraphic implements Graphic {
 
 		if (sizeChanged || bufferBackground == null) {
 			Rectangle bounds = drawCanvas.getClientArea();
+			Log.d(TAG, "bounds = " + bounds);
 			if (bounds.height < 30 || bounds.width	< 100)
 				return;
 
 			if (bufferBackground != null && ! bufferBackground.isDisposed())
 				bufferBackground.dispose();
 
-			if (bounds.width > 10000 || bounds.height > 10000) return;
+			if (bounds.width > 10000 || bounds.height > 10000) 
+				return;
 
 			bufferBackground = new Image(drawCanvas.getDisplay(),bounds);
 

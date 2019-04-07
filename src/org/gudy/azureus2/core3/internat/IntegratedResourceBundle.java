@@ -131,11 +131,12 @@ public class IntegratedResourceBundle
 	}
 
 	public IntegratedResourceBundle(
-		ResourceBundle 		main,
+		ResourceBundle		main,
 		Map 				localizationPaths,
 		Collection 			resource_bundles,
 		int					initCapacity,
 		boolean				isMessageBundle) {
+		
 		this.initCapacity 		= initCapacity;
 		this.isMessageBundle	= isMessageBundle;
 		messages = new LightHashMap(initCapacity);
@@ -156,7 +157,7 @@ public class IntegratedResourceBundle
 				}
 			}
 		}
-		usedMessages = new LightHashMap( messages.size());
+		usedMessages = new LightHashMap(messages.size());
 		synchronized(bundleMap) {
 			bundleMap.put(this, NULL_OBJECT);
 			resetCompactTimer();
@@ -284,15 +285,16 @@ public class IntegratedResourceBundle
 	public void addResourceMessages(
 		ResourceBundle 	bundle,
 		boolean			areMessages) {
-		boolean upper_case = upperCaseEnabled && (isMessageBundle || areMessages);
+		
+		boolean upperCase = upperCaseEnabled && (isMessageBundle || areMessages);
 		synchronized (bundleMap) {
 			loadMessages();
 			if (bundle != null) {
 				messagesDirty = true;
 				if (bundle instanceof IntegratedResourceBundle) {
 					Map<String,String> m = ((IntegratedResourceBundle)bundle).getMessages();
-					if (upper_case) {
-						for ( Map.Entry<String,String> entry: m.entrySet()) {
+					if (upperCase) {
+						for (Map.Entry<String,String> entry: m.entrySet()) {
 							String key = entry.getKey();
 							messages.put(key, toUpperCase(entry.getValue()));
 						}
@@ -308,7 +310,7 @@ public class IntegratedResourceBundle
 				} else {
 					for (Enumeration enumeration = bundle.getKeys(); enumeration.hasMoreElements();) {
 						String key = (String) enumeration.nextElement();
-						if (upper_case) {
+						if (upperCase) {
 							messages.put(key, toUpperCase((String)bundle.getObject(key)));
 						} else {
 							messages.put(key, bundle.getObject(key));

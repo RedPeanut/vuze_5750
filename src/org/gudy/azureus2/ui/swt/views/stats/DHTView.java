@@ -67,6 +67,7 @@ import com.aelitis.azureus.core.dht.transport.DHTTransportStats;
 import com.aelitis.azureus.plugins.dht.DHTPlugin;
 
 import hello.util.Log;
+import hello.util.SingleCounter0;
 
 /**
  *
@@ -86,8 +87,8 @@ public class DHTView implements UISWTViewEventListener {
 	DHT dht;
 	Composite panel;
 
-	String	yes_str;
-	String	no_str;
+	String	strYes;
+	String	strNo;
 
 	Label lblUpTime,lblNumberOfUsers;
 	Label lblNodes,lblLeaves;
@@ -183,7 +184,10 @@ public class DHTView implements UISWTViewEventListener {
 	}
 
 	public void initialize(Composite composite) {
-		Log.d(TAG, "initialize() is called...");
+		
+		//Log.d(TAG, "initialize() is called...");
+		//new Throwable().printStackTrace();
+		
 		if (autoDht) {
 			AzureusCoreFactory.addCoreRunningListener(new AzureusCoreRunningListener() {
 				public void azureusCoreRunning(AzureusCore core) {
@@ -198,8 +202,8 @@ public class DHTView implements UISWTViewEventListener {
 		layout.numColumns = 2;
 		panel.setLayout(layout);
 
-		yes_str = MessageText.getString("Button.yes").replaceAll("&", "");
-		no_str 	= MessageText.getString("Button.no").replaceAll("&", "");
+		strYes	= MessageText.getString("Button.yes").replaceAll("&", "");
+		strNo	= MessageText.getString("Button.no").replaceAll("&", "");
 
 		initialiseGeneralGroup();
 		initialiseDBGroup();
@@ -444,14 +448,14 @@ public class DHTView implements UISWTViewEventListener {
 		data = new GridData(GridData.FILL_HORIZONTAL);
 		data.horizontalSpan = 3;
 
-	Legend.createLegendComposite(
-			gTransport,
-			rttColours,
-				new String[]{
-							"DHTView.rtt.legend.average",
-							"DHTView.rtt.legend.best",
-							"DHTView.rtt.legend.worst" },
-						data);
+		Legend.createLegendComposite(
+				gTransport,
+				rttColours,
+				new String[] {
+					"DHTView.rtt.legend.average",
+					"DHTView.rtt.legend.best",
+					"DHTView.rtt.legend.worst" },
+				data);
 	}
 
 	private void initialiseOperationDetailsGroup() {
@@ -654,7 +658,7 @@ public class DHTView implements UISWTViewEventListener {
 		lblNumberOfUsers.setText("" + controlStats.getEstimatedDHTSize());
 		int percent = transportStats.getRouteablePercentage();
 		lblReachable.setText(
-				(transport.isReachable() ? yes_str : no_str)
+				(transport.isReachable() ? strYes : strNo)
 				+ (percent==-1 ? "" : (" " + percent + "%"))
 		);
 
@@ -665,7 +669,7 @@ public class DHTView implements UISWTViewEventListener {
 		if (puncher == null) {
 			puncher_str = "";
 		} else {
-			puncher_str = puncher.operational() ? yes_str : no_str;
+			puncher_str = puncher.operational() ? strYes : strNo;
 		}
 
 		lblRendezvous.setText(transport.isReachable() ? "" : puncher_str);
@@ -927,6 +931,9 @@ public class DHTView implements UISWTViewEventListener {
 				break;
 
 			case UISWTViewEvent.TYPE_REFRESH:
+				if (SingleCounter0.getInstance().getAndIncreaseCount() == 1)
+					new Throwable().printStackTrace();
+				
 				refresh();
 				break;
 

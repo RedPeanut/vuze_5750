@@ -56,6 +56,7 @@ public class ScaledGraphic extends BackGroundGraphic {
 	}
 
 	protected void drawScale(boolean sizeChanged) {
+		
 		if (drawCanvas == null || drawCanvas.isDisposed() || !drawCanvas.isVisible())
 			return;
 

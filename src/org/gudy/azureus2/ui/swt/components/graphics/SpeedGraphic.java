@@ -112,8 +112,10 @@ public class SpeedGraphic extends ScaledGraphic implements ParameterListener {
 								// Ignore ERROR_NO_GRAPHICS_LIBRARY error or any others
 							}
 						}
-						e.gc.drawImage(bufferImage, e.x, e.y, e.width, e.height, e.x, e.y,
-								e.width, e.height);
+						e.gc.drawImage(bufferImage,
+								e.x, e.y, e.width, e.height,
+								e.x, e.y, e.width, e.height
+						);
 					}
 				}
 			}
@@ -143,7 +145,7 @@ public class SpeedGraphic extends ScaledGraphic implements ParameterListener {
 
 	public void addIntsValue(int[] newValues) {
 		try {
-			this_mon.enter();
+			thisMon.enter();
 			if (allValues.length < newValues.length) {
 				int[][]	new_all_values = new int[newValues.length][];
 				System.arraycopy(allValues, 0, new_all_values, 0, allValues.length);
@@ -161,7 +163,7 @@ public class SpeedGraphic extends ScaledGraphic implements ParameterListener {
 			}
 			currentPosition %= maxEntries;
 		} finally {
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -170,15 +172,19 @@ public class SpeedGraphic extends ScaledGraphic implements ParameterListener {
 	}
 
 	public void refresh(boolean force) {
+		
 		if (drawCanvas == null || drawCanvas.isDisposed())
 			return;
+		
 		Rectangle bounds = drawCanvas.getClientArea();
+		
 		if (bounds.height < 30 || bounds.width	< 100 || bounds.width > 10000 || bounds.height > 10000)
 			return;
+		
 		// inflate # of values only if necessary
 		if (bounds.width > maxEntries) {
 			try {
-				this_mon.enter();
+				thisMon.enter();
 				while (maxEntries < bounds.width)
 					maxEntries += 1000;
 				for (int i=0;i<allValues.length;i++) {
@@ -187,7 +193,7 @@ public class SpeedGraphic extends ScaledGraphic implements ParameterListener {
 					allValues[i] = newValues;
 				}
 			} finally {
-				this_mon.exit();
+				thisMon.exit();
 			}
 
 		}
@@ -215,7 +221,7 @@ public class SpeedGraphic extends ScaledGraphic implements ParameterListener {
 		}
 		GC gcImage = null;
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			drawScale(sizeChanged);
 
@@ -258,22 +264,22 @@ public class SpeedGraphic extends ScaledGraphic implements ParameterListener {
 			}
 
 			int max = maxs[0];
-			int max_primary = max;
+			int maxPrimary = max;
 
 			for (int i = 1; i < maxs.length; i++) {
 				int m = maxs[i];
 				if (i == 1) {
 					if (max < m) {
 						max = m;
-						max_primary = max;
+						maxPrimary = max;
 					}
 				} else {
 					// trim secondary indicators so we don't loose the more important info
 					if (max < m) {
-						if (m <= 2 * max_primary) {
+						if (m <= 2 * maxPrimary) {
 							max = m;
 						} else {
-							max = 2 * max_primary;
+							max = 2 * maxPrimary;
 							break;
 						}
 					}
@@ -351,7 +357,7 @@ public class SpeedGraphic extends ScaledGraphic implements ParameterListener {
 			if (gcImage != null) {
 				gcImage.dispose();
 			}
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 

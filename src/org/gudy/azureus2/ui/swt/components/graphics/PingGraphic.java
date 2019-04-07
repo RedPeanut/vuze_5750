@@ -92,7 +92,7 @@ public class PingGraphic extends ScaledGraphic implements ParameterListener {
 
   public void addIntsValue(int[] new_values) {
     try {
-    	this_mon.enter();
+    	thisMon.enter();
 
     	if (all_values.length < new_values.length) {
 
@@ -127,7 +127,7 @@ public class PingGraphic extends ScaledGraphic implements ParameterListener {
 
     } finally {
 
-    	this_mon.exit();
+    	thisMon.exit();
     }
   }
 
@@ -167,7 +167,7 @@ public class PingGraphic extends ScaledGraphic implements ParameterListener {
 
   protected void drawChart(boolean sizeChanged) {
    try {
-   	  this_mon.enter();
+   	  thisMon.enter();
 
    	  // should create bufferscale
       drawScale(sizeChanged);
@@ -255,7 +255,7 @@ public class PingGraphic extends ScaledGraphic implements ParameterListener {
 
     } finally {
 
-    	this_mon.exit();
+    	thisMon.exit();
     }
   }
 
