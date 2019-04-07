@@ -37,20 +37,19 @@ public class DHTFactory {
 	public static DHT create(
 		DHTTransport			transport,
 		Properties				properties,
-		DHTStorageAdapter		storage_adapter,
-		DHTNATPuncherAdapter	nat_adapter,
+		DHTStorageAdapter		storageAdapter,
+		DHTNATPuncherAdapter	natAdapter,
 		DHTLogger				logger) {
-		return (new DHTImpl(transport, properties, storage_adapter, nat_adapter, logger));
+		return (new DHTImpl(transport, properties, storageAdapter, natAdapter, logger));
 	}
 
-	public static DHT
-	create(
+	public static DHT create(
 		DHTTransport			transport,
 		DHTRouter				router,
 		DHTDB					database,
 		Properties				properties,
-		DHTStorageAdapter		storage_adapter,
+		DHTStorageAdapter		storageAdapter,
 		DHTLogger				logger) {
-		return (new DHTImpl( transport, router, database, properties, storage_adapter, logger));
+		return (new DHTImpl(transport, router, database, properties, storageAdapter, logger));
 	}
 }

@@ -55,11 +55,11 @@ public class DHTRouterNodeImpl {
 	protected DHTRouterNodeImpl(
 		DHTRouterImpl					_router,
 		int								_depth,
-		boolean							_contains_router_node_id,
+		boolean							_containsRouterNodeId,
 		List<DHTRouterContactImpl>		_buckets) {
 		router					= _router;
 		depth					= _depth;
-		containsRouterNodeId	= _contains_router_node_id;
+		containsRouterNodeId	= _containsRouterNodeId;
 		buckets					= _buckets;
 	}
 
@@ -80,8 +80,8 @@ public class DHTRouterNodeImpl {
 	}
 
 	protected void split(
-		DHTRouterNodeImpl	new_left,
-		DHTRouterNodeImpl	new_right) {
+		DHTRouterNodeImpl	newLeft,
+		DHTRouterNodeImpl	newRight) {
 		buckets	= null;
 		if (replacements != null) {
 			// we can get this when coming out of sleep mode
@@ -91,8 +91,8 @@ public class DHTRouterNodeImpl {
 			}
 			replacements = null;
 		}
-		left	= new_left;
-		right	= new_right;
+		left	= newLeft;
+		right	= newRight;
 	}
 
 	protected List<DHTRouterContactImpl> getBuckets() {

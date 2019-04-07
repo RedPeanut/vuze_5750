@@ -31,21 +31,19 @@ import org.gudy.azureus2.core3.util.Debug;
 import com.aelitis.azureus.core.dht.DHTLogger;
 import com.aelitis.azureus.core.dht.router.impl.*;
 
-public class
-DHTRouterFactory
-{
+public class DHTRouterFactory {
+	
 	private static final List	observers = new ArrayList();
 
-	public static DHTRouter
-	create(
+	public static DHTRouter create(
 		int							K,
 		int							B,
-		int							max_rep_per_node,
+		int							maxRepPerNode,
 		byte[]						id,
 		DHTRouterContactAttachment	attachment,
 		DHTLogger					logger) {
 		
-		DHTRouterImpl res = new DHTRouterImpl(K, B, max_rep_per_node, id, attachment, logger);
+		DHTRouterImpl res = new DHTRouterImpl(K, B, maxRepPerNode, id, attachment, logger);
 		for (int i=0;i<observers.size();i++) {
 			try {
 				((DHTRouterFactoryObserver)observers.get(i)).routerCreated(res);
@@ -56,13 +54,11 @@ DHTRouterFactory
 		return (res);
 	}
 
-	public static void addObserver(
-		DHTRouterFactoryObserver	observer) {
+	public static void addObserver(DHTRouterFactoryObserver observer) {
 		observers.add(observer);
 	}
 
-	public static void removeObserver(
-		DHTRouterFactoryObserver	observer) {
+	public static void removeObserver(DHTRouterFactoryObserver observer) {
 		observers.remove(observer);
 	}
 }

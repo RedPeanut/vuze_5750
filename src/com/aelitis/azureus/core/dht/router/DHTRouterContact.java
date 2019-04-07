@@ -24,43 +24,36 @@ package com.aelitis.azureus.core.dht.router;
  *
  */
 
-public interface
-DHTRouterContact
-{
-	public byte[]
-	getID();
+public interface DHTRouterContact {
+	
+	public byte[] getID();
 
-	public DHTRouterContactAttachment
-	getAttachment();
+	public DHTRouterContactAttachment getAttachment();
 
-		/**
-		 * indicates whether or not a message has been received from, or an operation has
-		 * successfully been made to, the contact.
-		 * @return
-		 */
-
+	/**
+	 * indicates whether or not a message has been received from, or an operation has
+	 * successfully been made to, the contact.
+	 * @return
+	 */
 	public boolean hasBeenAlive();
 
-		/**
-		 * Whether or not the contact has failed once or more since last alive (if ever)
-		 * @return
-		 */
-
+	/**
+	 * Whether or not the contact has failed once or more since last alive (if ever)
+	 * @return
+	 */
 	public boolean isFailing();
 
-		/**
-		 * Whether or not the contact's last interaction was successful
-		 * @return
-		 */
-
+	/**
+	 * Whether or not the contact's last interaction was successful
+	 * @return
+	 */
 	public boolean isAlive();
 
-		/**
-		 * time between first establishing the contact was alive and now, assuming that its
-		 * not failing. 0 -> failing
-		 * @return
-		 */
-
+	/**
+	 * time between first establishing the contact was alive and now, assuming that its
+	 * not failing. 0 -> failing
+	 * @return
+	 */
 	public long getTimeAlive();
 
 	public String getString();

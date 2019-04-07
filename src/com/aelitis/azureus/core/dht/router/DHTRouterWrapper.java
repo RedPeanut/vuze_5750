@@ -24,43 +24,35 @@ package com.aelitis.azureus.core.dht.router;
 
 import java.util.List;
 
-public class
-DHTRouterWrapper
-	implements DHTRouter
-{
+public class DHTRouterWrapper implements DHTRouter {
+	
 	private final DHTRouter		delegate;
 
-	public
-	DHTRouterWrapper(
-		DHTRouter		_delegate) {
-		delegate	= _delegate;
+	public DHTRouterWrapper(DHTRouter _delegate) {
+		delegate = _delegate;
 	}
 
-	protected DHTRouter
-	getDelegate() {
+	protected DHTRouter getDelegate() {
 		return (delegate);
 	}
 
 	public int getK() {
-		return ( delegate.getK());
+		return (delegate.getK());
 	}
 
-	public byte[]
-	getID() {
-		return ( delegate.getID());
+	public byte[] getID() {
+		return (delegate.getID());
 	}
 
-	public boolean isID(
-		byte[]	node_id) {
-		return ( delegate.isID(node_id));
+	public boolean isID(byte[] node_id) {
+		return (delegate.isID(node_id));
 	}
 
 	public DHTRouterContact getLocalContact() {
-		return ( delegate.getLocalContact());
+		return (delegate.getLocalContact());
 	}
 
-	public void setAdapter(
-		DHTRouterAdapter	_adapter) {
+	public void setAdapter(DHTRouterAdapter _adapter) {
 		delegate.setAdapter(_adapter);
 	}
 
@@ -82,66 +74,55 @@ DHTRouterWrapper
 	}
 
 	public DHTRouterContact contactDead(
-		byte[]						node_id,
-		boolean						force) {
-		return ( delegate.contactDead(node_id, force));
+		byte[]		node_id,
+		boolean		force) {
+		return (delegate.contactDead(node_id, force));
 	}
 
-	public DHTRouterContact findContact(
-		byte[]	node_id) {
-		return ( delegate.findContact(node_id));
+	public DHTRouterContact findContact(byte[] node_id) {
+		return (delegate.findContact(node_id));
 	}
 
-	public List<DHTRouterContact>
-	findClosestContacts(
+	public List<DHTRouterContact> findClosestContacts(
 		byte[]		node_id,
 		int			num_to_return,
 		boolean		live_only) {
-		return ( delegate.findClosestContacts(node_id, num_to_return, live_only));
+		return (delegate.findClosestContacts(node_id, num_to_return, live_only));
 	}
 
-	public void recordLookup(
-		byte[]	node_id) {
+	public void recordLookup(byte[] node_id) {
 		delegate.recordLookup(node_id);
 	}
 
-	public boolean requestPing(
-		byte[]	node_id) {
-		return ( delegate.requestPing(node_id));
+	public boolean requestPing(byte[] node_id) {
+		return (delegate.requestPing(node_id));
 	}
 
-	public void refreshIdleLeaves(
-		long	idle_max) {
+	public void refreshIdleLeaves(long idle_max) {
 		delegate.refreshIdleLeaves(idle_max);
 	}
 
-	public byte[]
-	refreshRandom() {
-		return ( delegate.refreshRandom());
+	public byte[] refreshRandom() {
+		return (delegate.refreshRandom());
 	}
 
-	public List<DHTRouterContact>
-	findBestContacts(
-		int		max) {
-		return ( delegate.findBestContacts(max));
+	public List<DHTRouterContact> findBestContacts(int max) {
+		return (delegate.findBestContacts(max));
 	}
 
-	public List<DHTRouterContact>
-	getAllContacts() {
-		return ( delegate.getAllContacts());
+	public List<DHTRouterContact> getAllContacts() {
+		return (delegate.getAllContacts());
 	}
 
 	public DHTRouterStats getStats() {
-		return ( delegate.getStats());
+		return (delegate.getStats());
 	}
 
-	public void setSleeping(
-		boolean	sleeping) {
+	public void setSleeping(boolean sleeping) {
 		delegate.setSleeping(sleeping);
 	}
 
-	public void setSuspended(
-		boolean			susp) {
+	public void setSuspended(boolean susp) {
 		delegate.setSuspended(susp);
 	}
 
@@ -154,14 +135,14 @@ DHTRouterWrapper
 	}
 
 	public boolean addObserver(DHTRouterObserver rto) {
-		return ( delegate.addObserver(rto));
+		return (delegate.addObserver(rto));
 	}
 
 	public boolean containsObserver(DHTRouterObserver rto) {
-		return ( delegate.containsObserver(rto));
+		return (delegate.containsObserver(rto));
 	}
 
 	public boolean removeObserver(DHTRouterObserver rto) {
-		return ( delegate.removeObserver(rto));
+		return (delegate.removeObserver(rto));
 	}
 }

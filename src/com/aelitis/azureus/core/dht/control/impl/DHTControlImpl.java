@@ -144,13 +144,13 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	private final int	node_id_byte_count;
 	final int			searchConcurrency;
 	private final int	lookupConcurrency;
-	private final int	cache_at_closest_n;
+	private final int	cacheAtClosestN;
 	final int			K;
 	private final int	B;
 	private final int	maxRepPerNode;
 
-	private final boolean	encode_keys;
-	private final boolean	enable_random_poking;
+	private final boolean	encodeKeys;
+	private final boolean	enableRandomPoking;
 
 	private long		routerStartTime;
 	private int			routerCount;
@@ -263,9 +263,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		maxRepPerNode				= _max_rep_per_node;
 		searchConcurrency				= _search_concurrency;
 		lookupConcurrency				= _lookup_concurrency;
-		cache_at_closest_n				= _cache_at_closest_n;
-		encode_keys						= _encode_keys;
-		enable_random_poking			= _enable_random_poking;
+		cacheAtClosestN				= _cache_at_closest_n;
+		encodeKeys						= _encode_keys;
+		enableRandomPoking			= _enable_random_poking;
 
 		// set this so we don't do initial calculation until reasonably populated
 
@@ -419,14 +419,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		DHTDB				_database,
 		int					_K,
 		int					_B,
-		int					_max_rep_per_node,
+		int					_maxRepPerNode,
 		int					_searchConcurrency,
 		int					_lookupConcurrency,
 		int					_original_republish_interval,
 		int					_cache_republish_interval,
-		int					_cache_at_closest_n,
-		boolean				_encode_keys,
-		boolean				_enable_random_poking,
+		int					_cacheAtClosestN,
+		boolean				_encodeKeys,
+		boolean				_enableRandomPoking,
 		DHTLogger 			_logger) {
 		
 		//Log.d(TAG, ">>> K = " + _K);
@@ -437,12 +437,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 		K						= _K;
 		B						= _B;
-		maxRepPerNode		= _max_rep_per_node;
+		maxRepPerNode			= _maxRepPerNode;
 		searchConcurrency		= _searchConcurrency;
 		lookupConcurrency		= _lookupConcurrency;
-		cache_at_closest_n		= _cache_at_closest_n;
-		encode_keys				= _encode_keys;
-		enable_random_poking	= _enable_random_poking;
+		cacheAtClosestN			= _cacheAtClosestN;
+		encodeKeys				= _encodeKeys;
+		enableRandomPoking		= _enableRandomPoking;
 
 		// set this so we don't do initial calculation until reasonably populated
 		lastDhtEstimateTime	= SystemTime.getCurrentTime();
@@ -456,7 +456,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		externalLookupPool = new ThreadPool("DHTControl:externallookups", EXTERNAL_LOOKUP_CONCURRENCY, true);
 		externalPutPool = new ThreadPool("DHTControl:puts", EXTERNAL_PUT_CONCURRENCY, true);
 
-		router				= _router;
+		router			= _router;
 		routerStartTime	= SystemTime.getCurrentTime();
 
 		localContact = transport.getLocalContact();
@@ -488,7 +488,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		transport.setRequestHandler(this);
 	}
 
-	protected void createRouter(DHTTransportContact _local_contact) {
+	protected void createRouter(DHTTransportContact _localContact) {
 		
 		/*Log.d(TAG, "createRouter() is called...");
 		Throwable t = new Throwable();
@@ -496,7 +496,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		
 		routerStartTime	= SystemTime.getCurrentTime();
 		routerCount++;
-		localContact = _local_contact;
+		localContact = _localContact;
 		if (router != null) {
 			router.destroy();
 		}
@@ -795,7 +795,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	protected void poke() {
-		if (!enable_random_poking) {
+		if (!enableRandomPoking) {
 
 			return;
 		}
@@ -3266,7 +3266,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	protected byte[] encodeKey(byte[] key) {
-		if (encode_keys) {
+		if (encodeKeys) {
 			byte[] temp = new SHA1Simple().calculateHash(key);
 			byte[] result = new byte[node_id_byte_count];
 			System.arraycopy(temp, 0, result, 0, node_id_byte_count);
@@ -3282,22 +3282,16 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		}
 	}
 
-	public int computeAndCompareDistances(
-		byte[]		t1,
-		byte[]		t2,
-		byte[]		pivot) {
+	public int computeAndCompareDistances(byte[] t1, byte[] t2, byte[] pivot) {
 		return (computeAndCompareDistances2(t1, t2, pivot));
 	}
 
-	protected static int computeAndCompareDistances2(
-		byte[]		t1,
-		byte[]		t2,
-		byte[]		pivot) {
-		
-		for (int i=0;i<t1.length;i++) {
-			byte d1 = (byte)(t1[i] ^ pivot[i]);
-			byte d2 = (byte)(t2[i] ^ pivot[i]);
-			int diff = (d1&0xff) - (d2&0xff);
+	protected static int computeAndCompareDistances2(byte[] t1, byte[] t2, byte[] pivot) {
+
+		for (int i = 0; i < t1.length; i++) {
+			byte d1 = (byte) (t1[i] ^ pivot[i]);
+			byte d2 = (byte) (t2[i] ^ pivot[i]);
+			int diff = (d1 & 0xff) - (d2 & 0xff);
 			if (diff != 0) {
 				return (diff);
 			}
@@ -3305,18 +3299,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		return (0);
 	}
 
-	public byte[] computeDistance(
-		byte[]		n1,
-		byte[]		n2) {
+	public byte[] computeDistance(byte[] n1, byte[] n2) {
 		return (computeDistance2(n1, n2));
 	}
 
-	protected static byte[] computeDistance2(
-		byte[]		n1,
-		byte[]		n2) {
-		byte[]	res = new byte[n1.length];
-		for (int i=0;i<res.length;i++) {
-			res[i] = (byte)(n1[i] ^ n2[i]);
+	protected static byte[] computeDistance2(byte[] n1, byte[] n2) {
+		byte[] res = new byte[n1.length];
+		for (int i = 0; i < res.length; i++) {
+			res[i] = (byte) (n1[i] ^ n2[i]);
 		}
 		return (res);
 	}

@@ -26,12 +26,16 @@ import com.aelitis.azureus.core.dht.db.DHTDB;
 import com.aelitis.azureus.core.dht.router.DHTRouter;
 import com.aelitis.azureus.core.dht.transport.DHTTransport;
 
+import hello.util.Log;
+
 /**
  * @author parg
  *
  */
 
 public class DHTControlFactory {
+	
+	private static String TAG = DHTControlFactory.class.getSimpleName();
 	
 	public static DHTControl create(
 		DHTControlAdapter	adapter,
@@ -47,7 +51,9 @@ public class DHTControlFactory {
 		boolean				encode_keys,
 		boolean				enable_random_poking,
 		DHTLogger			logger) {
-		System.out.println("type 1 is called...");
+		
+		Log.d(TAG, "type 1 is called...");
+		
 		return (new DHTControlImpl(
 				adapter,
 				transport,
@@ -79,21 +85,23 @@ public class DHTControlFactory {
 		boolean				encode_keys,
 		boolean				enable_random_poking,
 		DHTLogger			logger) {
-		System.out.println("type 2 is called...");
+		
+		Log.d(TAG, "type 2 is called...");
 
 		return (new DHTControlImpl(
-						adapter,
-						transport,
-						router,
-						database,
-						K, B, max_rep_per_node,
-						search_concurrency,
-						lookup_concurrency,
-						original_republish_interval,
-						cache_republish_interval,
-						cache_at_closest_n,
-						encode_keys,
-						enable_random_poking,
-						logger));
+				adapter,
+				transport,
+				router,
+				database,
+				K, B, max_rep_per_node,
+				search_concurrency,
+				lookup_concurrency,
+				original_republish_interval,
+				cache_republish_interval,
+				cache_at_closest_n,
+				encode_keys,
+				enable_random_poking,
+				logger)
+		);
 	}
 }
