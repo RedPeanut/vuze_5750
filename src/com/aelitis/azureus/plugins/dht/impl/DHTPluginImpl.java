@@ -130,7 +130,7 @@ public class DHTPluginImpl implements DHTInterface {
 		PluginInterface			_plugin_interface,
 		DHTNATPuncherAdapter	_natAdapter,
 		DHTPluginImplAdapter	_adapter,
-		byte					_protocol_version,
+		byte					_protocolVersion,
 		int						_network,
 		boolean					_v6,
 		String					_ip,
@@ -142,7 +142,7 @@ public class DHTPluginImpl implements DHTInterface {
 		DHTLogger				_dht_log) {
 
 		pluginInterface	= _plugin_interface;
-		protocolVersion	= _protocol_version;
+		protocolVersion	= _protocolVersion;
 		network				= _network;
 		v6					= _v6;
 		port				= _port;
@@ -158,16 +158,16 @@ public class DHTPluginImpl implements DHTInterface {
 
 			final PluginConfig conf = pluginInterface.getPluginconfig();
 
-			int	send_delay = conf.getPluginIntParameter("dht.senddelay", 25);
-			int	recv_delay	= conf.getPluginIntParameter("dht.recvdelay", 10);
+			int	sendDelay = conf.getPluginIntParameter("dht.senddelay", 25);
+			int	recvDelay	= conf.getPluginIntParameter("dht.recvdelay", 10);
 
 			boolean	bootstrap	= conf.getPluginBooleanParameter("dht.bootstrapnode", false);
 
 			// start off optimistic with reachable = true
-			boolean	initial_reachable = conf.getPluginBooleanParameter("dht.reachable." + network, true);
+			boolean	initialReachable = conf.getPluginBooleanParameter("dht.reachable." + network, true);
 
 			transport = DHTTransportFactory.createUDP(
-						_protocol_version,
+						_protocolVersion,
 						_network,
 						_v6,
 						_ip,
@@ -177,9 +177,9 @@ public class DHTPluginImpl implements DHTInterface {
 						1,
 						10000, 	// udp timeout - tried less but a significant number of
 								// premature timeouts occurred
-						send_delay, recv_delay,
+						sendDelay, recvDelay,
 						bootstrap,
-						initial_reachable,
+						initialReachable,
 						dhtLog);
 
 			transport.addListener(

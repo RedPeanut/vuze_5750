@@ -1856,7 +1856,8 @@ outer:
 						handler.failed(contact, e);
 					}
 				},
-				requestTimeout, PRUDPPacketHandler.PRIORITY_MEDIUM);
+				requestTimeout, 
+				PRUDPPacketHandler.PRIORITY_MEDIUM);
 
 		} catch (Throwable e) {
 			stats.findNodeFailed();

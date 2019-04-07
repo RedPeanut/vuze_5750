@@ -29,9 +29,8 @@ import org.gudy.azureus2.core3.util.IndentWriter;
 import com.aelitis.azureus.core.AzureusCore;
 import com.aelitis.azureus.core.networkmanager.admin.impl.NetworkAdminImpl;
 
-public abstract class
-NetworkAdmin
-{
+public abstract class NetworkAdmin {
+	
 	private static NetworkAdmin	singleton;
 
 	public static final String PR_NETWORK_INTERFACES	= "Network Interfaces";
@@ -48,32 +47,28 @@ NetworkAdmin
 		PR_AS
 	};
 
-	public static synchronized NetworkAdmin
-	getSingleton() {
+	public static synchronized NetworkAdmin getSingleton() {
 		if (singleton == null) {
-
 			singleton = new NetworkAdminImpl();
 		}
-
 		return (singleton);
 	}
 
-	public InetAddress getSingleHomedServiceBindAddress() {return getSingleHomedServiceBindAddress(IP_PROTOCOL_VERSION_AUTO);}
+	public InetAddress getSingleHomedServiceBindAddress() {
+		return getSingleHomedServiceBindAddress(IP_PROTOCOL_VERSION_AUTO);
+	}
 
 	/**
 	 * @throws UnsupportedAddressTypeException when no address matching the v4/v6 requirements is found, always returns an address when auto is selected
 	 */
-	public abstract InetAddress
-	getSingleHomedServiceBindAddress(int protocolVersion) throws UnsupportedAddressTypeException;
+	public abstract InetAddress getSingleHomedServiceBindAddress(int protocolVersion)
+			throws UnsupportedAddressTypeException;
 
-	public abstract InetAddress[]
-	getMultiHomedServiceBindAddresses(boolean forNIO);
+	public abstract InetAddress[] getMultiHomedServiceBindAddresses(boolean forNIO);
 
-	public abstract InetAddress
-	getMultiHomedOutgoingRoundRobinBindAddress(InetAddress target);
+	public abstract InetAddress getMultiHomedOutgoingRoundRobinBindAddress(InetAddress target);
 
-	public abstract String
-	getNetworkInterfacesAsString();
+	public abstract String getNetworkInterfacesAsString();
 
 	public abstract InetAddress[]
 	getAllBindAddresses(

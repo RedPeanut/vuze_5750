@@ -203,11 +203,16 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 		new Throwable().printStackTrace();
 		/*Log.d(TAG, "<init>() is called...");
 		new Throwable().printStackTrace();*/
-		
+
 		port				= _port;
 		explicitBindIp		= _bindIp;
 		packetTransformer	= _packetTransformer;
 		defaultBindIp		= NetworkAdmin.getSingleton().getSingleHomedServiceBindAddress();
+		
+		Log.d(TAG, "port = " + port);
+		Log.d(TAG, "explicitBindIp = " + explicitBindIp);
+		Log.d(TAG, "defaultBindIp = " + defaultBindIp);
+		
 		calcBind();
 		
 		final AESemaphore initSemaphore = new AESemaphore("PRUDPPacketHandler:init");
@@ -326,19 +331,18 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 		return (currentBindIp);
 	}
 
-	protected void setDefaultBindAddress(
-		InetAddress	address) {
+	protected void setDefaultBindAddress(InetAddress address) {
 		try {
 			bindAddressMon.enter();
-			defaultBindIp	= address;
+			defaultBindIp = address;
 			calcBind();
 		} finally {
 			bindAddressMon.exit();
 		}
 	}
 
-	public void setExplicitBindAddress(
-		InetAddress	address) {
+	public void setExplicitBindAddress(InetAddress address) {
+		
 		try {
 			bindAddressMon.enter();
 			explicitBindIp	= address;
@@ -510,6 +514,9 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 				
 				while (!(failed || destroyed)) {
 					
+					//int count = SingleCounter0.getInstance().getAndIncreaseCount();
+					//Log.d(TAG, String.format("how many times is this called... #%d", count));
+					
 					if (currentBindIp != targetBindIp)
 						break;
 					
@@ -547,6 +554,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 						}
 						
 					} catch (SocketTimeoutException e) {
+						//Log.d(TAG, "ste is occured...");
 					} catch (Throwable e) {
 						// on vista we get periodic socket closures
 						String	message = e.getMessage();
@@ -896,6 +904,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 			throw (new PRUDPPacketHandlerException("Transport unavailable"));
 		}
 		
+		//Log.d(TAG, "destinationAddress = " + destinationAddress);
 		final InetSocketAddress f_destinationAddress = destinationAddress;
 		
 		checkTargetAddress(destinationAddress);

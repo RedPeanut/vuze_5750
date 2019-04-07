@@ -438,60 +438,40 @@ NetworkAdminImpl
 			return addrs[0];
 		} else {
 			for (InetAddress addr: addrs) {
-
 				if ((proto == IP_PROTOCOL_VERSION_REQUIRE_V4 && addr instanceof Inet4Address || addr.isAnyLocalAddress()) ||
 					(proto == IP_PROTOCOL_VERSION_REQUIRE_V6 && addr instanceof Inet6Address)) {
-
 					if (addr.isAnyLocalAddress()) {
-
 						if (proto == IP_PROTOCOL_VERSION_REQUIRE_V4) {
-
 							return (anyLocalAddressIPv4);
-
 						} else {
-
 							return (anyLocalAddressIPv6);
 						}
 					} else {
-
 						return (addr);
 					}
 				}
 			}
 		}
-
 		throw new UnsupportedAddressTypeException();
 	}
 
-	public InetAddress[]
-	getAllBindAddresses(
-		boolean	include_wildcard) {
+	public InetAddress[] getAllBindAddresses(boolean include_wildcard) {
 		if (include_wildcard) {
-
 			return (currentBindIPs);
-
 		} else {
-
 			List<InetAddress> res = new ArrayList<InetAddress>();
-
 			InetAddress[] bind_ips = currentBindIPs;
-
-			for (InetAddress ip: bind_ips) {
-
+			for (InetAddress ip : bind_ips) {
 				if (!ip.isAnyLocalAddress()) {
-
 					res.add(ip);
 				}
 			}
-
-			return ( res.toArray(new InetAddress[ res.size()]));
+			return (res.toArray(new InetAddress[res.size()]));
 		}
 	}
 
-	public InetAddress[]
-	resolveBindAddresses(
-		String	bind_to) {
-		return (calcBindAddresses( bind_to, false));
+	public InetAddress[] resolveBindAddresses(String bind_to) {
+		return (calcBindAddresses(bind_to, false));
 	}
 
 	private InetAddress[] calcBindAddresses(final String addressString, boolean enforceBind) {
@@ -1082,242 +1062,155 @@ addressLoop:
 	mapAddressToBindIP(
 		InetAddress	address) {
 		boolean[]	address_bits = bytesToBits( address.getAddress());
-
 		NetworkAdminNetworkInterface[] interfaces = getInterfaces();
-
 		InetAddress	best_bind_address	= null;
 		int			best_prefix			= 0;
-
 		for (int i=0;i<interfaces.length;i++) {
-
 			NetworkAdminNetworkInterface intf = interfaces[i];
-
 			NetworkAdminNetworkInterfaceAddress[] addresses = intf.getAddresses();
-
 			for (int j=0;j<addresses.length;j++) {
-
 				NetworkAdminNetworkInterfaceAddress bind_address = addresses[j];
-
 				InetAddress ba = bind_address.getAddress();
-
 				byte[]	bind_bytes = ba.getAddress();
-
 				if (address_bits.length == bind_bytes.length) {
-
 					boolean[]	bind_bits = bytesToBits(bind_bytes);
-
 					for (int k=0;k<bind_bits.length;k++) {
-
 						if (address_bits[k] != bind_bits[k]) {
-
 							break;
 						}
-
 						if (k > best_prefix) {
-
 							best_prefix	= k;
-
 							best_bind_address	= ba;
 						}
 					}
 				}
 			}
 		}
-
 		return (best_bind_address);
 	}
 
-	protected boolean[]
-  	bytesToBits(
-  		byte[]	bytes )
-  	{
-  		boolean[]	res = new boolean[bytes.length*8];
+	protected boolean[] bytesToBits(byte[] bytes) {
+		boolean[] res = new boolean[bytes.length * 8];
+		for (int i = 0; i < bytes.length; i++) {
+			byte b = bytes[i];
+			for (int j = 0; j < 8; j++) {
+				res[i * 8 + j] = (b & (byte) (0x01 << (7 - j))) != 0;
+			}
+		}
+		return (res);
+	}
 
-  		for (int i=0;i<bytes.length;i++) {
-
-  			byte	b = bytes[i];
-
-  			for (int j=0;j<8;j++) {
-
-  				res[i*8+j] = (b&(byte)(0x01<<(7-j))) != 0;
-  			}
-  		}
-
-  		return (res);
-  	}
-
-	protected InetAddress
-	guessAddress(
-		List	addresses) {
-			// prioritise 192.168.0.* and 192.168.1.* as common
-			// then ipv4 over ipv6
-
+	protected InetAddress guessAddress(List addresses) {
+		// prioritise 192.168.0.* and 192.168.1.* as common
+		// then ipv4 over ipv6
 		for (int i=0;i<addresses.size();i++) {
-
 			InetAddress address = (InetAddress)addresses.get(i);
-
 			String str = address.getHostAddress();
-
 			if (str.startsWith("192.168.0.") || str.startsWith("192.168.1.")) {
-
 				return (address);
 			}
 		}
-
 		for (int i=0;i<addresses.size();i++) {
-
 			InetAddress address = (InetAddress)addresses.get(i);
-
 			if (address instanceof Inet4Address) {
-
 				return (address);
 			}
 		}
-
 		for (int i=0;i<addresses.size();i++) {
-
 			InetAddress address = (InetAddress)addresses.get(i);
-
 			if (address instanceof Inet6Address) {
-
 				return (address);
 			}
 		}
-
 		if (addresses.size() > 0) {
-
 			return ((InetAddress)addresses.get(0));
 		}
-
 		return (null);
 	}
 
-	static final InetAddress[]		gdpa_lock = { null };
-	private static AESemaphore			gdpa_sem;
-	private static long					gdpa_last_fail;
-	private static long					gdpa_last_lookup;
-	static final AESemaphore			gdpa_initial_sem = new AESemaphore("gdpa:init");
+	static final InetAddress[]		gdpaLock = { null };
+	private static AESemaphore		gdpaSem;
+	private static long				gdpaLastFail;
+	private static long				gdpaLastLookup;
+	static final AESemaphore		gdpaInitialSem = new AESemaphore("gdpa:init");
 
-	public InetAddress
-	getDefaultPublicAddress() {
-		return (getDefaultPublicAddress( false));
+	public InetAddress getDefaultPublicAddress() {
+		return (getDefaultPublicAddress(false));
 	}
 
-	public InetAddress
-	getDefaultPublicAddress(
-		boolean		peek) {
+	public InetAddress getDefaultPublicAddress(boolean peek) {
 		final AESemaphore	sem;
-
-		synchronized(gdpa_lock) {
-
+		synchronized(gdpaLock) {
 			long	now = SystemTime.getMonotonousTime();
-
-			if (gdpa_sem == null) {
-
+			if (gdpaSem == null) {
 				boolean	do_lookup = true;
-
 				if (peek) {
-
-					if (gdpa_last_lookup != 0 && now - gdpa_last_lookup <= 60*1000) {
-
+					if (gdpaLastLookup != 0 && now - gdpaLastLookup <= 60*1000) {
 						do_lookup = false;
 					}
 				}
-
 				if (do_lookup) {
-
-					gdpa_last_lookup = now;
-
-					gdpa_sem = sem = new AESemaphore("getDefaultPublicAddress");
-
+					gdpaLastLookup = now;
+					gdpaSem = sem = new AESemaphore("getDefaultPublicAddress");
 					new AEThread2("getDefaultPublicAddress") {
 						public void run() {
 							InetAddress address = null;
-
 							try {
 								Utilities utils = PluginInitializer.getDefaultInterface().getUtilities();
-
 								address = utils.getPublicAddress();
-
 								if (address == null) {
-
 									address = utils.getPublicAddress(true);
 								}
 							} catch (Throwable e) {
-
 							} finally {
-
-								synchronized(gdpa_lock) {
-
-									gdpa_lock[0]	= address;
-
+								synchronized(gdpaLock) {
+									gdpaLock[0]	= address;
 									sem.releaseForever();
-
-									gdpa_sem = null;
-
-									gdpa_initial_sem.releaseForever();
+									gdpaSem = null;
+									gdpaInitialSem.releaseForever();
 								}
 							}
 						}
 					}.start();
 				} else {
-
 					sem = null;		// no lookup this time around - we're peeking
 				}
 			} else {
-
-				sem = gdpa_sem;
+				sem = gdpaSem;
 			}
-
-			if (gdpa_last_fail != 0 && SystemTime.getMonotonousTime() - gdpa_last_fail < 5*60*1000) {
-
-				return (gdpa_lock[0]);
+			if (gdpaLastFail != 0 && SystemTime.getMonotonousTime() - gdpaLastFail < 5*60*1000) {
+				return (gdpaLock[0]);
 			}
 		}
-
 		if (peek) {
-
 				// we're doing a peek and don't want to wait
-
-			gdpa_initial_sem.reserve(10*1000);
-
-			synchronized(gdpa_lock) {
-
-				return (gdpa_lock[0]);
+			gdpaInitialSem.reserve(10*1000);
+			synchronized(gdpaLock) {
+				return (gdpaLock[0]);
 			}
 		} else {
 				// in case things block - yes, they can do :(
-
 			boolean	worked = sem.reserve(10*1000);
-
-			synchronized(gdpa_lock) {
-
+			synchronized(gdpaLock) {
 				if (worked) {
-
-					gdpa_last_fail = 0;
-
+					gdpaLastFail = 0;
 				} else {
-
-					gdpa_initial_sem.releaseForever();
-
-					gdpa_last_fail = SystemTime.getMonotonousTime();
+					gdpaInitialSem.releaseForever();
+					gdpaLastFail = SystemTime.getMonotonousTime();
 				}
-
-				return (gdpa_lock[0]);
+				return (gdpaLock[0]);
 			}
 		}
 	}
 
 	@Override
-	public InetAddress
-	getDefaultPublicAddressV6() {
-		return (getDefaultPublicAddressV6( false));
+	public InetAddress getDefaultPublicAddressV6() {
+		return (getDefaultPublicAddressV6(false));
 	}
 
 	@Override
-	public InetAddress
-	getDefaultPublicAddressV6(
-		boolean	peek ) {
+	public InetAddress getDefaultPublicAddressV6(boolean peek) {
+		
 		if (!supportsIPv6)
 			return null;
 

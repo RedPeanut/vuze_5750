@@ -37,36 +37,37 @@ public class DHTTransportFactory {
 	}
 
 	public static DHTTransportUDP createUDP(
-		byte			protocol_version,
+		byte			protocolVersion,
 		int				network,
 		boolean			v6,
 		String			ip,
-		String			default_ip,
+		String			defaultIp,
 		int				port,
-		int				max_fails_for_live,
-		int				max_fails_for_unknown,
+		int				maxFailsForLive,
+		int				maxFailsForUnknown,
 		long			timeout,
-		int				send_delay,
-		int				receive_delay,
-		boolean			bootstrap_node,
+		int				sendDelay,
+		int				receiveDelay,
+		boolean			bootstrapNode,
 		boolean			reachable,
 		DHTLogger		logger )
 		throws DHTTransportException {
 		
 		return (new DHTTransportUDPImpl(
-					protocol_version,
-					network,
-					v6,
-					ip,
-					default_ip,
-					port,
-					max_fails_for_live,
-					max_fails_for_unknown,
-					timeout,
-					send_delay,
-					receive_delay,
-					bootstrap_node,
-					reachable,
-					logger));
+				protocolVersion,
+				network,
+				v6,
+				ip,
+				defaultIp,
+				port,
+				maxFailsForLive,
+				maxFailsForUnknown,
+				timeout,
+				sendDelay,
+				receiveDelay,
+				bootstrapNode,
+				reachable,
+				logger)
+		);
 	}
 }
