@@ -64,7 +64,7 @@ public class DHTUDPPacketReply
 
 	private long	skew;
 
-	private DHTNetworkPosition[]	network_positions;
+	private DHTNetworkPosition[]	networkPositions;
 
 	private short	processingTime;
 
@@ -168,24 +168,20 @@ public class DHTUDPPacketReply
 		return (flags);
 	}
 
-	public byte
-	getGenericFlags2() {
+	public byte getGenericFlags2() {
 		return (flags2);
 	}
 
-	public void setNetwork(
-		int		_network) {
-		network	= _network;
+	public void setNetwork(int _network) {
+		network = _network;
 	}
 
-	protected DHTNetworkPosition[]
-	getNetworkPositions() {
-		return (network_positions);
+	protected DHTNetworkPosition[] getNetworkPositions() {
+		return (networkPositions);
 	}
 
-	protected void setNetworkPositions(
-		DHTNetworkPosition[] _network_positions) {
-		network_positions = _network_positions;
+	protected void setNetworkPositions(DHTNetworkPosition[] _networkPositions) {
+		networkPositions = _networkPositions;
 	}
 
 	public void serialise(DataOutputStream os)

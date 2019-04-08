@@ -245,8 +245,7 @@ public class DHTImpl
 				logger);
 	}
 
-	public void runStateChanged(
-		long run_state ) {
+	public void runStateChanged(long run_state) {
 		try {
 			boolean	is_sleeping = AERunStateHandler.isDHTSleeping();
 			if (sleeping != is_sleeping) {

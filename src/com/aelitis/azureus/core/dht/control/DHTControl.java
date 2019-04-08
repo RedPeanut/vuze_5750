@@ -134,19 +134,10 @@ public interface DHTControl {
 		DHTTransportContact			contact,
 		DHTOperationListener		listener);
 
-	public int computeAndCompareDistances(
-		byte[]		n1,
-		byte[]		n2,
-		byte[]		pivot);
+	public int computeAndCompareDistances(byte[] n1, byte[] n2, byte[] pivot);
 
-	public byte[]
-	computeDistance(
-		byte[]		n1,
-		byte[]		n2);
-
-	public int compareDistances(
-		byte[]		n1,
-		byte[]		n2);
+	public byte[] computeDistance(byte[] n1, byte[] n2);
+	public int compareDistances(byte[] n1, byte[] n2);
 
 	public boolean verifyContact(
 		DHTTransportContact c,

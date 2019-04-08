@@ -61,7 +61,8 @@ public class SimpleTimer {
 						}
 					}
 				}
-			});
+			}
+		);
 	}
 
 	public static TimerEvent addEvent(
@@ -72,14 +73,12 @@ public class SimpleTimer {
 		return (res);
 	}
 
-	public static TimerEvent
-	addEvent(
+	public static TimerEvent addEvent(
 		String				name,
 		long				when,
 		boolean				absolute,
 		TimerEventPerformer	performer) {
 		TimerEvent	res = timer.addEvent(name, when, absolute, performer);
-
 		return (res);
 	}
 

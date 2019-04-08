@@ -320,23 +320,13 @@ public class DHTUDPUtils {
 
 	public static final int	DHTTRANSPORTCONTACT_SIZE	= 2 + INETSOCKETADDRESS_IPV4_SIZE;
 
-	protected static void
-	serialiseContact(
-		DataOutputStream		os,
-		DHTTransportContact		contact )
-
-		throws IOException, DHTTransportException
-	{
+	protected static void serialiseContact(DataOutputStream os, DHTTransportContact contact)
+			throws IOException, DHTTransportException {
 		if (contact.getTransport() instanceof DHTTransportUDP) {
-
-			os.writeByte(CT_UDP);		// 1
-
-			os.writeByte( contact.getProtocolVersion());	// 2
-
-			serialiseAddress(os, contact.getExternalAddress());	// 2 + address
-
+			os.writeByte(CT_UDP); // 1
+			os.writeByte(contact.getProtocolVersion()); // 2
+			serialiseAddress(os, contact.getExternalAddress()); // 2 + address
 		} else {
-
 			throw (new IOException("Unsupported contact type:" + contact.getClass().getName()));
 		}
 	}
@@ -599,26 +589,15 @@ public class DHTUDPUtils {
 		}
 	}
 
-	protected static void
-	serialiseContacts(
-		DataOutputStream		os,
-		DHTTransportContact[]	contacts )
-
-		throws IOException
-	{
+	protected static void serialiseContacts(DataOutputStream os, DHTTransportContact[] contacts)
+			throws IOException {
 		serialiseLength(os, contacts.length, 65535);
-
-		for (int i=0;i<contacts.length;i++) {
-
+		for (int i = 0; i < contacts.length; i++) {
 			try {
 				serialiseContact(os, contacts[i]);
-
 			} catch (DHTTransportException e) {
-
 				Debug.printStackTrace(e);
-
-					// not much we can do here to recover - shouldn't fail anyways
-
+				// not much we can do here to recover - shouldn't fail anyways
 				throw (new IOException(e.getMessage()));
 			}
 		}

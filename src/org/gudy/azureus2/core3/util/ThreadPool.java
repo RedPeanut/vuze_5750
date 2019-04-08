@@ -36,16 +36,17 @@ import org.gudy.azureus2.core3.config.ParameterListener;
 
 
 public class ThreadPool {
+	
 	private static final boolean	NAME_THREADS = Constants.IS_CVS_VERSION && System.getProperty("az.thread.pool.naming.enable", "true" ).equals("true");
 
 	private static final boolean	LOG_WARNINGS	= false;
 	private static final int		WARN_TIME		= 10000;
 
 	static final List		busyPools			= new ArrayList();
-	private static boolean	busy_pool_timer_set	= false;
+	private static boolean	busyPoolTimerSet	= false;
 
-	private static boolean	debug_thread_pool;
-	private static boolean	debug_thread_pool_log_on;
+	private static boolean	debugThreadPool;
+	private static boolean	debugThreadPoolLogOn;
 
 	static {
 		if (System.getProperty("transitory.startup", "0").equals("0")) {
@@ -71,12 +72,11 @@ public class ThreadPool {
 		}
 	}
 
-	static final ThreadLocal		tls	=
-		new ThreadLocal() {
-			public Object initialValue() {
-				return (null);
-			}
-		};
+	static final ThreadLocal tls = new ThreadLocal() {
+		public Object initialValue() {
+			return (null);
+		}
+	};
 
 	protected static void checkAllTimeouts() {
 		List	pools;
@@ -89,7 +89,6 @@ public class ThreadPool {
 			((ThreadPool)pools.get(i)).checkTimeouts();
 		}
 	}
-
 
 	final String		name;
 	private final int	maxSize;
@@ -114,9 +113,7 @@ public class ThreadPool {
 
 	private boolean			logCpu	= AEThread2.TRACE_TIMES;
 
-	public ThreadPool(
-		String	_name,
-		int		_maxSize) {
+	public ThreadPool(String _name, int _maxSize) {
 		this(_name, _maxSize, false);
 	}
 
@@ -149,15 +146,13 @@ public class ThreadPool {
 		return (maxSize);
 	}
 
-	public void setThreadPriority(
-		int	_priority) {
-		threadPriority	= _priority;
+	public void setThreadPriority(int _priority) {
+		threadPriority = _priority;
 	}
 
-	public void setExecutionLimit(
-		long		millis) {
-		synchronized(this) {
-			executionLimit	= millis;
+	public void setExecutionLimit(long millis) {
+		synchronized (this) {
+			executionLimit = millis;
 		}
 	}
 
@@ -310,19 +305,19 @@ public class ThreadPool {
 	}
 
 	public int getRunningCount() {
-  		int	res = 0;
-  		synchronized(this) {
-  			Iterator	it = busy.iterator();
-  			while (it.hasNext()) {
-  				ThreadPoolWorker	worker = (ThreadPoolWorker)it.next();
-  				AERunnable	runnable = worker.getRunnable();
-  				if (runnable != null) {
-  					res++;
-  				}
-  			}
-  		}
-  		return (res);
-  	}
+		int res = 0;
+		synchronized (this) {
+			Iterator it = busy.iterator();
+			while (it.hasNext()) {
+				ThreadPoolWorker worker = (ThreadPoolWorker) it.next();
+				AERunnable runnable = worker.getRunnable();
+				if (runnable != null) {
+					res++;
+				}
+			}
+		}
+		return (res);
+	}
 
 	public boolean isFull() {
 		return (threadSemaphore.getValue() == 0);
@@ -367,14 +362,14 @@ public class ThreadPool {
 			long	diff = taskTotal - taskTotalLast;
 			taskAverage.addValue(diff);
 			taskTotalLast = taskTotal;
-			if (debug_thread_pool_log_on) {
+			if (debugThreadPoolLogOn) {
 				System.out.println("ThreadPool '" + getName() + "'/" + threadNameIndex + ": max=" + maxSize + ",sem=[" + threadSemaphore.getString() + "],busy=" + busy.size() + ",queue=" + taskQueue.size());
 			}
 			long	now = SystemTime.getMonotonousTime();
 			for (int i=0;i<busy.size();i++) {
 				ThreadPoolWorker	x = (ThreadPoolWorker)busy.get(i);
 				long	elapsed = now - x.runStartTime;
-				if (elapsed > ( (long)WARN_TIME * (x.warnCount+1))) {
+				if (elapsed > ((long)WARN_TIME * (x.warnCount+1))) {
 					x.warnCount++;
 					if (LOG_WARNINGS) {
 						DebugLight.out(x.getWorkerName() + ": running, elapsed = " + elapsed + ", state = " + x.state);
@@ -418,7 +413,7 @@ public class ThreadPool {
 			}
 			// if debug is on we leave the pool registered so that we
 			// can trace on the timeout events
-			if (busy.size() == 0 && !debug_thread_pool) {
+			if (busy.size() == 0 && !debugThreadPool) {
 				synchronized (busyPools) {
 					busyPools.remove(this);
 				}
@@ -490,18 +485,18 @@ public class ThreadPool {
 								synchronized (busyPools) {
 									if (!busyPools.contains(ThreadPool.this)) {
 										busyPools.add(ThreadPool.this);
-										if (!busy_pool_timer_set) {
+										if (!busyPoolTimerSet) {
 											// we have to defer this action rather
 											// than running as a static initialiser
 											// due to the dependency between
 											// ThreadPool, Timer and ThreadPool again
 											COConfigurationManager.addAndFireParameterListeners(new String[] { "debug.threadpool.log.enable", "debug.threadpool.debug.trace" }, new ParameterListener() {
 												public void parameterChanged(String name) {
-													debug_thread_pool = COConfigurationManager.getBooleanParameter("debug.threadpool.log.enable", false);
-													debug_thread_pool_log_on = COConfigurationManager.getBooleanParameter("debug.threadpool.debug.trace", false);
+													debugThreadPool = COConfigurationManager.getBooleanParameter("debug.threadpool.log.enable", false);
+													debugThreadPoolLogOn = COConfigurationManager.getBooleanParameter("debug.threadpool.debug.trace", false);
 												}
 											});
-											busy_pool_timer_set = true;
+											busyPoolTimerSet = true;
 											SimpleTimer.addPeriodicEvent("ThreadPool:timeout", WARN_TIME, new TimerEventPerformer() {
 												public void perform(TimerEvent event) {
 													checkAllTimeouts();
@@ -516,14 +511,14 @@ public class ThreadPool {
 						if (runnable instanceof ThreadPoolTask) {
 							ThreadPoolTask tpt = (ThreadPoolTask) runnable;
 							tpt.worker = this;
-							String task_name = NAME_THREADS?tpt.getName():null;
+							String taskName = NAME_THREADS?tpt.getName():null;
 							try {
-								if (task_name != null)
-									setName(workerName + "{" + task_name + "}");
+								if (taskName != null)
+									setName(workerName + "{" + taskName + "}");
 								tpt.taskStarted();
 								runIt(runnable);
 							} finally {
-								if (task_name != null)
+								if (taskName != null)
 									setName(workerName);
 
 								if (tpt.isAutoReleaseAndAllowManual())
@@ -550,7 +545,7 @@ public class ThreadPool {
 
 								// if debug is on we leave the pool registered so that we
 								// can trace on the timeout events
-								if (busy.size() == 0 && !debug_thread_pool)
+								if (busy.size() == 0 && !debugThreadPool)
 									synchronized (busyPools) {
 										busyPools.remove(ThreadPool.this);
 									}

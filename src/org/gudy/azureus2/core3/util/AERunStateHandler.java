@@ -26,9 +26,8 @@ import org.gudy.azureus2.core3.config.COConfigurationManager;
 
 import com.aelitis.azureus.core.util.CopyOnWriteList;
 
-public class
-AERunStateHandler
-{
+public class AERunStateHandler {
+	
 	public static final long		RS_DELAYED_UI			= 0x00000001;
 	public static final long		RS_UDP_NET_ONLY			= 0x00000002;
 	public static final long		RS_DHT_SLEEPING			= 0x00000004;
@@ -62,95 +61,67 @@ AERunStateHandler
 		return (( current_mode & RS_DELAYED_UI ) != 0);
 	}
 
-	public static boolean
-	isUDPNetworkOnly() {
-		return (( current_mode & RS_UDP_NET_ONLY ) != 0);
+	public static boolean isUDPNetworkOnly() {
+		return ((current_mode & RS_UDP_NET_ONLY) != 0);
 	}
 
-	public static boolean
-	isDHTSleeping() {
-		return (( current_mode & RS_DHT_SLEEPING ) != 0);
+	public static boolean isDHTSleeping() {
+		return ((current_mode & RS_DHT_SLEEPING) != 0);
 	}
 
-	public static long
-	getResourceMode() {
+	public static long getResourceMode() {
 		return (current_mode);
 	}
 
-	public static void
-	setResourceMode(
-		final long		new_mode) {
+	public static void setResourceMode(final long new_mode) {
 		synchronized(dispatcher) {
-
 			if (new_mode == current_mode) {
-
 				return;
 			}
-
 			current_mode = new_mode;
-
 			final Iterator<RunStateChangeListener> it = listeners.iterator();
-
 			dispatcher.dispatch(
 				new AERunnable() {
 					public void
 					runSupport() {
 						while (it.hasNext()) {
-
 							try {
 								it.next().runStateChanged(new_mode);
-
 							} catch (Throwable e) {
-
 								Debug.out(e);
 							}
 						}
-
 					}
 				});
 		}
 	}
 
-	public static void
-	addListener(
+	public static void addListener(
 		final RunStateChangeListener	l,
 		boolean							fire_now) {
 		synchronized(dispatcher) {
-
 			listeners.add(l);
-
 			if (fire_now) {
-
-				dispatcher.dispatch(
-					new AERunnable() {
-						public void
-						runSupport() {
-							try {
-								l.runStateChanged(current_mode);
-
-							} catch (Throwable e) {
-
-								Debug.out(e);
-							}
+				dispatcher.dispatch(new AERunnable() {
+					public void runSupport() {
+						try {
+							l.runStateChanged(current_mode);
+						} catch (Throwable e) {
+							Debug.out(e);
 						}
-					});
+					}
+				});
 			}
 		}
 	}
 
-	public static void
-	removeListener(
-		RunStateChangeListener	l) {
-		synchronized(dispatcher) {
-
+	public static void removeListener(RunStateChangeListener l) {
+		synchronized (dispatcher) {
 			listeners.remove(l);
 		}
 	}
 
-	public interface RunStateChangeListener
-	{
-		public void
-		runStateChanged(
-			long		run_state);
+	public interface RunStateChangeListener {
+		public void runStateChanged(long run_state);
 	}
 }

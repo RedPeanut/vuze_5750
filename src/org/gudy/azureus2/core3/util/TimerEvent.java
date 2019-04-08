@@ -29,13 +29,13 @@ package org.gudy.azureus2.core3.util;
 
 public class TimerEvent
 	extends		ThreadPoolTask
-	implements 	Comparable<TimerEvent>
-{
-	private String					name;
+	implements 	Comparable<TimerEvent> {
+	
+	private String						name;
 
-	private final Timer				timer;
-	private final long				created;
-	private long					when;
+	private final Timer					timer;
+	private final long					created;
+	private long						when;
 	private final TimerEventPerformer	performer;
 
 	private final boolean	absolute;
@@ -69,9 +69,8 @@ public class TimerEvent
 		}
 	}
 
-	public void setName(
-		String		_name) {
-		name	= _name;
+	public void setName(String _name) {
+		name = _name;
 	}
 
 	public String getName() {
@@ -86,8 +85,8 @@ public class TimerEvent
 		return (when);
 	}
 
-	protected void setWhen(long new_when) {
-		when	= new_when;
+	protected void setWhen(long newWhen) {
+		when = newWhen;
 	}
 
 	protected AERunnable getRunnable() {

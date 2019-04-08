@@ -26,9 +26,6 @@ package org.gudy.azureus2.core3.util;
  * @author parg
  *
  */
-public interface
-TimerEventPerformer
-{
-	public void perform(
-		TimerEvent	event);
+public interface TimerEventPerformer {
+	public void perform(TimerEvent event);
 }

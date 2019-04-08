@@ -138,7 +138,7 @@ public class DHTRouterImpl implements DHTRouter {
 		isBootstrapProxy	= COConfigurationManager.getBooleanParameter("dht.bootstrap.is.proxy", false);
 		K					= _K;
 		B					= _B;
-		maxRepPerNode	= _maxRepPerNode;
+		maxRepPerNode		= _maxRepPerNode;
 		logger				= _logger;
 
 		smallestSubtreeMax	= 1;

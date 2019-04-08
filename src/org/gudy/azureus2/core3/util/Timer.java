@@ -32,8 +32,8 @@ import java.util.*;
 
 public class Timer
 	extends 	AERunnable
-	implements	SystemTime.ChangeListener
-{
+	implements	SystemTime.ChangeListener {
+	
 	private static final boolean DEBUG_TIMERS = true;
 	private static ArrayList<WeakReference<Timer>> timers = null;
 	static final AEMonitor timersMon = new AEMonitor("timers list");
@@ -93,9 +93,8 @@ public class Timer
 		return (new ArrayList<TimerEvent>(events));
 	}
 	
-	public void setLogging(
-		boolean	_log) {
-		log	= _log;
+	public void setLogging(boolean _log) {
+		log = _log;
 	}
 
 	public boolean getLogging() {

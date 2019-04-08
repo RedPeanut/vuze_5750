@@ -26,9 +26,8 @@ import java.util.*;
  *
  */
 
-public abstract class
-AEMonSem
-{
+public abstract class AEMonSem {
+	
 	protected static final boolean	DEBUG					= AEDiagnostics.DEBUG_MONITOR_SEM_USAGE;
 	protected static final boolean	DEBUG_CHECK_DUPLICATES	= false;
 
@@ -45,7 +44,7 @@ AEMonSem
 	private static long	semaphore_id_next;
 
 	private static final Map 	debug_traces		= new HashMap();
-	static final List	debug_recursions	= new ArrayList();
+	static final List			debug_recursions	= new ArrayList();
 	private static final List	debug_reciprocals	= new ArrayList();
 	//private static List	debug_sem_in_mon	= new ArrayList();
 
@@ -55,10 +54,11 @@ AEMonSem
 	private static final Map	debug_monitors			= new WeakHashMap();
 	private static final Map	debug_semaphores		= new WeakHashMap();
 
-	static{
+	static {
+		
 		if (DEBUG) {
 
-				// defer this due to initialisation problems
+			// defer this due to initialisation problems
 
 			Thread t = new Thread("AEMonSem:delay debug init") {
 				public void run() {
@@ -77,14 +77,12 @@ AEMonSem
 						new TimerEventPerformer() {
 							AEDiagnosticsLogger diag_logger;
 
-							public void perform(
-								TimerEvent	event) {
+							public void perform(TimerEvent event) {
 								if (diag_logger == null) {
-
-									diag_logger	= AEDiagnostics.getLogger("monsem");
+	
+									diag_logger = AEDiagnostics.getLogger("monsem");
 								}
-
-								check(diag_logger);
+									check(diag_logger);
 							}
 						};
 
@@ -93,16 +91,12 @@ AEMonSem
 					new Timer("AEMonSem").addPeriodicEvent(	DEBUG_TIMER, performer);
 				}
 			};
-
 			t.setDaemon(true);
-
 			t.start();
 		}
 	}
 
-	protected static void
-	check(
-		AEDiagnosticsLogger diag_logger) {
+	protected static void check(AEDiagnosticsLogger diag_logger) {
 		List	active				= new ArrayList();
 		List	waiting_monitors	= new ArrayList();
 		List	busy_monitors		= new ArrayList();

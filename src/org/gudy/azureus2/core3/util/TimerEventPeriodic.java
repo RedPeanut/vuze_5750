@@ -26,9 +26,8 @@ package org.gudy.azureus2.core3.util;
  * @author parg
  *
  */
-public class TimerEventPeriodic
-	implements TimerEventPerformer
-{
+public class TimerEventPeriodic implements TimerEventPerformer {
+	
 	private final Timer					timer;
 	private final long					frequency;
 	private final boolean				absolute;
@@ -53,9 +52,9 @@ public class TimerEventPeriodic
 		currentEvent = timer.addEvent(now, now + frequency, absolute, this);
 	}
 
-	public void setName(String	_name) {
-		name	= _name;
-		synchronized(this) {
+	public void setName(String _name) {
+		name = _name;
+		synchronized (this) {
 			if (currentEvent != null) {
 				currentEvent.setName(name);
 			}
@@ -78,17 +77,17 @@ public class TimerEventPeriodic
 		return (cancelled);
 	}
 
-	public void perform(TimerEvent	event) {
+	public void perform(TimerEvent event) {
 		if (!cancelled) {
 			try {
 				performer.perform(event);
 			} catch (Throwable e) {
 				DebugLight.printStackTrace(e);
 			}
-			
-			synchronized(this) {
+
+			synchronized (this) {
 				if (!cancelled) {
-					long	 now = SystemTime.getCurrentTime();
+					long now = SystemTime.getCurrentTime();
 					currentEvent = timer.addEvent(name, now, now + frequency, absolute, this);
 				}
 			}

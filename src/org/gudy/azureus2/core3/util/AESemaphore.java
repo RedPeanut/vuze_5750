@@ -79,7 +79,7 @@ public class AESemaphore extends AEMonSem {
 
 	protected int reserveSupport(
 		long	millis,
-		int		max_to_reserve) {
+		int		maxToReserve) {
 		
 		if (DEBUG) {
 			super.debugEntry();
@@ -137,10 +137,10 @@ public class AESemaphore extends AEMonSem {
 					latestWaiter = null;
 				}
 			} else {
-				int	num_to_get = max_to_reserve>dontWait?dontWait:max_to_reserve;
-				dontWait -= num_to_get;
-				totalReserve += num_to_get;
-				return (num_to_get);
+				int	numToGet = maxToReserve>dontWait?dontWait:maxToReserve;
+				dontWait -= numToGet;
+				totalReserve += numToGet;
+				return (numToGet);
 			}
 		}
 	}
