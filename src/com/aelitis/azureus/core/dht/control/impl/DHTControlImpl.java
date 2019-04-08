@@ -141,7 +141,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 	final DHTLogger	logger;
 
-	private final int	node_id_byte_count;
+	private final int	nodeIdByteCount;
 	final int			searchConcurrency;
 	private final int	lookupConcurrency;
 	private final int	cacheAtClosestN;
@@ -205,8 +205,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 	//private Cipher 			spoof_cipher;
 	//private SecretKey		spoof_key;
-	MessageDigest	spoof_digest;
-	byte[]			spoof_key;
+	MessageDigest	spoofDigest;
+	byte[]			spoofKey;
 
 	private static final int	SPOOF_GEN_HISTORY_SIZE	= 256;
 
@@ -242,14 +242,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		DHTTransport		_transport,
 		int					_K,
 		int					_B,
-		int					_max_rep_per_node,
-		int					_search_concurrency,
-		int					_lookup_concurrency,
-		int					_original_republish_interval,
-		int					_cache_republish_interval,
-		int					_cache_at_closest_n,
-		boolean				_encode_keys,
-		boolean				_enable_random_poking,
+		int					_maxRepPerNode,
+		int					_searchConcurrency,
+		int					_lookupConcurrency,
+		int					_originalRepublishInterval,
+		int					_cacheRepublishInterval,
+		int					_cacheAtClosestN,
+		boolean				_encodeKeys,
+		boolean				_enableRandomPoking,
 		DHTLogger 			_logger) {
 		
 		Log.d(TAG, ">>> K = " + _K);
@@ -258,14 +258,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		transport	= _transport;
 		logger		= _logger;
 
-		K								= _K;
-		B								= _B;
-		maxRepPerNode				= _max_rep_per_node;
-		searchConcurrency				= _search_concurrency;
-		lookupConcurrency				= _lookup_concurrency;
-		cacheAtClosestN				= _cache_at_closest_n;
-		encodeKeys						= _encode_keys;
-		enableRandomPoking			= _enable_random_poking;
+		K							= _K;
+		B							= _B;
+		maxRepPerNode				= _maxRepPerNode;
+		searchConcurrency			= _searchConcurrency;
+		lookupConcurrency			= _lookupConcurrency;
+		cacheAtClosestN				= _cacheAtClosestN;
+		encodeKeys					= _encodeKeys;
+		enableRandomPoking			= _enableRandomPoking;
 
 		// set this so we don't do initial calculation until reasonably populated
 
@@ -273,11 +273,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 		database = DHTDBFactory.create(
 						adapter.getStorageAdapter(),
-						_original_republish_interval,
-						_cache_republish_interval,
+						_originalRepublishInterval,
+						_cacheRepublishInterval,
 						transport.getProtocolVersion(),
 						logger);
-
+		
+		Log.d(TAG, ">>> lookupConcurrency = " + lookupConcurrency);
+		new Throwable().printStackTrace();
+		
 		internalLookupPool = new ThreadPool("DHTControl:internallookups", lookupConcurrency);
 		internalPutPool = new ThreadPool("DHTControl:internalputs", lookupConcurrency);
 
@@ -290,7 +293,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		//Log.d(TAG, ">>> 1");
 		print_contactsToQuery();
 		
-		node_id_byte_count = router.getID().length;
+		nodeIdByteCount = router.getID().length;
 		stats = new DHTControlStatsImpl(this);
 
 		// don't bother computing anti-spoof stuff if we don't support value storage
@@ -304,9 +307,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				spoof_key = keyGen.generateKey();
 				*/
 
-				spoof_digest 	= MessageDigest.getInstance("MD5");
-				spoof_key		= new byte[16];
-				RandomUtils.nextSecureBytes(spoof_key);
+				spoofDigest 	= MessageDigest.getInstance("MD5");
+				spoofKey		= new byte[16];
+				RandomUtils.nextSecureBytes(spoofKey);
 			} catch (Throwable e) {
 				Debug.printStackTrace(e);
 				logger.log(e);
@@ -319,14 +322,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				
 			new DHTTransportListener() {
 				
-				public void localContactChanged(DHTTransportContact	new_local_contact) {
+				public void localContactChanged(DHTTransportContact	newLocalContact) {
 
 					logger.log("Transport ID changed, recreating router");
 
 					List	oldContacts = router.findBestContacts(0);
 					byte[]	oldRouterId = router.getID();
 
-					createRouter(new_local_contact);
+					createRouter(newLocalContact);
 
 					// sort for closeness to new router id
 					Set	sortedContacts = new SortedTransportContactSet(router.getID(), true).getSet();
@@ -462,7 +465,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		localContact = transport.getLocalContact();
 		database.setControl(this);
 
-		node_id_byte_count	= router.getID().length;
+		nodeIdByteCount	= router.getID().length;
 		stats = new DHTControlStatsImpl(this);
 
 		// don't bother computing anti-spoof stuff if we don't support value storage
@@ -476,9 +479,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				spoof_key = keyGen.generateKey();
 				*/
 
-				spoof_digest 	= MessageDigest.getInstance("MD5");
-				spoof_key		= new byte[16];
-				RandomUtils.nextSecureBytes(spoof_key);
+				spoofDigest 	= MessageDigest.getInstance("MD5");
+				spoofKey		= new byte[16];
+				RandomUtils.nextSecureBytes(spoofKey);
 			} catch (Throwable e) {
 				Debug.printStackTrace(e);
 				logger.log(e);
@@ -3268,15 +3271,15 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	protected byte[] encodeKey(byte[] key) {
 		if (encodeKeys) {
 			byte[] temp = new SHA1Simple().calculateHash(key);
-			byte[] result = new byte[node_id_byte_count];
-			System.arraycopy(temp, 0, result, 0, node_id_byte_count);
+			byte[] result = new byte[nodeIdByteCount];
+			System.arraycopy(temp, 0, result, 0, nodeIdByteCount);
 			return (result);
 		} else {
-			if (key.length == node_id_byte_count) {
+			if (key.length == nodeIdByteCount) {
 				return (key);
 			} else {
-				byte[] result = new byte[node_id_byte_count];
-				System.arraycopy(key, 0, result, 0, Math.min(node_id_byte_count, key.length));
+				byte[] result = new byte[nodeIdByteCount];
+				System.arraycopy(key, 0, result, 0, Math.min(nodeIdByteCount, key.length));
 				return (result);
 			}
 		}
@@ -3522,7 +3525,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 	private int generateSpoofID(
 		DHTTransportContact	contact) {
-		if (spoof_digest == null) {
+		if (spoofDigest == null) {
 
 			return (0);
 		}
@@ -3549,13 +3552,13 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			//spoof_cipher.init(Cipher.ENCRYPT_MODE, spoof_key);
 			//byte[]	data_out = spoof_cipher.doFinal(address);
 
-			byte[]	data_in = spoof_key.clone();
+			byte[]	data_in = spoofKey.clone();
 
 			for ( int i=0;i<address.length;i++) {
 				data_in[i] ^= address[i];
 			}
 
-			byte[] data_out = spoof_digest.digest(data_in);
+			byte[] data_out = spoofDigest.digest(data_in);
 
 			int	res =  	(data_out[0]<<24)&0xff000000 |
 						(data_out[1] << 16)&0x00ff0000 |
@@ -3583,7 +3586,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	private byte[]
 	generateSpoofID2(
 		DHTTransportContact	contact) {
-		if (spoof_digest == null) {
+		if (spoofDigest == null) {
 			return (new byte[ SPOOF_ID2_SIZE ]);
 		}
 		HashWrapper cid = new HashWrapper( contact.getID());
@@ -3599,12 +3602,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			// spoof_cipher.init(Cipher.ENCRYPT_MODE, spoof_key);
 			// byte[]	data_out = spoof_cipher.doFinal( cid.getBytes());
 			byte[] 	cid_bytes 	= cid.getBytes();
-			byte[]	data_in 	= spoof_key.clone();
+			byte[]	data_in 	= spoofKey.clone();
 			int	byte_count = Math.min(cid_bytes.length, data_in.length);
 			for ( int i=0;i<byte_count;i++) {
 				data_in[i] ^= cid_bytes[i];
 			}
-			byte[] data_out = spoof_digest.digest(data_in);
+			byte[] data_out = spoofDigest.digest(data_in);
 			byte[] res = new byte[SPOOF_ID2_SIZE];
 			System.arraycopy(data_out, 0, res, 0, SPOOF_ID2_SIZE);
 			//System.out.println("anti-spoof: generating " + res + " for " + contact.getAddress() + " - total=" + spoof_gen_history.size());

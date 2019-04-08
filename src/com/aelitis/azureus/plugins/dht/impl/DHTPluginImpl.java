@@ -210,7 +210,7 @@ public class DHTPluginImpl implements DHTInterface {
 			if (_network == DHT.NW_CVS) {
 					// reduce network usage
 				//System.out.println("CVS DHT cache republish interval modified");
-				props.put(DHT.PR_CACHE_REPUBLISH_INTERVAL, new Integer( 1*60*60*1000));
+				props.put(DHT.PR_CACHE_REPUBLISH_INTERVAL, new Integer(1*60*60*1000));
 			}
 
 			dht = DHTFactory.create(
