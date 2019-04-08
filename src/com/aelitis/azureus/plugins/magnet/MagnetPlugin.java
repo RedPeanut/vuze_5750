@@ -911,195 +911,117 @@ public class MagnetPlugin implements Plugin {
 		throws MagnetURIHandlerException
 	{
 		final long	timeout;
-
 		if (_timeout < 0) {
-
 			// use plugin defined value
-
 			int secs = timeout_param.getValue();
-
 			if (secs <= 0) {
-
 				timeout = Integer.MAX_VALUE;
-
 			} else {
-
 				timeout = secs*1000L;
 			}
-
 		} else {
-
 			timeout = _timeout;
 		}
-
 		boolean	md_enabled;
-
 		final boolean	dummy_hash = Arrays.equals(hash, new byte[20]);
-
 		if ((flags & FL_DISABLE_MD_LOOKUP) != 0) {
-
 			md_enabled = false;
-
 		} else {
-
 			md_enabled = md_lookup.getValue() && FeatureAvailability.isMagnetMDEnabled();
 		}
-
 		final byte[][]		result_holder 	= { null };
 		final Throwable[] 	result_error 	= { null };
-
 		TimerEvent							md_delay_event = null;
 		final MagnetPluginMDDownloader[]	md_downloader = { null };
-
 		boolean	net_pub_default = isNetworkEnabled(AENetworkClassifier.AT_PUBLIC);
-
 		final Set<String>	networks_enabled;
-
 		final Set<String>	additional_networks = new HashSet<String>();
-
 		if (args != null) {
-
 			String[] bits = args.split("&");
-
 			List<URL>	fl_args 	= new ArrayList<URL>();
-
 			Set<String>	tr_networks 		= new HashSet<String>();
 			Set<String>	explicit_networks 	= new HashSet<String>();
-
 			for (String bit: bits) {
-
 				if (bit.startsWith("maggot_sha1")) {
-
 					tr_networks.clear();
-
 					explicit_networks.clear();
-
 					fl_args.clear();
-
 					explicit_networks.add(AENetworkClassifier.AT_I2P);
-
 					break;
 				}
-
 				String[] x = bit.split("=");
-
 				if (x.length == 2) {
-
 					String	lhs = x[0].toLowerCase();
-
 					if (lhs.equals("fl" ) || lhs.equals("xs") || lhs.equals("as")) {
-
 						try {
 							URL url = new URL(UrlUtils.decode( x[1]));
-
 							fl_args.add(url);
-
 							tr_networks.add( AENetworkClassifier.categoriseAddress( url.getHost()));
-
 						} catch (Throwable e) {
 						}
 					} else if (lhs.equals("tr")) {
-
 						try {
 							tr_networks.add(AENetworkClassifier.categoriseAddress(new URL( UrlUtils.decode( x[1])).getHost()));
-
 						} catch (Throwable e) {
 						}
 					} else if (lhs.equals("net")) {
-
 						String network = AENetworkClassifier.internalise(x[1]);
-
 						if (network != null) {
-
 							explicit_networks.add(network);
 						}
 					}
 				}
 			}
-
 			if (explicit_networks.size() > 0) {
-
 				networks_enabled = explicit_networks;
-
 			} else {
-
 				networks_enabled = tr_networks;
-
 				if (net_pub_default) {
-
 					if (networks_enabled.size() == 0) {
-
 						networks_enabled.add(AENetworkClassifier.AT_PUBLIC);
 					}
 				} else {
-
 					networks_enabled.remove(AENetworkClassifier.AT_PUBLIC);
 				}
 			}
-
 			if (fl_args.size() > 0) {
-
 				final AESemaphore fl_sem = new AESemaphore("fl_sem");
-
 				int	fl_run = 0;
-
 				for (int i=0;i<fl_args.size() && i < 3; i++) {
-
 					final URL fl_url = fl_args.get(i);
-
 					String url_net = AENetworkClassifier.categoriseAddress( fl_url.getHost());
-
 					if (networks_enabled.contains( url_net)) {
-
 						new AEThread2("Magnet:fldl", true) {
 							public void run() {
 								try {
 									TOTorrent torrent = TorrentUtils.download(fl_url, timeout);
-
 									if (torrent != null) {
-
 										if (dummy_hash || Arrays.equals( torrent.getHash(), hash)) {
-
 											synchronized(result_holder) {
-
 												result_holder[0] = BEncoder.encode( torrent.serialiseToMap());
 											}
 										}
 									}
 								} catch (Throwable e) {
-
 									Debug.out(e);
-
 								} finally {
-
 									fl_sem.release();
 								}
 							}
 						}.start();
-
 						fl_run++;
 					}
 				}
-
 				if (dummy_hash) {
-
 					long	remaining = timeout;
-
 					for (int i=0; i<fl_run && remaining>0; i++) {
-
 						long	start = SystemTime.getMonotonousTime();
-
 						if (!fl_sem.reserve( remaining)) {
-
 							break;
 						}
-
 						remaining -= (SystemTime.getMonotonousTime() - start);
-
 						synchronized(result_holder) {
-
 							if (result_holder[0] != null) {
-
 								return (new DownloadResult( result_holder[0], networks_enabled, additional_networks));
 							}
 						}
@@ -1107,50 +1029,35 @@ public class MagnetPlugin implements Plugin {
 				}
 			}
 		} else {
-
 			networks_enabled = new HashSet<String>();
-
 			if (net_pub_default) {
-
 				networks_enabled.add(AENetworkClassifier.AT_PUBLIC);
 			}
 		}
-
 		if (dummy_hash) {
-
 			return (null);
 		}
-
 			// networks-enabled has either the networks inferrable from the magnet set up
 			// or, if none, then public (but only if public is enabled by default )
-
 		if (md_enabled) {
-
-			int	delay_millis = md_lookup_delay.getValue()*1000;
-
+			int	delayMillis = md_lookup_delay.getValue()*1000;
 			md_delay_event =
 				SimpleTimer.addEvent(
 					"MagnetPlugin:md_delay",
-					delay_millis<=0?0:(SystemTime.getCurrentTime() + delay_millis ),
+					delayMillis<=0?0:(SystemTime.getCurrentTime() + delayMillis ),
 					new TimerEventPerformer() {
 						public void perform(
 							TimerEvent event ) {
 							MagnetPluginMDDownloader mdd;
-
 							synchronized(md_downloader) {
-
 								if (event.isCancelled()) {
-
 									return;
 								}
-
 								md_downloader[0] = mdd = new MagnetPluginMDDownloader(MagnetPlugin.this, plugin_interface, hash, networks_enabled, sources, args);
 							}
-
 							if (listener != null) {
 								listener.reportActivity(getMessageText("report.md.starts"));
 							}
-
 							mdd.start(
 								new MagnetPluginMDDownloader.DownloadListener() {
 									public void reportProgress(
@@ -1158,40 +1065,30 @@ public class MagnetPlugin implements Plugin {
 										int		total_size) {
 										if (listener != null) {
   										listener.reportActivity(getMessageText("report.md.progress", String.valueOf( downloaded + "/" + total_size )));
-
   										listener.reportCompleteness(100*downloaded/total_size);
 										}
 									}
-
 									public void complete(
 										TOTorrent		torrent,
 										Set<String>		peer_networks) {
 										if (listener != null) {
 											listener.reportActivity(getMessageText("report.md.done"));
 										}
-
 										synchronized(result_holder) {
-
 											additional_networks.addAll(peer_networks);
-
 											try {
 												result_holder[0] = BEncoder.encode( torrent.serialiseToMap());
-
 											} catch (Throwable e) {
-
 												Debug.out(e);
 											}
 										}
 									}
-
 									public void failed(
 										Throwable e) {
 										if (listener != null) {
 											listener.reportActivity( getMessageText("report.error", Debug.getNestedExceptionMessage(e)));
 										}
-
 										synchronized(result_holder) {
-
 											result_error[0] = e;
 										}
 									}
@@ -1200,61 +1097,41 @@ public class MagnetPlugin implements Plugin {
 					});
 		}
 
-
 		try {
 			try {
 				long	remaining	= timeout;
-
 				boolean	sl_enabled				= secondary_lookup.getValue() && FeatureAvailability.isMagnetSLEnabled();
 				boolean	sl_failed				= false;
 				long secondary_lookup_time 	= -1;
-
 				final Object[] secondary_result = { null };
-
 					// public DHT lookup
-
 				if (networks_enabled.contains( AENetworkClassifier.AT_PUBLIC)) {
-
 					boolean	is_first_download = first_download;
-
 					if (is_first_download) {
-
 						if (listener != null) {
 							listener.reportActivity(getMessageText("report.waiting_ddb"));
 						}
-
 						first_download = false;
 					}
-
 					final DistributedDatabase db = plugin_interface.getDistributedDatabase();
-
 					if (db.isAvailable()) {
-
 						final List			potential_contacts 		= new ArrayList();
 						final AESemaphore	potential_contacts_sem 	= new AESemaphore("MagnetPlugin:liveones");
 						final AEMonitor		potential_contacts_mon	= new AEMonitor("MagnetPlugin:liveones");
-
 						final int[]			outstanding		= {0};
 						final boolean[]		lookup_complete	= {false};
-
 						if (listener != null) {
 							listener.reportActivity( getMessageText("report.searching"));
 						}
-
 						DistributedDatabaseListener	ddb_listener =
 							new DistributedDatabaseListener() {
 								private Set	found_set = new HashSet();
-
 								public void event(
 									DistributedDatabaseEvent 		event) {
 									int	type = event.getType();
-
 									if (type == DistributedDatabaseEvent.ET_OPERATION_STARTS) {
-
 											// give live results a chance before kicking in explicit ones
-
 										if (sources.length > 0) {
-
 											new DelayedEvent(
 												"MP:sourceAdd",
 												10*1000,
@@ -1264,78 +1141,51 @@ public class MagnetPlugin implements Plugin {
 													}
 												});
 										}
-
 									} else if (type == DistributedDatabaseEvent.ET_VALUE_READ) {
-
 										contactFound( event.getValue().getContact());
-
 									} else if (	type == DistributedDatabaseEvent.ET_OPERATION_COMPLETE ||
 												type == DistributedDatabaseEvent.ET_OPERATION_TIMEOUT) {
-
 										if (listener != null) {
 											listener.reportActivity( getMessageText("report.found", String.valueOf( found_set.size())));
 										}
-
 											// now inject any explicit sources
-
 										addExplicitSources();
-
 										try {
 											potential_contacts_mon.enter();
-
 											lookup_complete[0] = true;
-
 										} finally {
-
 											potential_contacts_mon.exit();
 										}
-
 										potential_contacts_sem.release();
 									}
 								}
-
 								protected void addExplicitSources() {
 									for (int i=0;i<sources.length;i++) {
-
 										try {
 											contactFound( db.importContact(sources[i]));
-
 										} catch (Throwable e) {
-
 											Debug.printStackTrace(e);
 										}
 									}
 								}
-
 								public void contactFound(
 									final DistributedDatabaseContact	contact) {
 									String	key = contact.getAddress().toString();
-
 									synchronized(found_set) {
-
 										if (found_set.contains( key)) {
-
 											return;
 										}
-
 										found_set.add(key);
 									}
-
 									if (listener != null && listener.verbose()) {
-
 										listener.reportActivity( getMessageText("report.found", contact.getName()));
 									}
-
 									try {
 										potential_contacts_mon.enter();
-
 										outstanding[0]++;
-
 									} finally {
-
 										potential_contacts_mon.exit();
 									}
-
 									contact.isAlive(
 										20*1000,
 										new DistributedDatabaseListener() {
@@ -1343,239 +1193,154 @@ public class MagnetPlugin implements Plugin {
 												DistributedDatabaseEvent event) {
 												try {
 													boolean	alive = event.getType() == DistributedDatabaseEvent.ET_OPERATION_COMPLETE;
-
 													if (listener != null && listener.verbose()) {
-
 														listener.reportActivity(
 															getMessageText( alive?"report.alive":"report.dead",	contact.getName()));
 													}
-
 													try {
 														potential_contacts_mon.enter();
-
 														Object[]	entry = new Object[]{Boolean.valueOf(alive), contact};
-
 														boolean	added = false;
-
 														if (alive) {
-
 																// try and place before first dead entry
-
 															for (int i=0;i<potential_contacts.size();i++) {
-
 																if (!((Boolean)((Object[])potential_contacts.get(i))[0]).booleanValue()) {
-
 																	potential_contacts.add(i, entry);
-
 																	added = true;
-
 																	break;
 																}
 															}
 														}
-
 														if (!added) {
-
 															potential_contacts.add(entry);	// dead at end
 														}
-
 													} finally {
-
 														potential_contacts_mon.exit();
 													}
 												} finally {
-
 													try {
 														potential_contacts_mon.enter();
-
 														outstanding[0]--;
-
 													} finally {
-
 														potential_contacts_mon.exit();
 													}
-
 													potential_contacts_sem.release();
 												}
 											}
 										});
 								}
 							};
-
 						db.read(
 							ddb_listener,
 							db.createKey(hash, "Torrent download lookup for '" + ByteFormatter.encodeString( hash ) + "'"),
 							timeout,
 							DistributedDatabase.OP_EXHAUSTIVE_READ | DistributedDatabase.OP_PRIORITY_HIGH);
-
 						long 	overall_start 			= SystemTime.getMonotonousTime();
 						long 	last_found 				= -1;
-
 						AsyncDispatcher	dispatcher = new AsyncDispatcher();
-
 						while (remaining > 0) {
-
 							try {
 								potential_contacts_mon.enter();
-
 								if (	lookup_complete[0] &&
 										potential_contacts.size() == 0 &&
 										outstanding[0] == 0) {
-
 									break;
 								}
 							} finally {
-
 								potential_contacts_mon.exit();
 							}
 
-
 							while (remaining > 0) {
-
 								if (listener != null && listener.cancelled()) {
-
 									return (null);
 								}
-
 								synchronized(result_holder) {
-
 									if (result_holder[0] != null) {
-
 										return (new DownloadResult( result_holder[0], networks_enabled, additional_networks));
 									}
 								}
-
 								long wait_start = SystemTime.getMonotonousTime();
-
 								boolean got_sem = potential_contacts_sem.reserve(1000);
-
 								long now = SystemTime.getMonotonousTime();
-
 								remaining -= (now - wait_start);
-
 								if (got_sem) {
-
 									last_found = now;
-
 									break;
-
 								} else {
-
 									if (sl_enabled) {
-
 										if (secondary_lookup_time == -1) {
-
 											long	base_time;
-
 											if (last_found == -1 || now - overall_start > 60*1000) {
-
 												base_time = overall_start;
-
 											} else {
-
 												base_time = last_found;
 											}
-
 											long	time_so_far = now - base_time;
-
 											if (time_so_far > SECONDARY_LOOKUP_DELAY) {
-
 												secondary_lookup_time = SystemTime.getMonotonousTime();
-
 												doSecondaryLookup(listener, secondary_result, hash, networks_enabled, args);
 											}
 										} else {
-
 											try {
 												byte[] torrent = getSecondaryLookupResult(secondary_result);
-
 												if (torrent != null) {
-
 													return (new DownloadResult( torrent, networks_enabled, additional_networks));
 												}
 											} catch (ResourceDownloaderException e) {
-
 												sl_failed = true;
-
 												// ignore, we just continue processing
 											}
 										}
 									}
-
 									continue;
 								}
 							}
-
 							if (sl_enabled) {
-
-									// check before we try another DHT contact
-
+								// check before we try another DHT contact
 								try {
 									byte[] torrent = getSecondaryLookupResult(secondary_result);
-
 									if (torrent != null) {
-
 										return (new DownloadResult( torrent, networks_enabled, additional_networks));
 									}
 								} catch (ResourceDownloaderException e) {
-
 									sl_failed = true;
 								}
 							}
-
 							final DistributedDatabaseContact	contact;
 							final boolean						live_contact;
-
 							try {
 								potential_contacts_mon.enter();
-
 								// System.out.println("rem=" + remaining + ",pot=" + potential_contacts.size() + ",out=" + outstanding[0]);
-
 								if (potential_contacts.size() == 0) {
-
 									if (outstanding[0] == 0) {
-
 										break;
-
 									} else {
-
 										continue;
 									}
 								} else {
-
 									Object[]	entry = (Object[])potential_contacts.remove(0);
-
 									live_contact 	= ((Boolean)entry[0]).booleanValue();
 									contact 		= (DistributedDatabaseContact)entry[1];
 								}
-
 							} finally {
-
 								potential_contacts_mon.exit();
 							}
-
 							// System.out.println("magnetDownload: " + contact.getName() + ", live = " + live_contact);
-
 							final AESemaphore	contact_sem 	= new AESemaphore("MD:contact");
-
 							dispatcher.dispatch(
 								new AERunnable() {
 									public void runSupport() {
 										try {
 											if (!live_contact) {
-
 												if (listener != null) {
 													listener.reportActivity( getMessageText("report.tunnel", contact.getName()));
 												}
-
 												contact.openTunnel();
 											}
-
 											try {
 												if (listener != null) {
 													listener.reportActivity( getMessageText("report.downloading", contact.getName()));
 												}
-
 												DistributedDatabaseValue	value =
 													contact.read(
 															listener == null ? null : new DistributedDatabaseProgressListener() {
@@ -1587,7 +1352,6 @@ public class MagnetPlugin implements Plugin {
 																	String	str) {
 																	listener.reportActivity(str);
 																}
-
 																public void reportCompleteness(
 																	int		percent) {
 																	listener.reportCompleteness(percent);
@@ -1596,205 +1360,135 @@ public class MagnetPlugin implements Plugin {
 															db.getStandardTransferType(DistributedDatabaseTransferType.ST_TORRENT),
 															db.createKey (hash , "Torrent download content for '" + ByteFormatter.encodeString( hash) + "'"),
 															timeout);
-
 												if (value != null) {
-
-														// let's verify the torrent
-
+													// let's verify the torrent
 													byte[]	data = (byte[])value.getValue(byte[].class);
-
 													try {
 														TOTorrent torrent = TOTorrentFactory.deserialiseFromBEncodedByteArray(data);
-
 														if (Arrays.equals( hash, torrent.getHash())) {
-
 															if (listener != null) {
 																listener.reportContributor( contact.getAddress());
 															}
-
 															synchronized(result_holder) {
-
 																result_holder[0] = data;
 															}
 														} else {
-
 															if (listener != null) {
 																listener.reportActivity(getMessageText("report.error", "torrent invalid (hash mismatch)"));
 															}
 														}
 													} catch (Throwable e) {
-
 														if (listener != null) {
 															listener.reportActivity(getMessageText("report.error", "torrent invalid (decode failed)"));
 														}
 													}
 												}
 											} catch (Throwable e) {
-
 												if (listener != null) {
 													listener.reportActivity( getMessageText("report.error", Debug.getNestedExceptionMessage(e)));
 												}
-
 												Debug.printStackTrace(e);
 											}
 										} finally {
-
 											contact_sem.release();
 										}
 									}
 								});
-
 							while (true) {
-
 								if (listener != null && listener.cancelled()) {
-
 									return (null);
 								}
-
 								boolean got_sem = contact_sem.reserve(500);
-
 								synchronized(result_holder) {
-
 									if (result_holder[0] != null) {
-
 										return (new DownloadResult( result_holder[0], networks_enabled, additional_networks));
 									}
 								}
-
 								if (got_sem) {
-
 									break;
 								}
 							}
 						}
 					} else {
-
 						if (is_first_download) {
-
 							if (listener != null) {
 								listener.reportActivity(getMessageText("report.ddb_disabled"));
 							}
 						}
 					}
 				}
-
-					// DDB lookup process is complete or skipped
-					// If secondary lookup is active/doable then hang around until it completes
-
+				
+				// DDB lookup process is complete or skipped
+				// If secondary lookup is active/doable then hang around until it completes
 				if (sl_enabled && !sl_failed) {
-
 					if (secondary_lookup_time == -1) {
-
 						secondary_lookup_time = SystemTime.getMonotonousTime();
-
 						doSecondaryLookup(listener, secondary_result, hash, networks_enabled, args);
 					}
-
 					while (SystemTime.getMonotonousTime() - secondary_lookup_time < SECONDARY_LOOKUP_MAX_TIME) {
-
 						if (listener != null && listener.cancelled()) {
-
 							return (null);
 						}
-
 						try {
 							byte[] torrent = getSecondaryLookupResult(secondary_result);
-
 							if (torrent != null) {
-
 								return (new DownloadResult( torrent, networks_enabled, additional_networks));
 							}
-
 							synchronized(result_holder) {
-
 								if (result_holder[0] != null) {
-
 									return (new DownloadResult( result_holder[0], networks_enabled, additional_networks));
 								}
 							}
-
 							Thread.sleep(500);
-
 						} catch (ResourceDownloaderException e) {
-
-								// get here when secondary lookup completes with fail
-
+							// get here when secondary lookup completes with fail
 							sl_failed = true;
-
 							break;
 						}
 					}
 				}
-
-					// lastly hang around until metadata download completes
-
+				// lastly hang around until metadata download completes
 				if (md_enabled) {
-
 					while (remaining > 0) {
-
 						if (listener != null && listener.cancelled()) {
-
 							return (null);
 						}
-
 						Thread.sleep(500);
-
 						remaining -= 500;
-
 						if (!sl_failed) {
-
 							try {
 								byte[] torrent = getSecondaryLookupResult(secondary_result);
-
 								if (torrent != null) {
-
 									return (new DownloadResult( torrent, networks_enabled, additional_networks));
 								}
 							} catch (ResourceDownloaderException e) {
-
 									// get here when secondary lookup completes with fail
-
 								sl_failed = true;
 							}
 						}
-
 						synchronized(result_holder) {
-
 							if (result_holder[0] != null) {
-
 								return (new DownloadResult( result_holder[0], networks_enabled, additional_networks));
 							}
-
 							if (result_error[0] != null) {
-
 								break;
 							}
 						}
 					}
 				}
-
 				return (null);		// nothing found
-
 			} catch (Throwable e) {
-
 				Debug.printStackTrace(e);
-
 				if (listener != null) {
 					listener.reportActivity( getMessageText("report.error", Debug.getNestedExceptionMessage(e)));
 				}
-
 				throw (new MagnetURIHandlerException("MagnetURIHandler failed", e));
 			}
 		} finally {
-
 			synchronized(md_downloader) {
-
 				if (md_delay_event != null) {
-
 					md_delay_event.cancel();
-
 					if (md_downloader[0] != null) {
-
 						 md_downloader[0].cancel();
 					}
 				}

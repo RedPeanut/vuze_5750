@@ -126,10 +126,10 @@ public class Timer
 							currentWhen = 0;
 						}
 					} else {
-						long	now = SystemTime.getCurrentTime();
-						TimerEvent	nextEvent = (TimerEvent)events.iterator().next();
-						long	when = nextEvent.getWhen();
-						long	delay = when - now;
+						long now = SystemTime.getCurrentTime();
+						TimerEvent nextEvent = (TimerEvent) events.iterator().next();
+						long when = nextEvent.getWhen();
+						long delay = when - now;
 						if (delay > 0) {
 							// System.out.println("waiting for " + delay);
 							try {

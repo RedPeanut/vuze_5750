@@ -126,13 +126,12 @@ public class TimerEvent
 		return (uniqueId);
 	}
 
-	public int compareTo(
-		TimerEvent		other) {
-		long	res =  when - other.when;
+	public int compareTo(TimerEvent other) {
+		long res = when - other.when;
 		if (res == 0) {
 			res = uniqueId - other.uniqueId;
 			if (res == 0) {
-				return ( 0);
+				return (0);
 			}
 		}
 		return res < 0 ? -1 : 1;
