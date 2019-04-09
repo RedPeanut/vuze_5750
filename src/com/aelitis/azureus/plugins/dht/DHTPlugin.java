@@ -943,23 +943,24 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 			throw (new RuntimeException("DHT isn't enabled"));
 		}
 
-		final DHTPluginOperationListener main_listener;
+		final DHTPluginOperationListener mainListener;
 
 		if (cvsDht == null) {
-			main_listener = original_listener;
+			mainListener = original_listener;
 		} else {
+			
 			if (mainDht == null && mainV6Dht == null) {
 				// just the cvs dht
 				cvsDht.get(original_key, description, flags, max_values, timeout, exhaustive, high_priority, original_listener);
 				return;
 			}
 
-				// hook into CVS completion to prevent runaway CVS dht operations
+			// hook into CVS completion to prevent runaway CVS dht operations
 
 			final int[]		completes_to_go = { 2 };
 			final boolean[]	main_timeout 	= { false };
 
-			main_listener =
+			mainListener =
 				new DHTPluginOperationListener() {
 					public boolean diversified() {
 						return ( original_listener.diversified());
@@ -1038,11 +1039,11 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 
 		if (mainDht != null && mainV6Dht == null) {
 
-			mainDht.get(original_key, description, flags, max_values, timeout, exhaustive, high_priority, main_listener);
+			mainDht.get(original_key, description, flags, max_values, timeout, exhaustive, high_priority, mainListener);
 
 		} else if (mainDht == null && mainV6Dht != null) {
 
-			mainV6Dht.get(original_key, description, flags, max_values, timeout, exhaustive, high_priority, main_listener);
+			mainV6Dht.get(original_key, description, flags, max_values, timeout, exhaustive, high_priority, mainListener);
 
 		} else {
 
@@ -1063,7 +1064,7 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 					private int	result_count	= 0;
 
 					public boolean diversified() {
-						return ( main_listener.diversified());
+						return ( mainListener.diversified());
 					}
 
 					public void starts(
@@ -1078,7 +1079,7 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 							started = true;
 						}
 
-						main_listener.starts(original_key);
+						mainListener.starts(original_key);
 					}
 
 					public void valueRead(
@@ -1092,7 +1093,7 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 
 							if (complete_count < 2) {
 
-								main_listener.valueRead(originator, value);
+								mainListener.valueRead(originator, value);
 							}
 						}
 					}
@@ -1117,7 +1118,7 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 									// if we have reported any results then we can't report
 									// timeout!
 
-								main_listener.complete(original_key, result_count>0?false:timeout_occurred);
+								mainListener.complete(original_key, result_count>0?false:timeout_occurred);
 
 								return;
 

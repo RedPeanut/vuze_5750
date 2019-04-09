@@ -678,70 +678,70 @@ outer:
 	}
 
 	public void get(
-		final byte[]								key,
-		final String								description,
-		final byte									flags,
-		final int									max_values,
-		final long									timeout,
-		final boolean								exhaustive,
-		final boolean								high_priority,
-		final DHTPluginOperationListener			listener) {
+		final byte[]						key,
+		final String						description,
+		final byte							flags,
+		final int							maxValues,
+		final long							timeout,
+		final boolean						exhaustive,
+		final boolean						highPriority,
+		final DHTPluginOperationListener	listener) {
 		
-		dht.get( 	key, description, flags, max_values, timeout, exhaustive, high_priority,
-					new DHTOperationListener() {
-			
-						private boolean	started = false;
+		dht.get( 	
+				key, description, flags, maxValues, timeout, exhaustive, highPriority,
+				new DHTOperationListener() {
+		
+					private boolean	started = false;
 
-						public void searching(
-							DHTTransportContact	contact,
-							int					level,
-							int					active_searches) {
-							
-							if (listener != null) {
-								synchronized(this) {
-									if (started) {
-										return;
-									}
-									started = true;
+					public void searching(
+						DHTTransportContact	contact,
+						int					level,
+						int					activeSearches) {
+						
+						if (listener != null) {
+							synchronized(this) {
+								if (started) {
+									return;
 								}
-								listener.starts(key);
+								started = true;
 							}
+							listener.starts(key);
 						}
+					}
 
-						public boolean diversified(String desc) {
-							if (listener != null) {
-								return (listener.diversified());
-							}
-							return (true);
+					public boolean diversified(String desc) {
+						if (listener != null) {
+							return (listener.diversified());
 						}
+						return (true);
+					}
 
-						public void found(
-							DHTTransportContact	contact,
-							boolean				is_closest) {
-						}
+					public void found(DHTTransportContact contact, boolean isClosest) {
+					}
 
-						public void read(
-							final DHTTransportContact	contact,
-							final DHTTransportValue		value) {
-							// log.log("Get: read " + value.getString() + " from " + contact.getString() + ", originator = " + value.getOriginator().getString());
-							if (listener != null) {
-								listener.valueRead(new DHTPluginContactImpl( DHTPluginImpl.this, value.getOriginator()), mapValue( value));
-							}
+					public void read(
+						final DHTTransportContact	contact,
+						final DHTTransportValue		value) {
+						// log.log("Get: read " + value.getString() + " from " + contact.getString() + ", originator = " + value.getOriginator().getString());
+						if (listener != null) {
+							listener.valueRead(new DHTPluginContactImpl( DHTPluginImpl.this, value.getOriginator()), mapValue( value));
 						}
+					}
 
-						public void wrote(
-							final DHTTransportContact	contact,
-							final DHTTransportValue		value) {
-							// log.log("Get: wrote " + value.getString() + " to " + contact.getString());
-						}
+					public void wrote(
+						final DHTTransportContact	contact,
+						final DHTTransportValue		value) {
+						// log.log("Get: wrote " + value.getString() + " to " + contact.getString());
+					}
 
-						public void complete(boolean _timeout) {
-							// log.log("Get: complete, timeout = " + _timeout);
-							if (listener != null) {
-								listener.complete(key, _timeout);
-							}
+					public void complete(boolean _timeout) {
+						// log.log("Get: complete, timeout = " + _timeout);
+						if (listener != null) {
+							listener.complete(key, _timeout);
 						}
-					});
+					}
+				}
+		);
 	}
 
 	public void remove(

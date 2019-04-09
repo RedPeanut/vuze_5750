@@ -51,10 +51,9 @@ import org.gudy.azureus2.plugins.utils.StaticUtilities;
 
 import com.aelitis.azureus.core.AzureusCore;
 
-public class
-PlatformManagerImpl
-	implements PlatformManager, AEWin32AccessListener, AEDiagnosticsEvidenceGenerator
-{
+public class PlatformManagerImpl
+	implements PlatformManager, AEWin32AccessListener, AEDiagnosticsEvidenceGenerator {
+	
 	public static final int			RT_NONE		= 0;
 	public static final int			RT_AZ 		= 1;
 	public static final int			RT_OTHER 	= 2;
@@ -83,62 +82,40 @@ PlatformManagerImpl
 		}
 	}
 
-	public static PlatformManagerImpl
-	getSingleton()
-
-		throws PlatformManagerException
-	{
+	public static PlatformManagerImpl getSingleton()
+		throws PlatformManagerException {
+		
 		try {
 			class_mon.enter();
-
 			if (singleton != null) {
-
 				return (singleton);
 			}
-
 			try {
 				if (initialising) {
-
 					System.err.println("PlatformManager: recursive entry during initialisation");
 				}
-
 				initialising	= true;
-
 				if (!init_tried) {
-
 					init_tried	= true;
-
 					try {
 						singleton	= new PlatformManagerImpl();
-
 							// gotta separate this so that a recursive call due to config access during
 							// patching finds the singleton
-
 						singleton.applyPatches();
-
 					} catch (PlatformManagerException e) {
-
 						throw (e);
-
 					} catch (Throwable e) {
-
 						if (e instanceof PlatformManagerException) {
-
 							throw ((PlatformManagerException)e);
 						}
-
 						throw (new PlatformManagerException("Win32Platform: failed to initialise", e));
 					}
 				}
 			} finally {
-
 				initialising	= false;
 			}
-
 			return (singleton);
-
 		} finally {
-
 			class_mon.exit();
 		}
 	}
@@ -153,45 +130,29 @@ PlatformManagerImpl
 	private boolean					prevent_computer_sleep;
 	private AEThread2				prevent_sleep_thread;
 
-	protected PlatformManagerImpl()
-
-		throws PlatformManagerException
-	{
+	public PlatformManagerImpl()
+		throws PlatformManagerException {
+		
 		access	= AEWin32Manager.getAccessor(true);
-
 		access.addListener(this);
-
 		app_name		= SystemProperties.getApplicationName();
-
 		String mod_name = System.getProperty("exe4j.moduleName", null);
-
 		String exe_name = null;
-
 		if (mod_name != null && new File(mod_name).exists() && mod_name.toLowerCase().endsWith(".exe")) {
-
 			int	pos = mod_name.lastIndexOf(File.separator);
-
 			if (pos != -1) {
-
 				exe_name = mod_name.substring(pos+1);
 			}
 		}
-
 		if (exe_name == null) {
-
 			exe_name	= app_name + ".exe";
 		}
-
 		app_exe_name = exe_name;
-
         initializeCapabilities();
 	}
 
-    private void
-    initializeCapabilities()
-    {
+    private void initializeCapabilities() {
     	if (access.isEnabled()) {
-
 	        capabilitySet.add(PlatformManagerCapabilities.CreateCommandLineProcess);
 	        capabilitySet.add(PlatformManagerCapabilities.GetUserDataDirectory);
 	        capabilitySet.add(PlatformManagerCapabilities.RecoverableFileDelete);
@@ -200,50 +161,33 @@ PlatformManagerImpl
 	        capabilitySet.add(PlatformManagerCapabilities.GetVersion);
 	        capabilitySet.add(PlatformManagerCapabilities.SetTCPTOSEnabled);
 	        capabilitySet.add(PlatformManagerCapabilities.ComputerIDAvailability);
-
 	        String plugin_version = access.getVersion();
-
 	        if (Constants.compareVersions( plugin_version, "1.11") >= 0 &&
 	        		!Constants.isWindows9598ME) {
-
 	            capabilitySet.add(PlatformManagerCapabilities.CopyFilePermissions);
-
 	        }
-
 	        if (Constants.compareVersions(plugin_version, "1.12") >= 0) {
-
 	            capabilitySet.add(PlatformManagerCapabilities.TestNativeAvailability);
 	        }
-
 	        if (Constants.compareVersions(plugin_version, "1.14") >= 0) {
-
 	            capabilitySet.add(PlatformManagerCapabilities.TraceRouteAvailability);
 	        }
-
 	        if (Constants.compareVersions(plugin_version, "1.15") >= 0) {
-
 	            capabilitySet.add(PlatformManagerCapabilities.PingAvailability);
 	        }
-
 	        try {
 	        	getUserDataDirectory();
-
 	        		// if we can access the user dir then we're good to access vmoptions
-
 	        	if (Constants.compareVersions(plugin_version, "1.19") >= 0) {
-
 	        		capabilitySet.add(PlatformManagerCapabilities.AccessExplicitVMOptions);
 	        	}
 	        } catch (Throwable e) {
 	        }
-
 	        capabilitySet.add(PlatformManagerCapabilities.RunAtLogin);
 	        capabilitySet.add(PlatformManagerCapabilities.PreventComputerSleep);
     	} else {
-
     			// disabled -> only available capability is that to get the version
     			// therefore allowing upgrade
-
 	        capabilitySet.add(PlatformManagerCapabilities.GetVersion);
     	}
     }

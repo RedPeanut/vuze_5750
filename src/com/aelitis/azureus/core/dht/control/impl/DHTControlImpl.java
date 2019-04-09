@@ -19,9 +19,7 @@
 package com.aelitis.azureus.core.dht.control.impl;
 
 import hello.util.Log;
-import hello.util.SingleCounter0;
-import hello.util.SingleCounter9;
-import hello.util.Util;
+import hello.util.SingleCounter2;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -119,7 +117,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 	@SuppressWarnings("CanBeFinal")		// accessed from plugin
 
-	public  static int EXTERNAL_LOOKUP_CONCURRENCY			= 16;
+	public  static int EXTERNAL_LOOKUP_CONCURRENCY					= 16;
 
 	private static final int EXTERNAL_PUT_CONCURRENCY				= 8;
 	private static final int EXTERNAL_SLEEPING_PUT_CONCURRENCY		= 4;
@@ -533,7 +531,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 							id,					
 							description,		
 							(byte)0,			// short flags
-							false,				// boolean valueSearch: 
+							false,				// (boolean) true: value search, false: node search
 							5*60*1000,			// long timeout: upper bound on this refresh/seeding operation
 							searchConcurrency,	
 							1,					
@@ -739,14 +737,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final AESemaphore sem = new AESemaphore("DHTControl:seed");
 		lookup(internalLookupPool, 
 				false,
-				router.getID(), // byte[] lookupId
-				"Seeding DHT", // String description
-				(byte)0, // short flags
-				false, // (boolean) true: value search, false: node search
-				0,
-				searchConcurrency*4,
-				1,
-				router.getK(),
+				router.getID(), 		// byte[] lookupId
+				"Seeding DHT", 			// String description
+				(byte)0, 				// short flags
+				false, 					// (boolean) true: value search, false: node search
+				0,						//
+				searchConcurrency*4,	// int concurrency
+				1,						//
+				router.getK(),			// int searchAccuracy
 				new LookupResultHandler(new DHTOperationAdapter()) {
 			
 					public void diversify(
@@ -979,7 +977,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					encodedKey,
 					thisDescription,
 					(short)(flags | DHT.FLAG_LOOKUP_FOR_STORE),
-					false, // boolean valueSearch
+					false, 				// (boolean) true: value search, false: node search
 					timeout,
 					searchConcurrency,
 					1,
@@ -1487,21 +1485,21 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	public void get(
-		byte[]						unencoded_key,
+		byte[]						unencodedKey,
 		String						description,
 		short						flags,
-		int							max_values,
+		int							maxValues,
 		long						timeout,
 		boolean						exhaustive,
-		boolean						high_priority,
-		final DHTOperationListener	get_listener) {
-		final byte[]	encoded_key = encodeKey(unencoded_key);
+		boolean						highPriority,
+		final DHTOperationListener	getListener) {
+		final byte[]	encodedKey = encodeKey(unencodedKey);
 
 		if (DHTLog.isOn()) {
-			DHTLog.log("get for " + DHTLog.getString( encoded_key));
+			DHTLog.log("get for " + DHTLog.getString(encodedKey));
 		}
 
-		final DhtTaskSet[] task_set = { null };
+		final DhtTaskSet[] taskSet = { null };
 
 		DHTOperationListenerDemuxer demuxer =
 			new DHTOperationListenerDemuxer(
@@ -1510,48 +1508,46 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 						DHTTransportContact	contact,
 						int					level,
 						int					active_searches) {
-						get_listener.searching(contact, level, active_searches);
+						getListener.searching(contact, level, active_searches);
 					}
 
-					public boolean diversified(
-						String				desc) {
-						return ( get_listener.diversified(desc));
+					public boolean diversified(String desc) {
+						return (getListener.diversified(desc));
 					}
 
 					public void found(
 						DHTTransportContact	contact,
-						boolean				is_closest) {
-						get_listener.found(contact,is_closest);
+						boolean				isClosest) {
+						getListener.found(contact,isClosest);
 					}
 
 					public void read(
 						DHTTransportContact	contact,
 						DHTTransportValue	value) {
-						get_listener.read(contact, value);
+						getListener.read(contact, value);
 					}
 
 					public void wrote(
 						DHTTransportContact	contact,
 						DHTTransportValue	value) {
-						get_listener.wrote(contact, value);
+						getListener.wrote(contact, value);
 					}
 
-					public void complete(
-						boolean				timeout) {
+					public void complete(boolean timeout) {
 						try {
-							get_listener.complete(timeout);
+							getListener.complete(timeout);
 						} catch (Throwable e) {
 							Debug.out(e);
 						} finally {
-							if (task_set[0] != null) {
-								task_set[0].cancel();
+							if (taskSet[0] != null) {
+								taskSet[0].cancel();
 							}
 						}
 					}
 				});
 
 
-		task_set[0] = getSupport(encoded_key, description, flags, max_values, timeout, exhaustive, high_priority, demuxer);
+		taskSet[0] = getSupport(encodedKey, description, flags, maxValues, timeout, exhaustive, highPriority, demuxer);
 	}
 
 	public boolean isDiversified(byte[] unencoded_key) {
@@ -1623,12 +1619,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				highPriority,
 				encodedKey,
 				description,
-				(byte)0,
-				false,				// boolean valueSearch
+				(byte)0,			// 
+				false,				// (boolean) true: value search, false: node search
 				timeout,
 				searchConcurrency,
-				1,
-				router.getK(),
+				1,					// 
+				router.getK(),		// searchAccuracy
 				new LookupResultHandler(delegate) {
 		
 					public void diversify(
@@ -1655,66 +1651,66 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final byte[]						initial_encoded_key,
 		final String						description,
 		final short							flags,
-		final int							max_values,
+		final int							maxValues,
 		final long							timeout,
 		final boolean						exhaustive,
-		final boolean						high_priority,
-		final DHTOperationListenerDemuxer	get_listener) {
+		final boolean						highPriority,
+		final DHTOperationListenerDemuxer	getListener) {
 		final DhtTaskSet result = new DhtTaskSet();
 		// get the initial starting point for the get - may have previously been diversified
-		byte[][]	encoded_keys = adapter.diversify( description, null, false, true, initial_encoded_key, DHT.DT_NONE, exhaustive, getMaxDivDepth());
+		byte[][]	encoded_keys = adapter.diversify(description, null, false, true, initial_encoded_key, DHT.DT_NONE, exhaustive, getMaxDivDepth());
 		if  (encoded_keys.length == 0) {
 			// over-diversified
-			get_listener.diversified("Over-diversification of [" + description + "]");
-			get_listener.complete(false);
+			getListener.diversified("Over-diversification of [" + description + "]");
+			getListener.complete(false);
 			return (result);
 		}
 		
 		for (int i=0;i<encoded_keys.length;i++) {
 			final boolean[]	diversified = { false };
-			final byte[]	encoded_key	= encoded_keys[i];
-			boolean	div = !Arrays.equals(encoded_key, initial_encoded_key);
-			final String	this_description =
+			final byte[]	encodedKey	= encoded_keys[i];
+			boolean	div = !Arrays.equals(encodedKey, initial_encoded_key);
+			final String	thisDescription =
 				div?("Diversification of [" + description + "]" ):description;
 			if (div) {
-				if (!get_listener.diversified( this_description)) {
+				if (!getListener.diversified(thisDescription)) {
 					continue;
 				}
 			}
-			boolean	is_stats_query = (flags & DHT.FLAG_STATS ) != 0;
+			boolean	isStatsQuery = (flags & DHT.FLAG_STATS ) != 0;
 			result.add(
 				lookup(
 					externalLookupPool,
-					high_priority,
-					encoded_key,
-					this_description,
-					flags,				
-					true,				// boolean valueSearch
+					highPriority,		// 
+					encodedKey,			// 
+					thisDescription,	// 
+					flags,				// 
+					true,				// (boolean) true: value search, false: node search
 					timeout,
-					is_stats_query?searchConcurrency*2:searchConcurrency,
-					max_values,
+					isStatsQuery?searchConcurrency*2:searchConcurrency,
+					maxValues,
 					router.getK(),
-					new LookupResultHandler(get_listener) {
+					new LookupResultHandler(getListener) {
 					
 						private final List	found_values = new ArrayList();
 						
 						public void diversify(
 							DHTTransportContact	cause,
-							byte				diversification_type) {
-							boolean ok_to_div = diversified("Diversification of [" + this_description + "]");
+							byte				diversificationType) {
+							boolean okToDiv = diversified("Diversification of [" + thisDescription + "]");
 							// we only want to follow one diversification
-							if (ok_to_div && !diversified[0]) {
+							if (okToDiv && !diversified[0]) {
 								diversified[0] = true;
-								int	rem = max_values==0?0:( max_values - found_values.size());
-								if (max_values == 0 || rem > 0) {
-									byte[][]	diversified_keys = adapter.diversify( description, cause, false, false, encoded_key, diversification_type, exhaustive, getMaxDivDepth());
+								int	rem = maxValues==0?0:( maxValues - found_values.size());
+								if (maxValues == 0 || rem > 0) {
+									byte[][]	diversified_keys = adapter.diversify( description, cause, false, false, encodedKey, diversificationType, exhaustive, getMaxDivDepth());
 									if (diversified_keys.length > 0) {
 										// should return a max of 1 (0 if diversification refused)
 										// however, could change one day to search > 1
 										for (int j=0;j<diversified_keys.length;j++) {
 											if (!result.isCancelled()) {
 												result.add(
-													getSupport(diversified_keys[j], "Diversification of [" + this_description + "]", flags, rem,  timeout, exhaustive, high_priority, get_listener));
+													getSupport(diversified_keys[j], "Diversification of [" + thisDescription + "]", flags, rem,  timeout, exhaustive, highPriority, getListener));
 											}
 										}
 									}
@@ -1764,7 +1760,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 							}
 							*/
 						}
-					}));
+					}
+				)
+			);
 		}
 		return (result);
 	}
@@ -1849,6 +1847,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final int 					maxValues,
 		final int 					searchAccuracy,
 		final LookupResultHandler	handler) {
+		
+		int count = SingleCounter2.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format("how many times lookup() is called... #%d", count));
+		
+		
 		
 		/*if ( 
 				   (flags & DHT.FLAG_LOOKUP_FOR_STORE) == 1

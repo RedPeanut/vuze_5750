@@ -380,12 +380,12 @@ public class DHTImpl
 		byte[]					key,
 		String					description,
 		short					flags,
-		int						max_values,
+		int						maxValues,
 		long					timeout,
 		boolean					exhaustive,
-		boolean					high_priority,
+		boolean					highPriority,
 		DHTOperationListener	listener) {
-		control.get(key, description, flags, max_values, timeout, exhaustive, high_priority, listener);
+		control.get(key, description, flags, maxValues, timeout, exhaustive, highPriority, listener);
 	}
 
 	public byte[] remove(
