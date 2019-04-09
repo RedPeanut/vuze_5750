@@ -21,9 +21,8 @@ package com.aelitis.azureus.core.dht.netcoords;
 
 import java.io.*;
 
-public interface
-DHTNetworkPosition
-{
+public interface DHTNetworkPosition {
+	
 	public static byte	POSITION_TYPE_NONE				= 0;
 	public static byte	POSITION_TYPE_VIVALDI_V1		= 1;
 	//public static byte	POSITION_TYPE_VIVALDI_V2	= 3;	// was 2 but serialisation format changed to include header and 5-dimensions

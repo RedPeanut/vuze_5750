@@ -123,9 +123,9 @@ public class DHTRouterImpl implements DHTRouter {
 		DHTRouterContactAttachment	_attachment,
 		DHTLogger					_logger) {
 
-		Log.d(TAG, "<init>() is called...");
+		//Log.d(TAG, "<init>() is called...");
 		//Log.d(TAG, "_routerNodeId = " + Util.toHexString(_routerNodeId));
-		new Throwable().printStackTrace();
+		//new Throwable().printStackTrace();
 		
 		try {
 			// only needed for in-process multi-router testing :P

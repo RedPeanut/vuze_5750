@@ -103,7 +103,7 @@ public class BackGroundGraphic implements Graphic {
 
 		if (sizeChanged || bufferBackground == null) {
 			Rectangle bounds = drawCanvas.getClientArea();
-			Log.d(TAG, "bounds = " + bounds);
+			//Log.d(TAG, "bounds = " + bounds);
 			if (bounds.height < 30 || bounds.width	< 100)
 				return;
 

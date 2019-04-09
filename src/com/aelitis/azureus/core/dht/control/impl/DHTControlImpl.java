@@ -250,8 +250,6 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		boolean				_enableRandomPoking,
 		DHTLogger 			_logger) {
 		
-		Log.d(TAG, ">>> K = " + _K);
-		
 		adapter		= _adapter;
 		transport	= _transport;
 		logger		= _logger;
@@ -265,8 +263,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		encodeKeys					= _encodeKeys;
 		enableRandomPoking			= _enableRandomPoking;
 
+		//Log.d(TAG, ">>> K = " + _K);
+		Log.d(TAG, ">>> lookupConcurrency = " + lookupConcurrency);
+		new Throwable().printStackTrace();
+				
 		// set this so we don't do initial calculation until reasonably populated
-
 		lastDhtEstimateTime	= SystemTime.getCurrentTime();
 
 		database = DHTDBFactory.create(
@@ -275,9 +276,6 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 						_cacheRepublishInterval,
 						transport.getProtocolVersion(),
 						logger);
-		
-		Log.d(TAG, ">>> lookupConcurrency = " + lookupConcurrency);
-		new Throwable().printStackTrace();
 		
 		internalLookupPool = new ThreadPool("DHTControl:internallookups", lookupConcurrency);
 		internalPutPool = new ThreadPool("DHTControl:internalputs", lookupConcurrency);
@@ -1850,8 +1848,6 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		
 		int count = SingleCounter2.getInstance().getAndIncreaseCount();
 		Log.d(TAG, String.format("how many times lookup() is called... #%d", count));
-		
-		
 		
 		/*if ( 
 				   (flags & DHT.FLAG_LOOKUP_FOR_STORE) == 1

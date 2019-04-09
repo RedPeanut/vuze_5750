@@ -127,7 +127,7 @@ public class DHTPluginImpl implements DHTInterface {
 	private int					stats_ticks;
 
 	public DHTPluginImpl(
-		PluginInterface			_plugin_interface,
+		PluginInterface			_pluginInterface,
 		DHTNATPuncherAdapter	_natAdapter,
 		DHTPluginImplAdapter	_adapter,
 		byte					_protocolVersion,
@@ -136,20 +136,20 @@ public class DHTPluginImpl implements DHTInterface {
 		String					_ip,
 		int						_port,
 		ActionParameter			_reseed,
-		BooleanParameter		_warn_user_param,
+		BooleanParameter		_warnUserParam,
 		boolean					_logging,
 		LoggerChannel			_log,
-		DHTLogger				_dht_log) {
+		DHTLogger				_dhtLog) {
 
-		pluginInterface	= _plugin_interface;
-		protocolVersion	= _protocolVersion;
+		pluginInterface		= _pluginInterface;
+		protocolVersion		= _protocolVersion;
 		network				= _network;
 		v6					= _v6;
 		port				= _port;
-		reseedParam		= _reseed;
-		warn_user_param		= _warn_user_param;
+		reseedParam			= _reseed;
+		warn_user_param		= _warnUserParam;
 		log					= _log;
-		dhtLog				= _dht_log;
+		dhtLog				= _dhtLog;
 
 		final DHTPluginImplAdapter adapter = _adapter;
 
