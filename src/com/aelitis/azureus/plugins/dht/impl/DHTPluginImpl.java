@@ -154,7 +154,7 @@ public class DHTPluginImpl implements DHTInterface {
 		final DHTPluginImplAdapter adapter = _adapter;
 
 		try {
-			storageManager = new DHTPluginStorageManager(network, dhtLog, getDataDir( _network));
+			storageManager = new DHTPluginStorageManager(network, dhtLog, getDataDir(_network));
 
 			final PluginConfig conf = pluginInterface.getPluginconfig();
 
@@ -383,10 +383,8 @@ public class DHTPluginImpl implements DHTInterface {
 		}
 	}
 
-	protected File
-	getDataDir(
-		int		network) {
-		File	dir = new File(pluginInterface.getUtilities().getAzureusUserDir(), "dht");
+	protected File getDataDir(int network) {
+		File dir = new File(pluginInterface.getUtilities().getAzureusUserDir(), "dht");
 		if (network != 0) {
 			dir = new File(dir, "net" + network);
 		}

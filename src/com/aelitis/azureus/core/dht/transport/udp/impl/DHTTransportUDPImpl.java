@@ -113,13 +113,13 @@ public class DHTTransportUDPImpl
 	public static final int		STORE_TIMEOUT_MULTIPLIER = 2;
 
 
-	private String				external_address;
+	private String				externalAddress;
 	private int					min_address_change_period = MIN_ADDRESS_CHANGE_PERIOD_INIT_DEFAULT;
 
 	private final byte			protocolVersion;
 	private final int			network;
 	private final boolean		v6;
-	private final String		ip_override;
+	private final String		ipOverride;
 	private int					port;
 	private final int			maxFailsForLive;
 	private final int			maxFailsForUnknown;
@@ -156,7 +156,7 @@ public class DHTTransportUDPImpl
 
 	private static final int ROUTABLE_CONTACT_HISTORY_MAX 		= 128;
 
-	final Map<InetSocketAddress,DHTTransportContact>	routable_contact_history =
+	final Map<InetSocketAddress,DHTTransportContact>	routableContactHistory =
 		new LinkedHashMap<InetSocketAddress,DHTTransportContact>(ROUTABLE_CONTACT_HISTORY_MAX,0.75f,true) {
 			protected boolean removeEldestEntry(Map.Entry<InetSocketAddress,DHTTransportContact> eldest) {
 				return size() > ROUTABLE_CONTACT_HISTORY_MAX;
@@ -164,9 +164,9 @@ public class DHTTransportUDPImpl
 		};
 
 
-	private long					other_routable_total;
-	private long					other_non_routable_total;
-	private final MovingImmediateAverage	routeable_percentage_average = AverageFactory.MovingImmediateAverage(8);
+	private long							otherRoutableTotal;
+	private long							otherNonRoutableTotal;
+	private final MovingImmediateAverage	routeablePercentageAverage = AverageFactory.MovingImmediateAverage(8);
 
 	private static final int RECENT_REPORTS_HISTORY_MAX = 32;
 
@@ -184,16 +184,16 @@ public class DHTTransportUDPImpl
 	private static final long	STATS_INIT_PERIOD	= 15*60*1000;	// bit more than 10 mins to allow average to establish
 
 	private long	statsStartTime	= SystemTime.getCurrentTime();
-	private long	last_alien_count;
-	private long	last_alien_fv_count;
+	private long	lastAlienCount;
+	private long	lastAlienFvCount;
 
-	private final Average	alien_average 		= Average.getInstance(STATS_PERIOD,STATS_DURATION_SECS);
-	private final Average	alien_fv_average 	= Average.getInstance(STATS_PERIOD,STATS_DURATION_SECS);
+	private final Average	alienAverage 	= Average.getInstance(STATS_PERIOD,STATS_DURATION_SECS);
+	private final Average	alienFvAverage 	= Average.getInstance(STATS_PERIOD,STATS_DURATION_SECS);
 
 	private Random				random;
 
 	private static final int	BAD_IP_BLOOM_FILTER_SIZE	= 32000;
-	private BloomFilter			bad_ip_bloom_filter;
+	private BloomFilter			badIpBloomFilter;
 
 	private static final AEMonitor	classMon	= new AEMonitor("DHTTransportUDP:class");
 
@@ -224,7 +224,7 @@ public class DHTTransportUDPImpl
 		protocolVersion			= _protocolVersion;
 		network					= _network;
 		v6						= _v6;
-		ip_override				= _ip;
+		ipOverride				= _ip;
 		port					= _port;
 		maxFailsForLive			= _maxFailsForLive;
 		maxFailsForUnknown		= _maxFailsForUnknown;
@@ -280,9 +280,9 @@ public class DHTTransportUDPImpl
 				DHTUDPPacketData.MAX_DATA_SIZE,
 				1,
 				logger);
-		int last_pct = COConfigurationManager.getIntParameter("dht.udp.net" + network + ".routeable_pct", -1);
-		if (last_pct > 0) {
-			routeable_percentage_average.update(last_pct);
+		int lastPct = COConfigurationManager.getIntParameter("dht.udp.net" + network + ".routeable_pct", -1);
+		if (lastPct > 0) {
+			routeablePercentageAverage.update(lastPct);
 		}
 		DHTUDPUtils.registerTransport(this);
 		createPacketHandler();
@@ -290,27 +290,26 @@ public class DHTTransportUDPImpl
 			"DHTUDP:stats",
 			STATS_PERIOD,
 			new TimerEventPerformer() {
-				private int tick_count;
+				private int tickCount;
 				public void perform(TimerEvent	event) {
-					updateStats(tick_count++);
+					updateStats(tickCount++);
 					checkAltContacts();
 				}
 			});
-		String default_ip = _defaultIp==null?(v6?"::1":"127.0.0.1"):_defaultIp;
-		getExternalAddress(default_ip, logger);
-		InetSocketAddress address = new InetSocketAddress(external_address, port);
+		String defaultIp = _defaultIp==null?(v6?"::1":"127.0.0.1"):_defaultIp;
+		getExternalAddress(defaultIp, logger);
+		InetSocketAddress address = new InetSocketAddress(externalAddress, port);
 		DHTNetworkPositionManager.addProviderListener(
 			new DHTNetworkPositionProviderListener() {
-				public void providerAdded(
-					DHTNetworkPositionProvider		provider) {
+				public void providerAdded(DHTNetworkPositionProvider provider) {
 					if (localContact != null) {
 						localContact.createNetworkPositions(true);
 						try {
 							thisMon.enter();
-							for ( DHTTransportContact c: contactHistory.values()) {
+							for (DHTTransportContact c: contactHistory.values()) {
 								c.createNetworkPositions(false);
 							}
-							for ( DHTTransportContact c: routable_contact_history.values()) {
+							for (DHTTransportContact c: routableContactHistory.values()) {
 								c.createNetworkPositions(false);
 							}
 						} finally {
@@ -325,9 +324,10 @@ public class DHTTransportUDPImpl
 						}
 					}
 				}
-				public void providerRemoved(
-					DHTNetworkPositionProvider		provider) {
+
+				public void providerRemoved(DHTNetworkPositionProvider provider) {
 				}
+				
 			});
 		logger.log("Initial external address: " + address);
 		localContact = new DHTTransportUDPContactImpl(true, this, 
@@ -396,10 +396,10 @@ public class DHTTransportUDPImpl
 			alien_count	+= aliens[i];
 		}
 		long	alien_fv_count = aliens[ DHTTransportStats.AT_FIND_VALUE ];
-		alien_average.addValue( (alien_count-last_alien_count)*STATS_PERIOD/1000);
-		alien_fv_average.addValue( (alien_fv_count-last_alien_fv_count)*STATS_PERIOD/1000);
-		last_alien_count	= alien_count;
-		last_alien_fv_count	= alien_fv_count;
+		alienAverage.addValue( (alien_count-lastAlienCount)*STATS_PERIOD/1000);
+		alienFvAverage.addValue( (alien_fv_count-lastAlienFvCount)*STATS_PERIOD/1000);
+		lastAlienCount	= alien_count;
+		lastAlienFvCount	= alien_fv_count;
 		long	now = SystemTime.getCurrentTime();
 		if (now < 	statsStartTime) {
 			statsStartTime	= now;
@@ -407,16 +407,16 @@ public class DHTTransportUDPImpl
 			// only fiddle with the initial view of reachability when things have had
 			// time to stabilise
 			if (Constants.isCVSVersion()) {
-				long fv_average 		= alien_fv_average.getAverage();
-				long all_average 		= alien_average.getAverage();
+				long fv_average 		= alienFvAverage.getAverage();
+				long all_average 		= alienAverage.getAverage();
 				logger.log("Aliens for net " + network + ": " + fv_average + "/" + all_average);
 			}
 			if (now - statsStartTime > STATS_INIT_PERIOD) {
 				reachable_accurate	= true;
 				boolean	old_reachable	= reachable;
-				if (alien_fv_average.getAverage() > 1) {
+				if (alienFvAverage.getAverage() > 1) {
 					reachable	= true;
-				} else if (alien_average.getAverage() > 3) {
+				} else if (alienAverage.getAverage() > 3) {
 					reachable	= true;
 				} else {
 					reachable	= false;
@@ -545,12 +545,12 @@ public class DHTTransportUDPImpl
 
 		throws DHTTransportException
 	{
-		if (external_address.equals("127.0.0.1")) {
-			external_address = "192.168.0.2";
+		if (externalAddress.equals("127.0.0.1")) {
+			externalAddress = "192.168.0.2";
 		} else {
-			external_address = "127.0.0.1";
+			externalAddress = "127.0.0.1";
 		}
-		InetSocketAddress	address = new InetSocketAddress(external_address, port);
+		InetSocketAddress	address = new InetSocketAddress(externalAddress, port);
 		localContact = new DHTTransportUDPContactImpl(true, this, address, address, protocolVersion, localContact.getInstanceID(), 0, (byte)0);
 		for (int i=0;i<listeners.size();i++) {
 			try {
@@ -579,58 +579,62 @@ public class DHTTransportUDPImpl
 	}
 
 	protected void getExternalAddress(
-		String				default_address,
+		String				defaultAddress,
 		final DHTLogger		log) {
-			// class level synchronisation is for testing purposes when running multiple UDP instances
-			// in the same VM
+		
+		// class level synchronisation is for testing purposes when running multiple UDP instances
+		// in the same VM
 		try {
 			classMon.enter();
-			String new_external_address = null;
+			String newExternalAddress = null;
 			try {
 				log.log("Obtaining external address");
 				if (TEST_EXTERNAL_IP) {
-					new_external_address	= v6?"::1":"127.0.0.1";
-					log.log("	External IP address obtained from test data: " + new_external_address);
+					newExternalAddress	= v6?"::1":"127.0.0.1";
+					log.log("	External IP address obtained from test data: " + newExternalAddress);
 				}
-				if (ip_override != null) {
-					new_external_address	= ip_override;
-					log.log("	External IP address explicitly overridden: " + new_external_address);
+				
+				if (ipOverride != null) {
+					newExternalAddress	= ipOverride;
+					log.log("	External IP address explicitly overridden: " + newExternalAddress);
 				}
-				if (new_external_address == null) {
-						// First attempt is via other contacts we know about. Select three
+				
+				if (newExternalAddress == null) {
+					// First attempt is via other contacts we know about. Select three
 					List	contacts;
 					try {
 						thisMon.enter();
-						contacts = new ArrayList( contactHistory.values());
+						contacts = new ArrayList(contactHistory.values());
 					} finally {
 						thisMon.exit();
 					}
-						// randomly select a number of entries to ping until we
-						// get three replies
-					String	returned_address 	= null;
-					int		returned_matches	= 0;
-					int		search_lim = Math.min( CONTACT_HISTORY_PING_SIZE, contacts.size());
-					log.log("	Contacts to search = " + search_lim);
-					for (int i=0;i<search_lim;i++) {
+					
+					// randomly select a number of entries to ping until we
+					// get three replies
+					String	returnedAddress 	= null;
+					int		returnedMatches	= 0;
+					int		searchLim = Math.min(CONTACT_HISTORY_PING_SIZE, contacts.size());
+					log.log("	Contacts to search = " + searchLim);
+					for (int i=0;i<searchLim;i++) {
 						DHTTransportUDPContactImpl	contact = (DHTTransportUDPContactImpl)contacts.remove(RandomUtils.nextInt(contacts.size()));
 						InetSocketAddress a = askContactForExternalAddress(contact);
 						if (a != null && a.getAddress() != null) {
 							String	ip = a.getAddress().getHostAddress();
-							if (returned_address == null) {
-								returned_address = ip;
+							if (returnedAddress == null) {
+								returnedAddress = ip;
 								log.log("	: contact " + contact.getString() + " reported external address as '" + ip + "'");
-								returned_matches++;
-							} else if (returned_address.equals( ip)) {
-								returned_matches++;
+								returnedMatches++;
+							} else if (returnedAddress.equals( ip)) {
+								returnedMatches++;
 								log.log("	: contact " + contact.getString() + " also reported external address as '" + ip + "'");
-								if (returned_matches == 3) {
-									new_external_address	= returned_address;
-									log.log("	External IP address obtained from contacts: "  + returned_address);
+								if (returnedMatches == 3) {
+									newExternalAddress	= returnedAddress;
+									log.log("	External IP address obtained from contacts: "  + returnedAddress);
 									break;
 								}
 							} else {
 								log.log("	: contact " + contact.getString() + " reported external address as '" + ip + "', abandoning due to mismatch");
-									// mismatch - give up
+								// mismatch - give up
 								break;
 							}
 						} else {
@@ -638,38 +642,35 @@ public class DHTTransportUDPImpl
 						}
 					}
 				}
-				if (new_external_address == null) {
-					InetAddress public_address = logger.getPluginInterface().getUtilities().getPublicAddress(v6);
-					if (public_address != null) {
-						new_external_address = public_address.getHostAddress();
-						log.log("	External IP address obtained: " + new_external_address);
+				
+				if (newExternalAddress == null) {
+					InetAddress publicAddress = logger.getPluginInterface().getUtilities().getPublicAddress(v6);
+					if (publicAddress != null) {
+						newExternalAddress = publicAddress.getHostAddress();
+						log.log("	External IP address obtained: " + newExternalAddress);
 					}
 				}
 			} catch (Throwable e) {
 				Debug.printStackTrace(e);
 			}
-			if (new_external_address == null) {
-				new_external_address =	default_address;
-				log.log("	External IP address defaulted:  " + new_external_address);
+			if (newExternalAddress == null) {
+				newExternalAddress =	defaultAddress;
+				log.log("	External IP address defaulted:  " + newExternalAddress);
 			}
-			if (external_address == null || !external_address.equals(new_external_address)) {
-				informLocalAddress(new_external_address);
+			if (externalAddress == null || !externalAddress.equals(newExternalAddress)) {
+				informLocalAddress(newExternalAddress);
 			}
-			external_address = new_external_address;
+			externalAddress = newExternalAddress;
 		} finally {
 			classMon.exit();
 		}
 	}
 
-	protected void informLocalAddress(
-		String	address) {
+	protected void informLocalAddress(String	address) {
 		for (int i=0;i<listeners.size();i++) {
-
 			try {
 				((DHTTransportListener)listeners.get(i)).currentAddress(address);
-
 			} catch (Throwable e) {
-
 				Debug.printStackTrace(e);
 			}
 		}
@@ -721,7 +722,7 @@ public class DHTTransportUDPImpl
 
 		final String	new_ip = ia.getHostAddress();
 
-		if (new_ip.equals( external_address)) {
+		if (new_ip.equals( externalAddress)) {
 
 				// probably just be a second notification of an address change, return
 				// "ok to retry" as it should now work
@@ -800,7 +801,7 @@ public class DHTTransportUDPImpl
 			thisMon.exit();
 		}
 
-		final String	old_external_address = external_address;
+		final String	old_external_address = externalAddress;
 
 			// we need to perform this test on a separate thread otherwise we'll block in the UDP handling
 			// code because we're already running on the "process" callback from the UDP handler
@@ -827,7 +828,7 @@ public class DHTTransportUDPImpl
 				try {
 					getExternalAddress(new_ip, logger);
 
-					if (old_external_address.equals( external_address)) {
+					if (old_external_address.equals( externalAddress)) {
 
 							// address hasn't changed, notifier must be perceiving different address
 							// due to proxy or something
@@ -872,7 +873,7 @@ public class DHTTransportUDPImpl
 		try {
 			thisMon.enter();
 
-			Collection<DHTTransportContact> vals = routable_contact_history.values();
+			Collection<DHTTransportContact> vals = routableContactHistory.values();
 
 			DHTTransportContact[]	res = new DHTTransportContact[vals.size()];
 
@@ -912,65 +913,49 @@ public class DHTTransportUDPImpl
 		boolean						incoming) {
 		try {
 			thisMon.enter();
-
 			contact.setNodeStatus(status);
-
 			if (contact.getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_XFER_STATUS) {
-
 				if (status != DHTTransportUDPContactImpl.NODE_STATUS_UNKNOWN) {
-
 					boolean	other_routable = (status & DHTTransportUDPContactImpl.NODE_STATUS_ROUTABLE) != 0;
-
 						// only maintain stats on incoming requests so we get a fair sample.
 						// in general we'll only get replies from routable contacts so if we
 						// take this into account then everything gets skewed
-
 					if (other_routable) {
-
 						if (incoming) {
-
-							synchronized(routeable_percentage_average) {
-
-								other_routable_total++;
+							synchronized(routeablePercentageAverage) {
+								otherRoutableTotal++;
 							}
 						}
-
-						routable_contact_history.put(contact.getTransportAddress(), contact);
-
+						routableContactHistory.put(contact.getTransportAddress(), contact);
 					} else {
-
 						if (incoming) {
-
-							synchronized(routeable_percentage_average) {
-
-								other_non_routable_total++;
+							synchronized(routeablePercentageAverage) {
+								otherNonRoutableTotal++;
 							}
 						}
 					}
 				}
 			}
-
 		} finally {
-
 			thisMon.exit();
 		}
 	}
 
 	public int getRouteablePercentage() {
-		synchronized(routeable_percentage_average) {
-			double	average = routeable_percentage_average.getAverage();
-			long	both_total = other_routable_total + other_non_routable_total;
+		synchronized(routeablePercentageAverage) {
+			double	average = routeablePercentageAverage.getAverage();
+			long	both_total = otherRoutableTotal + otherNonRoutableTotal;
 			int	current_percent;
 			if (both_total == 0) {
 				current_percent = 0;
 			} else {
-				current_percent = (int)((other_routable_total * 100 )/ both_total);
+				current_percent = (int)((otherRoutableTotal * 100 )/ both_total);
 			}
 			if (both_total >= 300) {
 					// add current to average and reset
 				if (current_percent > 0) {
-					average = routeable_percentage_average.update(current_percent);
-					other_routable_total = other_non_routable_total = 0;
+					average = routeablePercentageAverage.update(current_percent);
+					otherRoutableTotal = otherNonRoutableTotal = 0;
 				}
 			} else if (both_total >= 100) {
 					// if we have enough samples and no existing average then use current
@@ -978,7 +963,7 @@ public class DHTTransportUDPImpl
 					average = current_percent;
 				} else {
 						// factor in current percantage
-					int samples = routeable_percentage_average.getSampleCount();
+					int samples = routeablePercentageAverage.getSampleCount();
 					if (samples > 0) {
 						average = ((samples * average ) + current_percent ) / ( samples + 1);
 					}
@@ -1008,13 +993,12 @@ public class DHTTransportUDPImpl
 		return (maxFailsForUnknown);
 	}
 
-	public DHTTransportContact
-	getLocalContact() {
+	public DHTTransportContact getLocalContact() {
 		return (localContact);
 	}
 
 	protected void setLocalContact() {
-		InetSocketAddress	s_address = new InetSocketAddress(external_address, port);
+		InetSocketAddress	s_address = new InetSocketAddress(externalAddress, port);
 		try {
 			localContact = new DHTTransportUDPContactImpl(true, DHTTransportUDPImpl.this, s_address, s_address, protocolVersion, random.nextInt(), 0, (byte)0);
 			logger.log("External address changed: " + s_address);
@@ -1226,13 +1210,13 @@ public class DHTTransportUDPImpl
 
 				byte[]	addr = ia.getAddress();
 
-				if (bad_ip_bloom_filter == null) {
+				if (badIpBloomFilter == null) {
 
-					bad_ip_bloom_filter = BloomFilterFactory.createAddOnly(BAD_IP_BLOOM_FILTER_SIZE);
+					badIpBloomFilter = BloomFilterFactory.createAddOnly(BAD_IP_BLOOM_FILTER_SIZE);
 
 				} else {
 
-					if (bad_ip_bloom_filter.contains( addr)) {
+					if (badIpBloomFilter.contains( addr)) {
 
 						throw (new DHTUDPPacketHandlerException("IPFilter check fails (repeat)"));
 					}
@@ -1245,12 +1229,12 @@ public class DHTTransportUDPImpl
 						// don't let an attacker deliberately fill up our filter so we start
 						// rejecting valid addresses
 
-					if (bad_ip_bloom_filter.getEntryCount() >= BAD_IP_BLOOM_FILTER_SIZE/10) {
+					if (badIpBloomFilter.getEntryCount() >= BAD_IP_BLOOM_FILTER_SIZE/10) {
 
-						bad_ip_bloom_filter = BloomFilterFactory.createAddOnly(BAD_IP_BLOOM_FILTER_SIZE);
+						badIpBloomFilter = BloomFilterFactory.createAddOnly(BAD_IP_BLOOM_FILTER_SIZE);
 					}
 
-					bad_ip_bloom_filter.add(addr);
+					badIpBloomFilter.add(addr);
 
 					throw (new DHTUDPPacketHandlerException("IPFilter check fails"));
 				}
@@ -2425,7 +2409,7 @@ outer:
 			List<DHTTransportContact> targets = new ArrayList<DHTTransportContact>(ROUTABLE_CONTACT_HISTORY_MAX);
 			try {
 				thisMon.enter();
-				for ( DHTTransportContact contact: routable_contact_history.values()) {
+				for ( DHTTransportContact contact: routableContactHistory.values()) {
 					if (contact.getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_ALT_CONTACTS) {
 						targets.add(contact);
 					}
@@ -2627,8 +2611,8 @@ outer:
 
 	public void addListener(DHTTransportListener l) {
 		listeners.add(l);
-		if (external_address != null) {
-			l.currentAddress(external_address);
+		if (externalAddress != null) {
+			l.currentAddress(externalAddress);
 		}
 	}
 

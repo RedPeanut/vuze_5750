@@ -116,15 +116,13 @@ public interface DHTTransportUDP extends DHTTransport {
 			return ((byte)Math.max(explicitMin, min&0x00ff));
 		}
 	}
-
-	public static final byte PROTOCOL_VERSION_MAIN					= Helper.getVersion(PROTOCOL_VERSION_PROC_TIME);
-	public static final byte PROTOCOL_VERSION_CVS					= Helper.getVersion(PROTOCOL_VERSION_PROC_TIME);
-
-	public static final byte PROTOCOL_VERSION_MIN					= Helper.getVersion(PROTOCOL_VERSION_VIVALDI_OPTIONAL);
-	public static final byte PROTOCOL_VERSION_MIN_CVS				= Helper.getVersion(PROTOCOL_VERSION_VIVALDI_OPTIONAL);
-
-
-
+	
+	public static final byte PROTOCOL_VERSION_MAIN		= Helper.getVersion(PROTOCOL_VERSION_PROC_TIME);
+	public static final byte PROTOCOL_VERSION_CVS		= Helper.getVersion(PROTOCOL_VERSION_PROC_TIME);
+		
+	public static final byte PROTOCOL_VERSION_MIN		= Helper.getVersion(PROTOCOL_VERSION_VIVALDI_OPTIONAL);
+	public static final byte PROTOCOL_VERSION_MIN_CVS	= Helper.getVersion(PROTOCOL_VERSION_VIVALDI_OPTIONAL);
+	
 	public static final byte VENDOR_ID_AELITIS		= 0x00;
 	public static final byte VENDOR_ID_ShareNET		= 0x01;			// http://www.sharep2p.net/
 	public static final byte VENDOR_ID_NONE			= (byte)0xff;

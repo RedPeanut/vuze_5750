@@ -35,13 +35,12 @@ import com.aelitis.azureus.core.dht.DHTStorageAdapter;
 import com.aelitis.azureus.core.dht.impl.DHTLog;
 import com.aelitis.azureus.core.util.CopyOnWriteList;
 
-public class
-DHTNetworkPositionManager
-{
+public class DHTNetworkPositionManager {
+	
 	private static DHTNetworkPositionProvider[]	providers = new DHTNetworkPositionProvider[0];
-	private static final Object providers_lock = new Object();
+	private static final Object providersLock = new Object();
 
-	private static DHTStorageAdapter	storage_adapter = null;
+	private static DHTStorageAdapter	storageAdapter = null;
 
 	private static final CopyOnWriteList<DHTNetworkPositionProviderListener>		provider_listeners = new CopyOnWriteList<DHTNetworkPositionProviderListener>();
 	private static volatile CopyOnWriteList<DHTNetworkPositionListener>		position_listeners;
@@ -49,9 +48,9 @@ DHTNetworkPositionManager
 	private static final DHTNetworkPosition[] NP_EMPTY_ARRAY = {};
 
 	public static void initialise(DHTStorageAdapter		adapter) {
-		synchronized(providers_lock) {
-			if (storage_adapter == null) {
-				storage_adapter	= adapter;
+		synchronized(providersLock) {
+			if (storageAdapter == null) {
+				storageAdapter	= adapter;
 				for (int i=0;i<providers.length;i++) {
 					DHTNetworkPositionProvider	provider = providers[i];
 					try {
@@ -66,8 +65,8 @@ DHTNetworkPositionManager
 
 	private static void startUp(DHTNetworkPositionProvider	provider) {
 		byte[] data = null;
-		if (storage_adapter != null) {
-			data = storage_adapter.getStorageForKey("NPP:" + provider.getPositionType());
+		if (storageAdapter != null) {
+			data = storageAdapter.getStorageForKey("NPP:" + provider.getPositionType());
 		}
 		if (data == null) {
 			data = new byte[0];
@@ -86,19 +85,19 @@ DHTNetworkPositionManager
 			provider.shutDown(dos);
 			dos.flush();
 			byte[]	data = baos.toByteArray();
-			storage_adapter.setStorageForKey("NPP:" + provider.getPositionType(), data);
+			storageAdapter.setStorageForKey("NPP:" + provider.getPositionType(), data);
 		} catch (Throwable e) {
 			Debug.printStackTrace(e);
 		}
 	}
 
 	public static void destroy(DHTStorageAdapter adapter) {
-		synchronized(providers_lock) {
-			if (storage_adapter == adapter) {
+		synchronized(providersLock) {
+			if (storageAdapter == adapter) {
 				for (int i=0;i<providers.length;i++) {
 					shutDown(providers[i]);
 				}
-				storage_adapter	= null;
+				storageAdapter	= null;
 			}
 		}
 	}
@@ -107,7 +106,7 @@ DHTNetworkPositionManager
 			final DHTNetworkPositionProvider provider) {
 		
 		boolean	fire_added = false;
-		synchronized(providers_lock) {
+		synchronized(providersLock) {
 			boolean						found 		= false;
 			DHTNetworkPositionProvider	type_found	= null;
 			for (DHTNetworkPositionProvider p: providers) {
@@ -127,7 +126,7 @@ DHTNetworkPositionManager
 				System.arraycopy(providers, 0, new_providers, 0, providers.length);
 				new_providers[providers.length] = provider;
 				providers	= new_providers;
-				if (storage_adapter != null) {
+				if (storageAdapter != null) {
 					startUp(provider);
 				}
 				fire_added = true;
@@ -169,7 +168,7 @@ DHTNetworkPositionManager
 		DHTNetworkPositionProvider	provider) {
 		boolean	removed = false;
 
-		synchronized(providers_lock) {
+		synchronized(providersLock) {
 
 			if (providers.length == 0) {
 
@@ -184,7 +183,7 @@ DHTNetworkPositionManager
 
 				if (providers[i] == provider) {
 
-					if (storage_adapter != null) {
+					if (storageAdapter != null) {
 
 						shutDown(provider);
 					}
@@ -207,7 +206,7 @@ DHTNetworkPositionManager
 	public static DHTNetworkPositionProvider
 	getProvider(
 		byte		type) {
-		synchronized(providers_lock) {
+		synchronized(providersLock) {
 
 			for (int i=0;i<providers.length;i++) {
 

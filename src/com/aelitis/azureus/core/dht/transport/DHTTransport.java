@@ -16,96 +16,61 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-
 package com.aelitis.azureus.core.dht.transport;
-
 /**
  * @author parg
  *
  */
-
 import java.io.*;
 import java.util.Map;
 
-public interface
-DHTTransport
-{
+public interface DHTTransport {
+	
 	public static final byte GF_NONE				= 0x00;
 	public static final byte GF_DHT_SLEEPING		= 0x01;
-
-	public byte
-	getProtocolVersion();
-
-	public byte
-	getMinimumProtocolVersion();
-
+	
+	public byte getProtocolVersion();
+	public byte getMinimumProtocolVersion();
 	public int getNetwork();
-
 	public boolean isIPV6();
-
-	public byte
-	getGenericFlags();
-
-	public void setGenericFlag(
-		byte		flag,
-		boolean		value);
-
-	public void setSuspended(
-		boolean			susp);
-
-		/**
-		 * Gives access to the node ID for this transport
-		 * @return
-		 */
-
-	public DHTTransportContact
-	getLocalContact();
-
+	public byte getGenericFlags();
+	public void setGenericFlag(byte flag, boolean value);
+	public void setSuspended(boolean susp);
+	
+	/**
+	 * Gives access to the node ID for this transport
+	 * @return
+	 */
+	public DHTTransportContact getLocalContact();
 	public int getPort();
-
-	public void setPort(
-		int	port )
-
-		throws DHTTransportException;
-
+	public void setPort(int port) throws DHTTransportException;
 	public long getTimeout();
-
-	public void setTimeout(
-		long		millis);
-
-	public DHTTransportContact
-	importContact(
-		DataInputStream		is,
-		boolean				is_bootstrap )
-
-		throws IOException, DHTTransportException;
-
-		/**
-		 * Set the handler for incoming requests
-		 * @param receiver
-		 */
-
-	public void setRequestHandler(
-		DHTTransportRequestHandler	receiver);
-
-	public DHTTransportStats
-	getStats();
-
-		// direct contact-contact communication
-
+	public void setTimeout(long millis);
+	public DHTTransportContact importContact(DataInputStream is, boolean isBootstrap)
+			throws IOException, DHTTransportException;
+	
+	/**
+	 * Set the handler for incoming requests
+	 * 
+	 * @param receiver
+	 */
+	public void setRequestHandler(DHTTransportRequestHandler receiver);
+	public DHTTransportStats getStats();
+	
+	// direct contact-contact communication
 	public void registerTransferHandler(
 		byte[]							handler_key,
 		DHTTransportTransferHandler		handler);
-
+	
 	public void registerTransferHandler(
 		byte[]							handler_key,
 		DHTTransportTransferHandler		handler,
 		Map<String,Object>				options);
-
+	
 	public void unregisterTransferHandler(
 		byte[]						handler_key,
 		DHTTransportTransferHandler	handler);
-
+	
 	public byte[]
 	readTransfer(
 		DHTTransportProgressListener	listener,
@@ -113,42 +78,29 @@ DHTTransport
 		byte[]							handler_key,
 		byte[]							key,
 		long							timeout )
-
 		throws DHTTransportException;
-
+	
 	public void writeTransfer(
 		DHTTransportProgressListener	listener,
 		DHTTransportContact				target,
 		byte[]							handler_key,
 		byte[]							key,
 		byte[]							data,
-		long							timeout )
-
+		long							timeout)
 		throws DHTTransportException;
-
-	public byte[]
-	writeReadTransfer(
+	
+	public byte[] writeReadTransfer(
 		DHTTransportProgressListener	listener,
 		DHTTransportContact				target,
 		byte[]							handler_key,
 		byte[]							data,
-		long							timeout )
-
+		long							timeout)
 		throws DHTTransportException;
-
+	
 	public boolean supportsStorage();
-
 	public boolean isReachable();
-
-	public DHTTransportContact[]
-	getReachableContacts();
-
-	public DHTTransportContact[]
-	getRecentContacts();
-
-	public void addListener(
-		DHTTransportListener	l);
-
-	public void removeListener(
-		DHTTransportListener	l);
+	public DHTTransportContact[] getReachableContacts();
+	public DHTTransportContact[] getRecentContacts();
+	public void addListener(DHTTransportListener l);
+	public void removeListener(DHTTransportListener l);
 }

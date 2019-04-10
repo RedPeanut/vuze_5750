@@ -83,14 +83,14 @@ DHTPluginStorageManager
 	private DHTLogger		log;
 	private File			dataDir;
 
-	private AEMonitor	address_mon	= new AEMonitor("DHTPluginStorageManager:address");
+	private AEMonitor	addressMon	= new AEMonitor("DHTPluginStorageManager:address");
 	private AEMonitor	contactMonitor	= new AEMonitor("DHTPluginStorageManager:contact");
 	private AEMonitor	storage_mon	= new AEMonitor("DHTPluginStorageManager:storage");
 	private AEMonitor	version_mon	= new AEMonitor("DHTPluginStorageManager:version");
 	private AEMonitor	key_block_mon	= new AEMonitor("DHTPluginStorageManager:block");
 
 	private Map					version_map			= new HashMap();
-	private Map					recent_addresses	= new HashMap();
+	private Map					recentAddresses	= new HashMap();
 
 	private Map					remote_diversifications	= new HashMap();
 	private Map					local_storage_keys		= new HashMap();
@@ -125,66 +125,41 @@ DHTPluginStorageManager
 	public DHTPluginStorageManager(
 		int					_network,
 		DHTLogger			_log,
-		File				_data_dir) {
+		File				_dataDir) {
 		network		= _network;
 		log			= _log;
-		dataDir	= _data_dir;
-
+		dataDir		= _dataDir;
 		if (network == DHT.NW_CVS) {
-
 				// work around issue whereby puts to the CVS dht went out of control and
 				// diversified everything
-
 			String key_ver 	= "dht.plugin.sm.hack.kill.div.2.v";
 			String key 		= "dht.plugin.sm.hack.kill.div.2";
-
 			final int 	HACK_VER 	= 6;
 			final long 	HACK_PERIOD = 3*24*60*60*1000L;
-
 			long suspend_ver = COConfigurationManager.getLongParameter(key_ver, 0);
-
 			long suspend_start;
-
 			if (suspend_ver < HACK_VER) {
-
 				suspend_start = 0;
-
 				COConfigurationManager.setParameter(key_ver, HACK_VER);
-
 			} else {
-
 				suspend_start = COConfigurationManager.getLongParameter(key, 0);
 			}
-
 			long now = SystemTime.getCurrentTime();
-
 			if (suspend_start == 0) {
-
 				suspend_start = now;
-
 				COConfigurationManager.setParameter(key, suspend_start);
 			}
-
 			suspend_divs_until = suspend_start + HACK_PERIOD;
-
 			if (suspendDivs()) {
-
 				writeMapToFile(new HashMap(), "diverse");
-
 			} else {
-
 				suspend_divs_until = 0;
 			}
 		}
-
 		FileUtil.mkdirs(dataDir);
-
 		readRecentAddresses();
-
 		readDiversifications();
-
 		readVersionData();
-
 		readKeyBlocks();
 	}
 
@@ -272,101 +247,71 @@ DHTPluginStorageManager
 
 	protected void readRecentAddresses() {
 		try {
-			address_mon.enter();
+			addressMon.enter();
 
-			recent_addresses = readMapFromFile("addresses");
+			recentAddresses = readMapFromFile("addresses");
 
 		} finally {
 
-			address_mon.exit();
+			addressMon.exit();
 		}
 	}
 
 	protected void writeRecentAddresses() {
 		try {
-			address_mon.enter();
-
-				// remove any old crud
-
-			Iterator	it = recent_addresses.keySet().iterator();
-
+			addressMon.enter();
+			// remove any old crud
+			Iterator	it = recentAddresses.keySet().iterator();
 			while (it.hasNext()) {
-
 				String	key = (String)it.next();
-
 				if (!key.equals("most_recent")) {
-
-					Long	time = (Long)recent_addresses.get(key);
-
+					Long	time = (Long)recentAddresses.get(key);
 					if (SystemTime.getCurrentTime() - time.longValue() > ADDRESS_EXPIRY) {
-
 						it.remove();
 					}
 				}
 			}
-
-			writeMapToFile(recent_addresses, "addresses");
-
+			writeMapToFile(recentAddresses, "addresses");
 		} catch (Throwable e) {
-
 			Debug.printStackTrace(e);
-
 		} finally {
-
-			address_mon.exit();
+			addressMon.exit();
 		}
 	}
 
-	protected void recordCurrentAddress(
-		String		address) {
+	protected void recordCurrentAddress(String address) {
 		try {
-			address_mon.enter();
-
-			recent_addresses.put( address, new Long( SystemTime.getCurrentTime()));
-
-			recent_addresses.put("most_recent", address.getBytes());
-
+			addressMon.enter();
+			recentAddresses.put(address, new Long(SystemTime.getCurrentTime()));
+			recentAddresses.put("most_recent", address.getBytes());
 			writeRecentAddresses();
-
 		} finally {
-
-			address_mon.exit();
+			addressMon.exit();
 		}
 	}
 
 	protected String getMostRecentAddress() {
-		byte[]	addr = (byte[])recent_addresses.get("most_recent");
-
+		byte[]	addr = (byte[])recentAddresses.get("most_recent");
 		if (addr == null) {
-
 			return (null);
 		}
-
 		return (new String( addr));
 	}
 
-	protected boolean isRecentAddress(
-		String		address) {
+	protected boolean isRecentAddress(String address) {
 		try {
-			address_mon.enter();
-
-			if (recent_addresses.containsKey( address)) {
-
+			addressMon.enter();
+			if (recentAddresses.containsKey(address)) {
 				return (true);
 			}
-
-			String	most_recent = getMostRecentAddress();
-
-			return (most_recent != null && most_recent.equals( address));
-
+			String	mostRecent = getMostRecentAddress();
+			return (mostRecent != null && mostRecent.equals(address));
 		} finally {
-
-			address_mon.exit();
+			addressMon.exit();
 		}
 	}
 
-	protected void localContactChanged(
-		DHTTransportContact	contact) {
+	protected void localContactChanged(DHTTransportContact contact) {
 		purgeDirectKeyBlocks();
 	}
 
@@ -393,10 +338,10 @@ DHTPluginStorageManager
 
 	protected void writeMapToFile(
 		Map			map,
-		String		file_prefix) {
+		String		filePrefix) {
 		try {
-			File	saving = new File(dataDir, file_prefix + ".saving");
-			File	target = new File(dataDir, file_prefix + ".dat");
+			File	saving = new File(dataDir, filePrefix + ".saving");
+			File	target = new File(dataDir, filePrefix + ".dat");
 			saving.delete();
 			if (map.size() == 0) {
 				target.delete();

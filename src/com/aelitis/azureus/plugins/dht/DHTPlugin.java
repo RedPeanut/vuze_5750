@@ -126,17 +126,17 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 	private boolean				enabled;
 	private int					dhtDataPort;
 
-	private boolean				got_extended_use;
-	private boolean				extended_use;
+	private boolean				gotExtendedUse;
+	private boolean				extendedUse;
 
 	private AESemaphore			initSem = new AESemaphore("DHTPlugin:init");
 
-	private AEMonitor			port_change_mon	= new AEMonitor("DHTPlugin:portChanger");
-	private boolean				port_changing;
-	private int					port_change_outstanding;
+	private AEMonitor			portChangeMon	= new AEMonitor("DHTPlugin:portChanger");
+	private boolean				portChanging;
+	private int					portChangeOutstanding;
 
 	private boolean[]           ipfilter_logging = new boolean[1];
-	private BooleanParameter	warn_user;
+	private BooleanParameter	warnUser;
 
 	private UPnPMapping			upnpMapping;
 
@@ -154,6 +154,7 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 		status = STATUS_INITALISING;
 		pluginInterface	= _pluginInterface;
 		dhtDataPort = UDPNetworkManager.getSingleton().getUDPNonDataListeningPortNumber();
+		Log.d(TAG, ">>> dhtDataPort = " + dhtDataPort);
 		log = pluginInterface.getLogger().getTimeStampedChannel(PLUGIN_NAME);
 		UIManager uiManager = pluginInterface.getUIManager();
 		final BasicPluginViewModel model = uiManager.createBasicPluginViewModel(PLUGIN_RESOURCE_ID);
@@ -184,7 +185,7 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 				ipfilter_logging[0] = ipfilter_logging_param.getValue();
 			}
 		});
-		warn_user = config.addBooleanParameter2("dht.warn.user", "dht.warn.user", true);
+		warnUser = config.addBooleanParameter2("dht.warn.user", "dht.warn.user", true);
 		final BooleanParameter	advanced = config.addBooleanParameter2("dht.advanced", "dht.advanced", false);
 		LabelParameter	advanced_label = config.addLabelParameter2("dht.advanced.label");
 		final StringParameter	override_ip	= config.addStringParameter2("dht.override.ip", "dht.override.ip", "");
@@ -512,24 +513,24 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 			// don't check for new_port being dht_data_port here as we want to continue to pick up
 			// changes that occurred during dht init
 		try {
-			port_change_mon.enter();
-			port_change_outstanding	= _new_port;
-			if (port_changing) {
+			portChangeMon.enter();
+			portChangeOutstanding	= _new_port;
+			if (portChanging) {
 				return;
 			}
-			port_changing			= true;
+			portChanging			= true;
 		} finally {
-			port_change_mon.exit();
+			portChangeMon.exit();
 		}
 		new AEThread2("DHTPlugin:portChanger", true) {
 			public void run() {
 				while (true) {
 					int	new_port;
 					try {
-						port_change_mon.enter();
-						new_port	= port_change_outstanding;
+						portChangeMon.enter();
+						new_port	= portChangeOutstanding;
 					} finally {
-						port_change_mon.exit();
+						portChangeMon.exit();
 					}
 					try {
 						dhtDataPort	= new_port;
@@ -549,13 +550,13 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 						}
 					} finally {
 						try {
-							port_change_mon.enter();
-							if (new_port == port_change_outstanding) {
-								port_changing	= false;
+							portChangeMon.enter();
+							if (new_port == portChangeOutstanding) {
+								portChanging	= false;
 								break;
 							}
 						} finally {
-							port_change_mon.exit();
+							portChangeMon.exit();
 						}
 					}
 				}
@@ -566,11 +567,11 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 	protected void initComplete(
 		final UITextField		statusArea,
 		final boolean			logging,
-		final String			override_ip) {
+		final String			overrideIp) {
 		
 		AEThread2 t = new AEThread2("DHTPlugin.init", true) {
 			public void run() {
-				boolean	went_async = false;
+				boolean	wentAsync = false;
 				try {
 					enabled = VersionCheckClient.getSingleton().DHTEnableAllowed();
 					if (enabled) {
@@ -599,13 +600,13 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 														pluginInterface,
 														AzureusCoreFactory.getSingleton().getNATTraverser(),
 														adapter,
-														DHTTransportUDP.PROTOCOL_VERSION_MAIN,
-														DHT.NW_MAIN,
+														DHTTransportUDP.PROTOCOL_VERSION_MAIN,	// byte _protocolVersion,
+														DHT.NW_MAIN,							// int _network,
 														false,
-														override_ip,
-														dhtDataPort,
+														overrideIp,								// String _ip,
+														dhtDataPort,							// int _port,
 														reseed,
-														warn_user,
+														warnUser,
 														logging,
 														log, dhtLog);
 												plugins.add(mainDht);
@@ -619,13 +620,13 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 															pluginInterface,
 															AzureusCoreFactory.getSingleton().getNATTraverser(),
 															adapter,
-															DHTTransportUDP.PROTOCOL_VERSION_MAIN,
-															DHT.NW_MAIN_V6,
-															true,
-															null,
-															dhtDataPort,
+															DHTTransportUDP.PROTOCOL_VERSION_MAIN,	// byte _protocolVersion,
+															DHT.NW_MAIN_V6,							// int _network,
+															true,									
+															null,									// String _ip,
+															dhtDataPort,							// int _port,
 															reseed,
-															warn_user,
+															warnUser,
 															logging,
 															log, dhtLog);
 													plugins.add(mainV6Dht);
@@ -641,10 +642,10 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 														DHTTransportUDP.PROTOCOL_VERSION_CVS,
 														DHT.NW_CVS,
 														false,
-														override_ip,
+														overrideIp,
 														dhtDataPort,
 														reseed,
-														warn_user,
+														warnUser,
 														logging,
 														log, dhtLog);
 												plugins.add(cvsDht);
@@ -675,7 +676,7 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 							}
 						});
 						dt.queue();
-						went_async = true;
+						wentAsync = true;
 					} else {
 						status	= STATUS_DISABLED;
 						statusArea.setText("Disabled administratively due to network problems");
@@ -687,7 +688,7 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 					log.log(e);
 					Debug.printStackTrace(e);
 				} finally {
-					if (!went_async) {
+					if (!wentAsync) {
 						initSem.releaseForever();
 					}
 				}
@@ -747,11 +748,11 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 		if (!isEnabled()) {
 			return (false);
 		}
-		if (!got_extended_use) {
-			got_extended_use	= true;
-			extended_use = VersionCheckClient.getSingleton().DHTExtendedUseAllowed();
+		if (!gotExtendedUse) {
+			gotExtendedUse	= true;
+			extendedUse = VersionCheckClient.getSingleton().DHTExtendedUseAllowed();
 		}
-		return (extended_use);
+		return (extendedUse);
 	}
 
 	public String getNetwork() {

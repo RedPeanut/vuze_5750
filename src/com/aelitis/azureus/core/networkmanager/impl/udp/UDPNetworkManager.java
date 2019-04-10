@@ -19,6 +19,8 @@
 
 package com.aelitis.azureus.core.networkmanager.impl.udp;
 
+import hello.util.Log;
+
 import org.gudy.azureus2.core3.config.COConfigurationManager;
 import org.gudy.azureus2.core3.config.ParameterListener;
 import org.gudy.azureus2.core3.logging.LogAlert;
@@ -31,6 +33,8 @@ import com.aelitis.azureus.core.networkmanager.impl.ProtocolDecoderPHE;
 import com.aelitis.net.udp.uc.PRUDPPacket;
 
 public class UDPNetworkManager {
+	
+	private static String TAG = UDPNetworkManager.class.getSimpleName();
 	
 	public static final boolean	MINIMISE_OVERHEADS	= true;
 
@@ -105,6 +109,7 @@ public class UDPNetworkManager {
 				   new ParameterListener() {
 					   public void parameterChanged(String name) {
 						   int port = COConfigurationManager.getIntParameter(name);
+						   Log.d(TAG, ">>> port = " + port);
 						   if (port == udpNonDataListenPort) {
 							   return;
 						   }

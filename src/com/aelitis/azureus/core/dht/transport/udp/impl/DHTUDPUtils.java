@@ -85,7 +85,7 @@ public class DHTUDPUtils {
 		final String	key;
 		InetAddress ia = address.getAddress();
 		if (ia == null) {
-			if (address.getHostName().equals( Constants.DHT_SEED_ADDRESS_V6)) {
+			if (address.getHostName().equals(Constants.DHT_SEED_ADDRESS_V6)) {
 				key = "IPv6SeedHack";
 			} else {
 				// Debug.out("Address '" + address + "' is unresolved");
