@@ -94,6 +94,9 @@ import com.aelitis.azureus.core.util.bloom.BloomFilterFactory;
 import com.aelitis.azureus.core.versioncheck.VersionCheckClient;
 import com.aelitis.net.udp.uc.PRUDPPacketHandler;
 
+import hello.util.Log;
+import hello.util.SingleCounter2;
+
 /**
  * @author parg
  *
@@ -220,6 +223,9 @@ public class DHTTransportUDPImpl
 			boolean			_initialReachability,
 			DHTLogger		_logger)
 		throws DHTTransportException {
+		
+		/*int count = SingleCounter2.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format("how many times <init> is called... #%d", count));*/
 		
 		protocolVersion			= _protocolVersion;
 		network					= _network;

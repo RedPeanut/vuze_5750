@@ -30,6 +30,9 @@ import com.aelitis.azureus.core.dht.transport.DHTTransportException;
 import com.aelitis.azureus.core.dht.transport.udp.impl.packethandler.DHTUDPPacketHandler;
 import com.aelitis.azureus.core.dht.transport.udp.impl.packethandler.DHTUDPRequestHandler;
 
+import hello.util.LangUtil;
+import hello.util.Log;
+
 /**
  * @author parg
  *
@@ -108,10 +111,9 @@ public interface DHTTransportUDP extends DHTTransport {
 	public static final byte PROTOCOL_VERSION_NETWORKS				= PROTOCOL_VERSION_FIX_ORIGINATOR;
 
 	// current versions
-
-	public static class Helper{
+	
+	public static class Helper {
 		private static final int explicitMin = COConfigurationManager.getIntParameter("DHT.protocol.version.min", -1);
-
 		static byte getVersion(byte min) {
 			return ((byte)Math.max(explicitMin, min&0x00ff));
 		}

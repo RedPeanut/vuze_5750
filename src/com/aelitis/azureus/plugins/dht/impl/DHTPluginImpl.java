@@ -184,9 +184,8 @@ public class DHTPluginImpl implements DHTInterface {
 
 			transport.addListener(
 				new DHTTransportListener() {
-					public void localContactChanged(
-						DHTTransportContact	local_contact) {
-						storageManager.localContactChanged(local_contact);
+					public void localContactChanged(DHTTransportContact	localContact) {
+						storageManager.localContactChanged(localContact);
 						if (adapter != null) {
 							adapter.localContactChanged( getLocalAddress());
 						}
@@ -860,35 +859,24 @@ outer:
 						});
 	}
 
-	public DHTPluginContact
-	getLocalAddress() {
-		return (new DHTPluginContactImpl( this, transport.getLocalContact()));
+	public DHTPluginContact getLocalAddress() {
+		return (new DHTPluginContactImpl(this, transport.getLocalContact()));
 	}
 
-	public DHTPluginContact
-	importContact(
-		Map<String,Object>				map) {
+	public DHTPluginContact importContact(Map<String, Object> map) {
 		try {
-			return (new DHTPluginContactImpl( this, transport.importContact( map)));
-
-		} catch (DHTTransportException	e) {
-
+			return (new DHTPluginContactImpl(this, transport.importContact(map)));
+		} catch (DHTTransportException e) {
 			Debug.printStackTrace(e);
-
 			return (null);
 		}
 	}
 
-	public DHTPluginContact
-	importContact(
-		InetSocketAddress				address) {
+	public DHTPluginContact importContact(InetSocketAddress address) {
 		try {
-			return (new DHTPluginContactImpl( this, transport.importContact( address, protocolVersion, false)));
-
-		} catch (DHTTransportException	e) {
-
+			return (new DHTPluginContactImpl(this, transport.importContact(address, protocolVersion, false)));
+		} catch (DHTTransportException e) {
 			Debug.printStackTrace(e);
-
 			return (null);
 		}
 	}

@@ -315,7 +315,7 @@ public class DHTImpl
 			properties.put(name, new Integer(def));
 			return (def);
 		}
-		return ( x.intValue());
+		return (x.intValue());
 	}
 
 	public int getIntProperty(String name) {

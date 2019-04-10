@@ -1846,8 +1846,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final int 					searchAccuracy,
 		final LookupResultHandler	handler) {
 		
-		int count = SingleCounter2.getInstance().getAndIncreaseCount();
-		Log.d(TAG, String.format("how many times lookup() is called... #%d", count));
+		/*int count = SingleCounter2.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format("how many times lookup() is called... #%d", count));*/
 		
 		/*if ( 
 				   (flags & DHT.FLAG_LOOKUP_FOR_STORE) == 1

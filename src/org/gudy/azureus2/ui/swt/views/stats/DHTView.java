@@ -931,8 +931,8 @@ public class DHTView implements UISWTViewEventListener {
 				break;
 
 			case UISWTViewEvent.TYPE_REFRESH:
-				if (SingleCounter0.getInstance().getAndIncreaseCount() == 1)
-					new Throwable().printStackTrace();
+				/*if (SingleCounter0.getInstance().getAndIncreaseCount() == 1)
+					new Throwable().printStackTrace();*/
 				
 				refresh();
 				break;
