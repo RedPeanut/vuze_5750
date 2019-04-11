@@ -454,8 +454,8 @@ public class DHTRouterImpl implements DHTRouter {
 		DHTRouterNodeImpl currentNode = root;
 		boolean	partOfSmallestSubtree = false;
 		for (int i=0;i<nodeId.length;i++) {
-			byte	b = nodeId[i];
-			int	j = 7;
+			byte b = nodeId[i];
+			int j = 7;
 			while (j >= 0) {
 				if (currentNode == smallestSubtree) {
 					partOfSmallestSubtree	= true;
@@ -469,7 +469,7 @@ public class DHTRouterImpl implements DHTRouter {
 				}
 				
 				if (nextNode == null) {
-					DHTRouterContact	existingContact = currentNode.updateExistingNode(nodeId, attachment, knownToBeAlive);
+					DHTRouterContact existingContact = currentNode.updateExistingNode(nodeId, attachment, knownToBeAlive);
 					if (existingContact != null) {
 						return (existingContact);
 					}
@@ -484,12 +484,12 @@ public class DHTRouterImpl implements DHTRouter {
 						// 1) this list contains router_node_id or
 						// 2) depth % B is not 0
 						// 3) this is part of the smallest subtree
-						boolean	contains_router_node_id = currentNode.containsRouterNodeID();
+						boolean	containsRouterNodeId = currentNode.containsRouterNodeID();
 						int		depth					= currentNode.getDepth();
-						boolean	too_deep_to_split = depth % B == 0;	// note this will be true for 0 but other
+						boolean	tooDeepToSplit = depth % B == 0;	// note this will be true for 0 but other
 																	// conditions will allow the split
-						if (	contains_router_node_id ||
-								(!too_deep_to_split)	||
+						if (	containsRouterNodeId ||
+								(!tooDeepToSplit)	||
 								partOfSmallestSubtree) {
 							
 							// the smallest-subtree bit is to ensure that we remember all of
@@ -507,8 +507,8 @@ public class DHTRouterImpl implements DHTRouter {
 							// deliberately try and create such a tree with a large number
 							// of entries.
 							if (	partOfSmallestSubtree &&
-									too_deep_to_split &&
-									(!contains_router_node_id) &&
+									tooDeepToSplit &&
+									(!containsRouterNodeId) &&
 									getContactCount(smallestSubtree ) > smallestSubtreeMax) {
 								Debug.out("DHTRouter: smallest subtree max size violation");
 								return (null);
@@ -527,7 +527,7 @@ public class DHTRouterImpl implements DHTRouter {
 							}
 							boolean	rightContainsRid = false;
 							boolean leftContainsRid = false;
-							if (contains_router_node_id) {
+							if (containsRouterNodeId) {
 								rightContainsRid =
 										((routerNodeId[depth/8]>>(7-(depth%8)))&0x01 ) == 0;
 								leftContainsRid	= !rightContainsRid;
@@ -1047,7 +1047,7 @@ public class DHTRouterImpl implements DHTRouter {
 
 		try {
 			monitor.enter();
-			if (!outstandingAdds.contains( contact)) {
+			if (!outstandingAdds.contains(contact)) {
 				outstandingAdds.add(contact);
 			}
 		} finally {

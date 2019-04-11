@@ -174,12 +174,11 @@ public class DHTTransportUDPImpl
 	private static final int RECENT_REPORTS_HISTORY_MAX = 32;
 
 	private final Map	recentReports =
-			new LinkedHashMap(RECENT_REPORTS_HISTORY_MAX,0.75f,true) {
-				protected boolean removeEldestEntry(
-			   		Map.Entry eldest) {
-					return size() > RECENT_REPORTS_HISTORY_MAX;
-				}
-			};
+		new LinkedHashMap(RECENT_REPORTS_HISTORY_MAX,0.75f,true) {
+			protected boolean removeEldestEntry(Map.Entry eldest) {
+				return size() > RECENT_REPORTS_HISTORY_MAX;
+			}
+		};
 
 
 	private static final int	STATS_PERIOD		= 60*1000;
@@ -984,11 +983,12 @@ public class DHTTransportUDPImpl
 		}
 	}
 
-	protected boolean invalidExternalAddress(
-		InetAddress	ia) {
-		return (	ia.isLinkLocalAddress() ||
+	protected boolean invalidExternalAddress(InetAddress ia) {
+		return (	
+				ia.isLinkLocalAddress() ||
 				ia.isLoopbackAddress() ||
-				ia.isSiteLocalAddress());
+				ia.isSiteLocalAddress()
+		);
 	}
 
 	protected int getMaxFailForLiveCount() {
@@ -1023,24 +1023,22 @@ public class DHTTransportUDPImpl
 
 	public DHTTransportContact importContact(
 		DataInputStream		is,
-		boolean				is_bootstrap )
+		boolean				isBootstrap)
 		throws IOException, DHTTransportException
 	{
 		DHTTransportUDPContactImpl contact = DHTUDPUtils.deserialiseContact(this, is);
-		importContact(contact, is_bootstrap);
+		importContact(contact, isBootstrap);
 		return (contact);
 	}
 
 	public DHTTransportUDPContact importContact(
-		InetSocketAddress	_address,
-		byte				_protocol_version,
-		boolean				is_bootstrap )
-
-		throws DHTTransportException
-	{
+			InetSocketAddress	_address,
+			byte				_protocolVersion,
+			boolean				isBootstrap)
+		throws DHTTransportException {
 		// instance id of 0 means "unknown"
-		DHTTransportUDPContactImpl contact = new DHTTransportUDPContactImpl(false, this, _address, _address, _protocol_version, 0, 0, (byte)0);
-		importContact(contact, is_bootstrap);
+		DHTTransportUDPContactImpl contact = new DHTTransportUDPContactImpl(false, this, _address, _address, _protocolVersion, 0, 0, (byte)0);
+		importContact(contact, isBootstrap);
 		return (contact);
 	}
 
@@ -1128,9 +1126,8 @@ public class DHTTransportUDPImpl
 		requestHandler.contactRemoved(contact);
 	}
 
-	public void setRequestHandler(
-		DHTTransportRequestHandler	_request_handler) {
-		requestHandler = new DHTTransportRequestCounter(_request_handler, stats);
+	public void setRequestHandler(DHTTransportRequestHandler _requestHandler) {
+		requestHandler = new DHTTransportRequestCounter(_requestHandler, stats);
 	}
 
 	public DHTTransportStats getStats() {

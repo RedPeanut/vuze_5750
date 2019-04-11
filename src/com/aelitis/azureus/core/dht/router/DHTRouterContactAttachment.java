@@ -24,17 +24,10 @@ package com.aelitis.azureus.core.dht.router;
  *
  */
 
-public interface
-DHTRouterContactAttachment
-{
-	public void setRouterContact(
-		DHTRouterContact		contact);
-
+public interface DHTRouterContactAttachment {
+	public void setRouterContact(DHTRouterContact contact);
 	public int getMaxFailForLiveCount();
-
 	public int getMaxFailForUnknownCount();
-
 	public int getInstanceID();
-
 	public boolean isSleeping();
 }

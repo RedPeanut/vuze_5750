@@ -28,9 +28,6 @@ import com.aelitis.azureus.core.dht.transport.DHTTransportContact;
  *
  */
 
-public interface DHTTransportUDPContact
-	extends DHTTransportContact
-{
-	public void setTransportAddress(
-		InetSocketAddress	address);
+public interface DHTTransportUDPContact extends DHTTransportContact {
+	public void setTransportAddress(InetSocketAddress address);
 }

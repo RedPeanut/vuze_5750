@@ -28,21 +28,20 @@ import com.aelitis.azureus.core.dht.db.impl.DHTDBImpl;
  *
  */
 
-public class
-DHTDBFactory
-{
-	public static DHTDB
-	create(
+public class DHTDBFactory {
+	
+	public static DHTDB create(
 		DHTStorageAdapter	adapter,
 		int					original_republish_interval,
 		int					cache_republish_interval,
 		byte				protocol_version,
 		DHTLogger			logger) {
 		return (new DHTDBImpl(
-					adapter,
-					original_republish_interval,
-					cache_republish_interval,
-					protocol_version,
-					logger ));
+			adapter,
+			original_republish_interval,
+			cache_republish_interval,
+			protocol_version,
+			logger)
+		);
 	}
 }

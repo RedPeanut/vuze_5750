@@ -185,48 +185,49 @@ public class DHTRouterNodeImpl {
 		return (replacement);
 	}
 
-	protected DHTRouterContactImpl
-	updateExistingNode(
-		byte[]						node_id,
+	protected DHTRouterContactImpl updateExistingNode(
+		byte[]						nodeId,
 		DHTRouterContactAttachment	attachment,
-		boolean						known_to_be_alive) {
+		boolean						knownToBeAlive) {
 		for (int k=0;k<buckets.size();k++) {
 			DHTRouterContactImpl	contact = (DHTRouterContactImpl)buckets.get(k);
-			if (Arrays.equals(node_id, contact.getID())) {
-				if (known_to_be_alive) {
+			if (Arrays.equals(nodeId, contact.getID())) {
+				if (knownToBeAlive) {
 					// MGP: will update observers of updated status in this method
 					alive(contact);
 				}
-					// might be the same node but back after a restart. we need to
-					// treat this differently as we need to kick off the "store"
-					// events as required.
-				int	new_id	= attachment.getInstanceID();
-					// if the new-id is zero this represents us hearing about a contact
-					// indirectly (imported or returned as a query). In this case we
-					// don't use this information as an indication of the target's
-					// instance identity because it isn't!
-				if (new_id != 0) {
-					int	old_id 	= contact.getAttachment().getInstanceID();
-					if (old_id != new_id) {
+				// might be the same node but back after a restart. we need to
+				// treat this differently as we need to kick off the "store"
+				// events as required.
+				int	newId	= attachment.getInstanceID();
+				
+				// if the new-id is zero this represents us hearing about a contact
+				// indirectly (imported or returned as a query). In this case we
+				// don't use this information as an indication of the target's
+				// instance identity because it isn't!
+				if (newId != 0) {
+					int	oldId = contact.getAttachment().getInstanceID();
+					if (oldId != newId) {
 						DHTLog.log("Instance ID changed for " +
 									DHTLog.getString( contact.getID())+
-									": old = " + old_id + ", new = " + new_id);
+									": old = " + oldId + ", new = " + newId);
 						contact.setAttachment(attachment);
-							// if the instance id was 0, this means that it was unknown
-							// (e.g. contact imported). We still need to go ahead and treat
-							// as a new node
-						requestNodeAdd(contact, old_id != 0);
+						// if the instance id was 0, this means that it was unknown
+						// (e.g. contact imported). We still need to go ahead and treat
+						// as a new node
+						requestNodeAdd(contact, oldId != 0);
 					}
 				}
 				return (contact);
 			}
 		}
-			// check replacements as well
+		
+		// check replacements as well
 		if (replacements != null) {
 			for (int k=0;k<replacements.size();k++) {
-				DHTRouterContactImpl	contact = (DHTRouterContactImpl)replacements.get(k);
-				if (Arrays.equals(node_id, contact.getID())) {
-					if (known_to_be_alive) {
+				DHTRouterContactImpl contact = (DHTRouterContactImpl)replacements.get(k);
+				if (Arrays.equals(nodeId, contact.getID())) {
+					if (knownToBeAlive) {
 						// MGP: will update observers of updated status in this method
 						alive(contact);
 					}
@@ -237,24 +238,23 @@ public class DHTRouterNodeImpl {
 		return (null);
 	}
 
-	protected void alive(
-		DHTRouterContactImpl	contact) {
+	protected void alive(DHTRouterContactImpl contact) {
 		// DHTLog.log(DHTLog.getString( contact.getID()) + ": alive");
 		contact.setPingOutstanding(false);
 		// record whether was alive
-		boolean was_alive = contact.isAlive();
-		if (buckets.remove( contact)) {
+		boolean wasAlive = contact.isAlive();
+		if (buckets.remove(contact)) {
 			contact.setAlive();
-			if (!was_alive) {
+			if (!wasAlive) {
 				// MGP: notify observers that now alive
 				router.notifyNowAlive(contact);
 			}
 			// MGP: simply reinserting, so do not notify observers that added to bucket
 			buckets.add(contact);
 		} else if (replacements.remove( contact)) {
-			long	last_time = contact.getFirstFailOrLastAliveTime();
+			long lastTime = contact.getFirstFailOrLastAliveTime();
 			contact.setAlive();
-			if (!was_alive) {
+			if (!wasAlive) {
 				// MGP: notify observers that now alive
 				router.notifyNowAlive(contact);
 			}
@@ -262,7 +262,7 @@ public class DHTRouterNodeImpl {
 				// replacement is alive and therefore in a position to replace a
 				// dead bucket entry. Only do this if we haven't heard from this contact
 				// recently
-			if (contact.getLastAliveTime() - last_time > 30000) {
+			if (contact.getLastAliveTime() - lastTime > 30000) {
 				for (int i=0;i<buckets.size();i++) {
 					DHTRouterContactImpl	c = (DHTRouterContactImpl)buckets.get(i);
 						// don't ping ourselves or someone already being pinged
@@ -338,7 +338,7 @@ public class DHTRouterNodeImpl {
 
 	protected void requestNodeAdd(
 		DHTRouterContactImpl	contact,
-		boolean					definite_change) {
+		boolean					definiteChange) {
 		// DOS problem here - if a node deliberately flicked between
 		// instance IDs we'll get into an update frenzy.
 		long	now = SystemTime.getCurrentTime();
@@ -346,9 +346,9 @@ public class DHTRouterNodeImpl {
 			contact.setLastAddedTime(now);
 			router.requestNodeAdd(contact);
 		} else {
-				// only produce a warning if this is a definite change from one id to
-				// another (as opposed to a change from "unknown" to another)
-			if (definite_change) {
+			// only produce a warning if this is a definite change from one id to
+			// another (as opposed to a change from "unknown" to another)
+			if (definiteChange) {
 				router.log("requestNodeAdd for " + contact.getString() + " denied as too soon after previous ");
 			}
 		}

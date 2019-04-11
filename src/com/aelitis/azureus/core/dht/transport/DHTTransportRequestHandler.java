@@ -26,59 +26,48 @@ package com.aelitis.azureus.core.dht.transport;
 
 import java.util.*;
 
-public interface
-DHTTransportRequestHandler
-{
-	public void pingRequest(
-		DHTTransportContact contact);
+public interface DHTTransportRequestHandler {
+
+	public void pingRequest(DHTTransportContact contact);
 
 	public void keyBlockRequest(
 		DHTTransportContact contact,
 		byte[]				key_block_request,
 		byte[]				key_block_signature);
 
-	public DHTTransportFullStats
-	statsRequest(
-		DHTTransportContact contact);
+	public DHTTransportFullStats statsRequest(DHTTransportContact contact);
 
-	public DHTTransportStoreReply
-	storeRequest(
+	public DHTTransportStoreReply storeRequest(
 		DHTTransportContact contact,
 		byte[][]				keys,
 		DHTTransportValue[][]	value_sets);
 
-	public DHTTransportQueryStoreReply
-	queryStoreRequest(
+	public DHTTransportQueryStoreReply queryStoreRequest(
 		DHTTransportContact 	contact,
 		int						header_len,
 		List<Object[]>			keys);
 
-	public DHTTransportContact[]
-	findNodeRequest(
+	public DHTTransportContact[] findNodeRequest(
 		DHTTransportContact contact,
 		byte[]				id);
 
-	public DHTTransportFindValueReply
-	findValueRequest(
+	public DHTTransportFindValueReply findValueRequest(
 		DHTTransportContact contact,
 		byte[]				key,
 		int					max_values,
 		short				flags);
 
-		/**
-		 * Mechanism for reporting that a contact has been imported
-		 * @param contact
-		 */
-
+	/**
+	 * Mechanism for reporting that a contact has been imported
+	 * @param contact
+	 */
 	public void contactImported(
 		DHTTransportContact		contact,
-		boolean					is_bootstrap);
+		boolean					isBootstrap);
 
-	public void contactRemoved(
-		DHTTransportContact	contact);
+	public void contactRemoved(DHTTransportContact	contact);
 
 	public int getTransportEstimatedDHTSize();
 
-	public void setTransportEstimatedDHTSize(
-		int	size);
+	public void setTransportEstimatedDHTSize(int size);
 }

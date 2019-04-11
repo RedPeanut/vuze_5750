@@ -35,134 +35,99 @@ import com.aelitis.azureus.core.dht.transport.DHTTransportValue;
  *
  */
 
-public interface
-DHTDB
-{
-	public void setControl(
-		DHTControl		control);
+public interface DHTDB {
+	
+	public void setControl(DHTControl control);
 
-		/**
-		 * Local store
-		 * @param key
-		 * @param value
-		 * @param flags
-		 * @return
-		 */
-
-	public DHTDBValue
-	store(
+	/**
+	 * Local store
+	 * @param key
+	 * @param value
+	 * @param flags
+	 * @return
+	 */
+	public DHTDBValue store(
 		HashWrapper		key,
 		byte[]			value,
 		short			flags,
 		byte			life_hours,
 		byte			replication_control);
 
-		/**
-		 * Remote store
-		 *
-		 * @param sender
-		 * @param key
-		 * @param values
-		 * @return diversification state
-		 */
+	/**
+	 * Remote store
+	 *
+	 * @param sender
+	 * @param key
+	 * @param values
+	 * @return diversification state
+	 */
 
-	public byte
-	store(
+	public byte store(
 		DHTTransportContact 	sender,
 		HashWrapper				key,
 		DHTTransportValue[]		values);
 
-	public DHTTransportQueryStoreReply
-	queryStore(
+	public DHTTransportQueryStoreReply queryStore(
 		DHTTransportContact 		originating_contact,
 		int							header_len,
 		List<Object[]>				keys);
 
-		/**
-		 * Internal lookup for locally originated values
-		 * @param key
-		 * @return
-		 */
+	/**
+	 * Internal lookup for locally originated values
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public DHTDBValue get(HashWrapper key);
 
-	public DHTDBValue
-	get(
-		HashWrapper		key);
+	/**
+	 * Returns a value for the given key (local or remote) if found
+	 * @param key
+	 * @return
+	 */
+	public DHTDBValue getAnyValue(HashWrapper key);
+	public List<DHTDBValue> getAllValues(HashWrapper key);
+	public boolean hasKey(HashWrapper key);
 
-		/**
-		 * Returns a value for the given key (local or remote) if found
-		 * @param key
-		 * @return
-		 */
-
-	public DHTDBValue
-	getAnyValue(
-		HashWrapper		key);
-
-	public List<DHTDBValue>
-	getAllValues(
-		HashWrapper		key);
-
-	public boolean hasKey(
-		HashWrapper		key);
-
-	public DHTDBLookupResult
-	get(
+	public DHTDBLookupResult get(
 		DHTTransportContact		reader,
 		HashWrapper				key,
 		int						max_values,
 		short					flags,
 		boolean					external_request);
 
-		/**
-		 * Local remove - returns a value suitable for putting in the DHT
-		 * @param sender
-		 * @param key
-		 * @return
-		 */
+	/**
+	 * Local remove - returns a value suitable for putting in the DHT
+	 * @param sender
+	 * @param key
+	 * @return
+	 */
 
-	public DHTDBValue
-	remove(
+	public DHTDBValue remove(
 		DHTTransportContact 	sender,
 		HashWrapper				key);
 
-	public DHTStorageBlock
-	keyBlockRequest(
+	public DHTStorageBlock keyBlockRequest(
 		DHTTransportContact		direct_sender,
 		byte[]					request,
 		byte[]					signature);
 
-	public DHTStorageBlock
-	getKeyBlockDetails(
-		byte[]			key);
-
-	public boolean isKeyBlocked(
-		byte[]			key);
-
-	public DHTStorageBlock[]
-	getDirectKeyBlocks();
-
+	public DHTStorageBlock getKeyBlockDetails(byte[] key);
+	public boolean isKeyBlocked(byte[] key);
+	public DHTStorageBlock[] getDirectKeyBlocks();
 	public boolean isEmpty();
 
-		/**
-		 * Returns an iterator over HashWrapper values denoting the snapshot of keys
-		 * Thus by the time a key is used the entry may no longer exist
-		 * @return
-		 */
-
-	public Iterator<HashWrapper>
-	getKeys();
-
-	public DHTDBStats
-	getStats();
-
-	public void setSleeping(
-		boolean	asleep);
-
-	public void setSuspended(
-		boolean			susp);
-
+	/**
+	 * Returns an iterator over HashWrapper values denoting the snapshot of keys
+	 * Thus by the time a key is used the entry may no longer exist
+	 * 
+	 * @return
+	 */
+	public Iterator<HashWrapper> getKeys();
+	public DHTDBStats getStats();
+	public void setSleeping(boolean asleep);
+	public void setSuspended(boolean susp);
 	public void destroy();
-
-	public void print(
-		boolean		full);
+	public void print(boolean full);
+	
 }

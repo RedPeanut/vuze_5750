@@ -119,12 +119,12 @@ public class DHTPluginImpl implements DHTInterface {
 
 	private DHTPluginStorageManager storageManager;
 
-	private long				last_root_seed_import_time;
+	private long				lastRootSeedImportTime;
 
 	private LoggerChannel		log;
 	private DHTLogger			dhtLog;
 
-	private int					stats_ticks;
+	private int					statsTicks;
 
 	public DHTPluginImpl(
 		PluginInterface			_pluginInterface,
@@ -271,9 +271,8 @@ public class DHTPluginImpl implements DHTInterface {
 		}
 	}
 
-	public void updateStats(
-		int		sample_stats_ticks) {
-		stats_ticks++;
+	public void updateStats(int sampleStatsTicks) {
+		statsTicks++;
 		if (transport != null) {
 			PluginConfig conf = pluginInterface.getPluginconfig();
 			boolean current_reachable = transport.isReachable();
@@ -294,7 +293,7 @@ public class DHTPluginImpl implements DHTInterface {
 					log.log("Reachability changed for the better");
 				}
 			}
-			if (stats_ticks % sample_stats_ticks == 0) {
+			if (statsTicks % sampleStatsTicks == 0) {
 				logStats();
 			}
 		}
@@ -309,11 +308,10 @@ public class DHTPluginImpl implements DHTInterface {
 	}
 
 	public boolean isReachable() {
-		return ( transport.isReachable());
+		return (transport.isReachable());
 	}
 
-	public void setLogging(
-		boolean		l) {
+	public void setLogging(boolean l) {
 		dht.setLogging(l);
 	}
 
@@ -324,9 +322,8 @@ public class DHTPluginImpl implements DHTInterface {
 		return (port);
 	}
 
-	public void setPort(
-		int	new_port) {
-		port	= new_port;
+	public void setPort(int newPort) {
+		port = newPort;
 		try {
 			transport.setPort(port);
 		} catch (Throwable e) {
@@ -487,9 +484,9 @@ outer:
 
 	protected DHTTransportContact importRootSeed() {
 		try {
-			long	 now = SystemTime.getCurrentTime();
-			if (now - last_root_seed_import_time > MIN_ROOT_SEED_IMPORT_PERIOD) {
-				last_root_seed_import_time	= now;
+			long now = SystemTime.getCurrentTime();
+			if (now - lastRootSeedImportTime > MIN_ROOT_SEED_IMPORT_PERIOD) {
+				lastRootSeedImportTime = now;
 				return (importSeed(getSeedAddress()));
 			} else {
 				log.log("    root seed imported too recently, ignoring");
@@ -500,26 +497,18 @@ outer:
 		return (null);
 	}
 
-	public DHTTransportContact
-	importSeed(
-		String		ip,
-		int			port) {
+	public DHTTransportContact importSeed(String ip, int port) {
 		try {
-			return (transport.importContact(checkResolve(new InetSocketAddress( ip, port )), protocolVersion, true));
+			return (transport.importContact(checkResolve(new InetSocketAddress(ip, port)), protocolVersion, true));
 		} catch (Throwable e) {
 			log.log(e);
 			return (null);
 		}
 	}
 
-	protected DHTTransportContact
-	importSeed(
-		InetAddress		ia,
-		int				port )
-
-	{
+	protected DHTTransportContact importSeed(InetAddress ia, int port) {
 		try {
-			return (	transport.importContact(new InetSocketAddress( ia, port ), protocolVersion, true));
+			return (transport.importContact(new InetSocketAddress(ia, port), protocolVersion, true));
 		} catch (Throwable e) {
 			log.log(e);
 			return (null);
@@ -539,16 +528,14 @@ outer:
 		return (checkResolve(new InetSocketAddress(v6?SEED_ADDRESS_V6:SEED_ADDRESS_V4, SEED_PORT)));
 	}
 
-	private InetSocketAddress
-	checkResolve(
-		InetSocketAddress	isa) {
+	private InetSocketAddress checkResolve(InetSocketAddress isa) {
 		if (v6) {
 			if (isa.isUnresolved()) {
 				try {
 					DNSUtils.DNSUtilsIntf dns_utils = DNSUtils.getSingleton();
 					if (dns_utils != null) {
-						String host = dns_utils.getIPV6ByName( isa.getHostName()).getHostAddress();
-						isa = new InetSocketAddress( host, isa.getPort());
+						String host = dns_utils.getIPV6ByName(isa.getHostName()).getHostAddress();
+						isa = new InetSocketAddress(host, isa.getPort());
 					}
 				} catch (Throwable e) {
 				}

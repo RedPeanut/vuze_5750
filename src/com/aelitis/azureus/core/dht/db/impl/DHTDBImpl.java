@@ -70,7 +70,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 	private static final int MAX_VALUE_LIFETIME	= 3*24*60*60*1000;
 
 
-	private final int			original_republish_interval;
+	private final int			originalRepublishInterval;
 
 	// the grace period gives the originator time to republish their data as this could involve
 	// some work on their behalf to find closest nodes etc. There's no real urgency here anyway
@@ -80,7 +80,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 	private static final boolean	ENABLE_PRECIOUS_STUFF			= false;
 	private static final int		PRECIOUS_CHECK_INTERVAL			= 2*60*60*1000;
 
-	private final int			cache_republish_interval;
+	private final int			cacheRepublishInterval;
 
 	private static final long		MIN_CACHE_EXPIRY_CHECK_INTERVAL		= 60*1000;
 	private long		last_cache_expiry_check;
@@ -98,13 +98,13 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 	protected static final int		QUERY_STORE_REQUEST_ENTRY_SIZE	= 6;
 	protected static final int		QUERY_STORE_REPLY_ENTRY_SIZE	= 2;
 
-	final Map<HashWrapper,DHTDBMapping>				storedValues 				= new HashMap<HashWrapper,DHTDBMapping>();
-	private final Map<DHTDBMapping.ShortHash,DHTDBMapping>	stored_values_prefix_map	= new HashMap<DHTDBMapping.ShortHash,DHTDBMapping>();
+	final Map<HashWrapper,DHTDBMapping> storedValues = new HashMap<HashWrapper,DHTDBMapping>();
+	private final Map<DHTDBMapping.ShortHash,DHTDBMapping>	storedValuesPrefixMap	= new HashMap<DHTDBMapping.ShortHash,DHTDBMapping>();
 
 	private DHTControl				control;
 	private final DHTStorageAdapter	adapter;
 	private DHTRouter				router;
-	private DHTTransportContact		local_contact;
+	private DHTTransportContact		localContact;
 	final DHTLogger					logger;
 
 	private static final long	MAX_TOTAL_SIZE	= 4*1024*1024;
@@ -119,7 +119,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 	private final IpFilter	ip_filter	= IpFilterManagerFactory.getSingleton().getIPFilter();
 
-	final AEMonitor	this_mon	= new AEMonitor("DHTDB");
+	final AEMonitor	thisMon	= new AEMonitor("DHTDB");
 
 	private static final boolean	DEBUG_SURVEY		= false;
 	private static final boolean	SURVEY_ONLY_RF_KEYS	= true;
@@ -147,11 +147,11 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			}
 		};
 
-	private TimerEventPeriodic		precious_timer;
-	private TimerEventPeriodic		original_republish_timer;
-	private TimerEventPeriodic		cache_republish_timer;
-	private final TimerEventPeriodic		bloomTimer;
-	private TimerEventPeriodic		surveyTimer;
+	private TimerEventPeriodic			preciousTimer;
+	private TimerEventPeriodic			originalRepublishTimer;
+	private TimerEventPeriodic			cache_republish_timer;
+	private final TimerEventPeriodic	bloomTimer;
+	private TimerEventPeriodic			surveyTimer;
 
 
 	private boolean	sleeping;
@@ -161,60 +161,58 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 	public DHTDBImpl(
 		DHTStorageAdapter	_adapter,
-		int					_original_republish_interval,
-		int					_cache_republish_interval,
-		byte				_protocol_version,
+		int					_originalRepublishInterval,
+		int					_cacheRepublishInterval,
+		byte				_protocolVersion,
 		DHTLogger			_logger) {
 		
-		adapter							= _adapter==null?null:new adapterFacade(_adapter);
-		original_republish_interval		= _original_republish_interval;
-		cache_republish_interval		= _cache_republish_interval;
-		logger							= _logger;
+		adapter						= _adapter==null?null:new adapterFacade(_adapter);
+		originalRepublishInterval	= _originalRepublishInterval;
+		cacheRepublishInterval		= _cacheRepublishInterval;
+		logger						= _logger;
 
 		surveyEnabled =
-			_protocol_version >= DHTTransportUDP.PROTOCOL_VERSION_REPLICATION_CONTROL3 &&
+			_protocolVersion >= DHTTransportUDP.PROTOCOL_VERSION_REPLICATION_CONTROL3 &&
 			(	adapter == null ||
 				adapter.getNetwork() == DHT.NW_CVS ||
 				FeatureAvailability.isDHTRepV2Enabled());
 
 		if (ENABLE_PRECIOUS_STUFF) {
-
-			precious_timer = SimpleTimer.addPeriodicEvent(
+			preciousTimer = SimpleTimer.addPeriodicEvent(
 				"DHTDB:precious",
 				PRECIOUS_CHECK_INTERVAL/4,
 				true, // absolute, we don't want effective time changes (computer suspend/resume) to shift these
 				new TimerEventPerformer() {
-					public void perform(
-						TimerEvent	event) {
+					public void perform(TimerEvent event) {
 						checkPreciousStuff();
 					}
 				});
 		}
 
-		if (original_republish_interval > 0) {
+		if (originalRepublishInterval > 0) {
 
-			original_republish_timer = SimpleTimer.addPeriodicEvent(
+			originalRepublishTimer = SimpleTimer.addPeriodicEvent(
 				"DHTDB:op",
-				original_republish_interval,
+				originalRepublishInterval,
 				true, // absolute, we don't want effective time changes (computer suspend/resume) to shift these
 				new TimerEventPerformer() {
 					public void perform(TimerEvent event) {
 						logger.log("Republish of original mappings starts");
-						long	start 	= SystemTime.getCurrentTime();
-						int	stats = republishOriginalMappings();
-						long	end 	= SystemTime.getCurrentTime();
+						long start = SystemTime.getCurrentTime();
+						int stats = republishOriginalMappings();
+						long end = SystemTime.getCurrentTime();
 						logger.log("Republish of original mappings completed in " + (end-start) + ": " +
 									"values = " + stats);
 					}
 				});
 		}
 
-		if (cache_republish_interval > 0) {
+		if (cacheRepublishInterval > 0) {
 			// random skew here so that cache refresh isn't very synchronised, as the optimisations
 			// regarding non-republising benefit from this
 			cache_republish_timer = SimpleTimer.addPeriodicEvent(
 					"DHTDB:cp",
-					cache_republish_interval + 10000 - RandomUtils.nextInt(20000),
+					cacheRepublishInterval + 10000 - RandomUtils.nextInt(20000),
 					true,	// absolute, we don't want effective time changes (computer suspend/resume) to shift these
 					new TimerEventPerformer() {
 						public void perform(TimerEvent event) {
@@ -242,27 +240,27 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 				"DHTDB:bloom",
 				IP_BLOOM_FILTER_REBUILD_PERIOD,
 				new TimerEventPerformer() {
-					public void perform(
-						TimerEvent	event) {
+					public void perform(TimerEvent event) {
 						try {
-							this_mon.enter();
+							thisMon.enter();
 							rebuildIPBloomFilter(false);
 						} finally {
-							this_mon.exit();
+							thisMon.exit();
 						}
 					}
 				});
 
 		if (surveyEnabled) {
 			surveyTimer = SimpleTimer.addPeriodicEvent(
-					"DHTDB:survey",
-					SURVEY_PERIOD,
-					true,
-					new TimerEventPerformer() {
-						public void perform(TimerEvent	event) {
-							survey();
-						}
-					});
+				"DHTDB:survey",
+				SURVEY_PERIOD,
+				true,
+				new TimerEventPerformer() {
+					public void perform(TimerEvent	event) {
+						survey();
+					}
+				}
+			);
 		}
 	}
 
@@ -270,58 +268,46 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 	public void setControl(
 		DHTControl		_control) {
 		control			= _control;
-
 			// trigger an "original value republish" if router has changed
-
 		force_original_republish = router != null;
-
 		router			= control.getRouter();
-		local_contact	= control.getTransport().getLocalContact();
-
+		localContact	= control.getTransport().getLocalContact();
 			// our ID has changed - amend the originator of all our values
-
 		try {
-			this_mon.enter();
-
+			thisMon.enter();
 			survey_state.clear();
-
 			Iterator<DHTDBMapping>	it = storedValues.values().iterator();
-
 			while (it.hasNext()) {
-
 				DHTDBMapping	mapping = it.next();
-
-				mapping.updateLocalContact(local_contact);
+				mapping.updateLocalContact(localContact);
 			}
 		} finally {
-
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
-	public DHTDBValue
-	store(
+	public DHTDBValue store(
 		HashWrapper		key,
 		byte[]			value,
 		short			flags,
 		byte			life_hours,
 		byte			replication_control) {
-			// local store
+		// local store
 		if ((flags & DHT.FLAG_PUT_AND_FORGET ) == 0) {
 			if ((flags & DHT.FLAG_OBFUSCATE_LOOKUP ) != 0) {
 				Debug.out("Obfuscated puts without 'put-and-forget' are not supported as original-republishing of them is not implemented");
 			}
 			if (life_hours > 0) {
-				if (life_hours*60*60*1000 < original_republish_interval) {
+				if (life_hours*60*60*1000 < originalRepublishInterval) {
 					Debug.out("Don't put persistent values with a lifetime less than republish period - lifetime over-ridden");
 					life_hours = 0;
 				}
 			}
 			try {
-				this_mon.enter();
+				thisMon.enter();
 				total_local_keys++;
-					// don't police max check for locally stored data
-					// only that received
+				// don't police max check for locally stored data
+				// only that received
 				DHTDBMapping	mapping = (DHTDBMapping)storedValues.get(key);
 				if (mapping == null) {
 					mapping = new DHTDBMapping(this, key, true);
@@ -333,8 +319,8 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 							SystemTime.getCurrentTime(),
 							value,
 							getNextValueVersion(),
-							local_contact,
-							local_contact,
+							localContact,
+							localContact,
 							true,
 							flags,
 							life_hours,
@@ -342,7 +328,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 				mapping.add(res);
 				return (res);
 			} finally {
-				this_mon.exit();
+				thisMon.exit();
 			}
 		} else {
 			DHTDBValueImpl res =
@@ -350,8 +336,8 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 						SystemTime.getCurrentTime(),
 						value,
 						getNextValueVersion(),
-						local_contact,
-						local_contact,
+						localContact,
+						localContact,
 						true,
 						flags,
 						life_hours,
@@ -382,7 +368,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		}
 		// logStoreOps();
 		try {
-			this_mon.enter();
+			thisMon.enter();
 			if (sleeping || suspended) {
 				return (DHT.DT_NONE);
 			}
@@ -402,7 +388,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			}
 			return (mapping.getDiversificationType());
 		} finally {
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -414,7 +400,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		short					flags,
 		boolean					external_request ) {
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			checkCacheExpiration(false);
 
@@ -447,7 +433,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -457,20 +443,20 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			// local get
 
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			DHTDBMapping mapping = (DHTDBMapping)storedValues.get(key);
 
 			if (mapping != null) {
 
-				return (mapping.get( local_contact));
+				return (mapping.get( localContact));
 			}
 
 			return (null);
 
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -478,20 +464,20 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 	getAnyValue(
 		HashWrapper				key) {
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			DHTDBMapping mapping = (DHTDBMapping)storedValues.get(key);
 
 			if (mapping != null) {
 
-				return (mapping.getAnyValue( local_contact));
+				return (mapping.getAnyValue( localContact));
 			}
 
 			return (null);
 
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -499,25 +485,25 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 	getAllValues(
 		HashWrapper				key) {
 		try {
-			this_mon.enter();
+			thisMon.enter();
 			DHTDBMapping mapping = (DHTDBMapping)storedValues.get(key);
 			List<DHTDBValue> result = new ArrayList<DHTDBValue>();
 			if (mapping != null) {
-				result.addAll(mapping.getAllValues( local_contact));
+				result.addAll(mapping.getAllValues( localContact));
 			}
 			return (result);
 		} finally {
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
 	public boolean hasKey(
 		HashWrapper		key) {
 		try {
-			this_mon.enter();
+			thisMon.enter();
 			return (storedValues.containsKey( key));
 		} finally {
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -528,7 +514,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			// local remove
 
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			DHTDBMapping mapping = (DHTDBMapping)storedValues.get(key);
 
@@ -559,7 +545,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -660,7 +646,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 	public int[] getValueDetails() {
 		try {
-			this_mon.enter();
+			thisMon.enter();
 			int[]	res = new int[6];
 			Iterator<DHTDBMapping>	it = storedValues.values().iterator();
 			while (it.hasNext()) {
@@ -686,7 +672,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			}
 			return (res);
 		} finally {
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -699,110 +685,75 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 	public Iterator<HashWrapper> getKeys() {
 		try {
-			this_mon.enter();
+			thisMon.enter();
 			return (new ArrayList<HashWrapper>(storedValues.keySet()).iterator());
 		} finally {
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
 	protected int republishOriginalMappings() {
 		if (suspended) {
-
 			logger.log("Original republish skipped as suspended");
-
 			return (0);
 		}
-
 		int	values_published	= 0;
-
 		Map<HashWrapper,List<DHTDBValueImpl>>	republish = new HashMap<HashWrapper,List<DHTDBValueImpl>>();
-
 		try {
-			this_mon.enter();
-
-			Iterator<Map.Entry<HashWrapper,DHTDBMapping>>	it = storedValues.entrySet().iterator();
-
+			thisMon.enter();
+			Iterator<Map.Entry<HashWrapper,DHTDBMapping>> it = storedValues.entrySet().iterator();
 			while (it.hasNext()) {
-
 				Map.Entry<HashWrapper,DHTDBMapping>	entry = it.next();
-
 				HashWrapper		key		= (HashWrapper)entry.getKey();
-
 				DHTDBMapping	mapping	= (DHTDBMapping)entry.getValue();
-
 				Iterator<DHTDBValueImpl>	it2 = mapping.getValues();
-
 				List<DHTDBValueImpl>	values = new ArrayList<DHTDBValueImpl>();
-
 				while (it2.hasNext()) {
-
 					DHTDBValueImpl	value = it2.next();
-
 					if (value != null && value.isLocal()) {
-
 						// we're republising the data, reset the creation time
-
 						value.setCreationTime();
-
 						values.add(value);
 					}
 				}
-
 				if (values.size() > 0) {
-
 					republish.put(key, values);
-
 				}
 			}
 		} finally {
-
-			this_mon.exit();
+			thisMon.exit();
 		}
-
 		Iterator<Map.Entry<HashWrapper,List<DHTDBValueImpl>>>	it = republish.entrySet().iterator();
-
 		int key_tot	= republish.size();
 		int	key_num = 0;
-
 		while (it.hasNext()) {
-
 			key_num++;
-
 			Map.Entry<HashWrapper,List<DHTDBValueImpl>>	entry = it.next();
-
 			HashWrapper			key		= (HashWrapper)entry.getKey();
-
 			List<DHTDBValueImpl>		values	= entry.getValue();
-
 				// no point in worry about multi-value puts here as it is extremely unlikely that
 				// > 1 value will locally stored, or > 1 value will go to the same contact
-
 			for (int i=0;i<values.size();i++) {
-
 				values_published++;
-
 				control.putEncodedKey(key.getHash(), "Republish orig: " + key_num + " of " + key_tot, values.get(i), 0, true);
 			}
 		}
-
 		return (values_published);
 	}
 
-	protected int[]
-	republishCachedMappings() {
+	protected int[] republishCachedMappings() {
 		if (suspended) {
 			logger.log("Cache republish skipped as suspended");
 			return (new int[]{ 0, 0, 0 });
 		}
 			// first refresh any leaves that have not performed at least one lookup in the
 			// last period
-		router.refreshIdleLeaves(cache_republish_interval);
+		router.refreshIdleLeaves(cacheRepublishInterval);
 		final Map<HashWrapper,List<DHTDBValueImpl>>	republish = new HashMap<HashWrapper,List<DHTDBValueImpl>>();
 		List<DHTDBMapping>	republish_via_survey = new ArrayList<DHTDBMapping>();
 		long	now = System.currentTimeMillis();
 		try {
-			this_mon.enter();
+			thisMon.enter();
 			checkCacheExpiration(true);
 			Iterator<Map.Entry<HashWrapper,DHTDBMapping>>	it = storedValues.entrySet().iterator();
 			while (it.hasNext()) {
@@ -833,7 +784,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 						if (now < value.getStoreTime()) {
 								// deal with clock changes
 							value.setStoreTime(now);
-						} else if (now - value.getStoreTime() <= cache_republish_interval) {
+						} else if (now - value.getStoreTime() <= cacheRepublishInterval) {
 							// System.out.println("skipping store");
 						} else {
 							values.add(value);
@@ -851,7 +802,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 				}
 			}
 		} finally {
-			this_mon.exit();
+			thisMon.exit();
 		}
 		if (republish_via_survey.size() > 0) {
 				// we still check for being too far away here
@@ -876,7 +827,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			}
 			if (stop_caching.size() > 0) {
 				try {
-					this_mon.enter();
+					thisMon.enter();
 					for (int i=0;i<stop_caching.size();i++) {
 						DHTDBMapping	mapping = (DHTDBMapping)storedValues.remove( stop_caching.get(i));
 						if (mapping != null) {
@@ -885,7 +836,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 						}
 					}
 				} finally {
-					this_mon.exit();
+					thisMon.exit();
 				}
 			}
 		}
@@ -974,7 +925,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 											DHTDBValueImpl	value	= values.get(j);
 												// we reduce the cache distance by 1 here as it is incremented by the
 												// recipients
-											store_values[i][j] = value.getValueForRelay(local_contact);
+											store_values[i][j] = value.getValueForRelay(localContact);
 										}
 									}
 									List<DHTTransportContact>	contacts = new ArrayList<DHTTransportContact>();
@@ -1006,7 +957,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 				sem.reserve();
 			}
 			try {
-				this_mon.enter();
+				thisMon.enter();
 				for (int i=0;i<stop_caching.size();i++) {
 					DHTDBMapping	mapping = (DHTDBMapping)storedValues.remove( stop_caching.get(i));
 					if (mapping != null) {
@@ -1015,7 +966,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 					}
 				}
 			} finally {
-				this_mon.exit();
+				thisMon.exit();
 			}
 		}
 		DHTStorageBlock[]	direct_key_blocks = getDirectKeyBlocks();
@@ -1104,7 +1055,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		}
 
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			last_cache_expiry_check	= now;
 
@@ -1142,7 +1093,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 							if (life_hours < 1) {
 
-								max_age = original_republish_interval;
+								max_age = originalRepublishInterval;
 
 							} else {
 
@@ -1179,7 +1130,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			}
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -1187,7 +1138,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		DHTDBMapping		mapping) {
 		DHTDBMapping.ShortHash key = mapping.getShortKey();
 
-		DHTDBMapping existing = stored_values_prefix_map.get(key);
+		DHTDBMapping existing = storedValuesPrefixMap.get(key);
 
 			// possible to have clashes, be consistent in which one we use to avoid
 			// confusing other nodes
@@ -1197,15 +1148,15 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			byte[]	existing_full 	= existing.getKey().getBytes();
 			byte[]	new_full		= mapping.getKey().getBytes();
 
-			if (control.computeAndCompareDistances( existing_full, new_full, local_contact.getID()) < 0) {
+			if (control.computeAndCompareDistances( existing_full, new_full, localContact.getID()) < 0) {
 
 				return;
 			}
 		}
 
-		stored_values_prefix_map.put(key, mapping);
+		storedValuesPrefixMap.put(key, mapping);
 
-		if (stored_values_prefix_map.size() > storedValues.size()) {
+		if (storedValuesPrefixMap.size() > storedValues.size()) {
 
 			Debug.out("inconsistent");
 		}
@@ -1215,11 +1166,11 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		DHTDBMapping		mapping) {
 		DHTDBMapping.ShortHash key = mapping.getShortKey();
 
-		DHTDBMapping existing = stored_values_prefix_map.get(key);
+		DHTDBMapping existing = storedValuesPrefixMap.get(key);
 
 		if (existing == mapping) {
 
-			stored_values_prefix_map.remove(key);
+			storedValuesPrefixMap.remove(key);
 		}
 	}
 
@@ -1230,7 +1181,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 		try {
 
-			this_mon.enter();
+			thisMon.enter();
 
 			Iterator<Map.Entry<HashWrapper,DHTDBMapping>>	it = storedValues.entrySet().iterator();
 
@@ -1272,7 +1223,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			}
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 
 		Iterator<Map.Entry<HashWrapper,List<DHTDBValueImpl>>>	it = republish.entrySet().iterator();
@@ -1297,7 +1248,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 	protected DHTTransportContact
 	getLocalContact() {
-		return (local_contact);
+		return (localContact);
 	}
 
 	protected DHTStorageAdapter
@@ -1337,7 +1288,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		byte[]	max_dist	= null;
 		final List<HashWrapper> applicable_keys = new ArrayList<HashWrapper>();
 		try {
-			this_mon.enter();
+			thisMon.enter();
 			long	now = SystemTime.getMonotonousTime();
 			Iterator<SurveyContactState> s_it = survey_state.values().iterator();
 			while (s_it.hasNext()) {
@@ -1377,7 +1328,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			}
 			logger.log("Survey starts: state size=" + survey_state.size() + ", all keys=" + storedValues.size() + ", applicable keys=" + applicable_keys.size());
 		} finally {
-			this_mon.exit();
+			thisMon.exit();
 		}
 		
 		if (DEBUG_SURVEY) {
@@ -1508,7 +1459,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			Map<DHTDBMapping,List<DHTTransportContact>>	mapping_to_node_map = new HashMap<DHTDBMapping, List<DHTTransportContact>>();
 			int max_nodes = Math.min( node_ids.length, router.getK());
 			try {
-				this_mon.enter();
+				thisMon.enter();
 				Iterator<HashWrapper>	it = applicable_keys.iterator();
 				int	value_count = 0;
 				while (it.hasNext()) {
@@ -1634,7 +1585,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 					}
 				}
 			} finally {
-				this_mon.exit();
+				thisMon.exit();
 			}
 			LinkedList<Map.Entry<DHTTransportContact,ByteArrayHashMap<List<DHTDBMapping>>>> to_do = new LinkedList<Map.Entry<DHTTransportContact,ByteArrayHashMap<List<DHTDBMapping>>>>( request_map.entrySet());
 			Map<DHTTransportContact,Object[]>	replies = new HashMap<DHTTransportContact,Object[]>();
@@ -1767,7 +1718,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 				List<byte[]> prefixes = map.keys();
 				List<Object[]> encoded = new ArrayList<Object[]>(prefixes.size());
 				try {
-					this_mon.enter();
+					thisMon.enter();
 					SurveyContactState contact_state = survey_state.get(new HashWrapper( contact.getID()));
 					for (byte[] prefix: prefixes) {
 						int	prefix_len = prefix.length;
@@ -1830,7 +1781,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 						}, QUERY_STORE_REQUEST_ENTRY_SIZE, encoded);
 					handled = true;
 				} finally {
-					this_mon.exit();
+					thisMon.exit();
 				}
 			} else {
 				if (DEBUG_SURVEY) {
@@ -1856,7 +1807,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		Map<DHTTransportContact,Object[]>				replies) {
 		Map<SurveyContactState,List<DHTDBMapping>>	store_ops = new HashMap<SurveyContactState, List<DHTDBMapping>>();
 		try {
-			this_mon.enter();
+			thisMon.enter();
 			if (!Arrays.equals( survey_my_id, router.getID())) {
 				logger.log("Survey abandoned - router changed");
 				return;
@@ -1896,7 +1847,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 							contact_state.removeMapping(mapping);
 						} else {
 								// must match against our short-key mapping for consistency
-							DHTDBMapping mapping_to_check = stored_values_prefix_map.get( mapping.getShortKey());
+							DHTDBMapping mapping_to_check = storedValuesPrefixMap.get( mapping.getShortKey());
 							if (mapping_to_check == null) {
 								// deleted
 							} else {
@@ -2046,7 +1997,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 				}
 			}
 		} finally {
-			this_mon.exit();
+			thisMon.exit();
 			survey_in_progress = false;
 		}
 		logger.log("Survey complete - " + store_ops.size() + " store ops");
@@ -2066,7 +2017,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 				while (it.hasNext()) {
 					DHTDBValueImpl value = it.next();
 					if (!value.isLocal()) {
-						v.add( value.getValueForRelay(local_contact));
+						v.add( value.getValueForRelay(localContact));
 					}
 				}
 				store_values[i] = v.toArray(new DHTTransportValue[v.size()]);
@@ -2086,7 +2037,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 								new DHTOperationAdapter() {
 									public void complete(boolean timeout) {
 										try {
-											this_mon.enter();
+											thisMon.enter();
 											if (timeout) {
 												contact.contactFailed();
 											} else {
@@ -2096,7 +2047,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 												}
 											}
 										} finally {
-											this_mon.exit();
+											thisMon.exit();
 										}
 									}
 								});
@@ -2117,10 +2068,10 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 							DHTTransportContact 	_contact,
 							Throwable				_error) {
 							try {
-								this_mon.enter();
+								thisMon.enter();
 								contact.contactFailed();
 							} finally {
-								this_mon.exit();
+								thisMon.exit();
 							}
 						}
 					},
@@ -2158,7 +2109,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 	public void setSleeping(
 		boolean	asleep) {
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			sleeping = asleep;
 
@@ -2168,7 +2119,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			}
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -2177,7 +2128,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		boolean	waking_up;
 
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			waking_up = suspended && !susp;
 
@@ -2190,7 +2141,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 
 		if (waking_up) {
@@ -2228,7 +2179,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		final List<byte[]> reply = new ArrayList<byte[]>();
 
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			SurveyContactState	existing_state = survey_state.get(new HashWrapper( originating_contact.getID()));
 
@@ -2253,7 +2204,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 					System.arraycopy(suffix, 0, header, prefix_len, suffix_len);
 
-					DHTDBMapping mapping = stored_values_prefix_map.get(new DHTDBMapping.ShortHash( header));
+					DHTDBMapping mapping = storedValuesPrefixMap.get(new DHTDBMapping.ShortHash( header));
 
 					if (mapping == null) {
 
@@ -2291,7 +2242,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -2300,7 +2251,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 		Map<Integer,Object[]>	count = new TreeMap<Integer,Object[]>();
 
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			logger.log("Stored keys = " + storedValues.size() + ", values = " + getValueDetails()[DHTDBStats.VD_VALUE_COUNT]);
 
@@ -2451,7 +2402,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 			}
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
@@ -2474,7 +2425,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 					// interfere with the current action
 
 				try {
-					this_mon.enter();
+					thisMon.enter();
 
 					Iterator<DHTDBMapping>	it = storedValues.values().iterator();
 
@@ -2516,7 +2467,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 					}
 				} finally {
 
-					this_mon.exit();
+					thisMon.exit();
 
 				}
 			}
@@ -2770,7 +2721,7 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 	protected int getNextValueVersion() {
 		try {
-			this_mon.enter();
+			thisMon.enter();
 
 			if (next_value_version_left == 0) {
 
@@ -2798,20 +2749,20 @@ public class DHTDBImpl implements DHTDB, DHTDBStats {
 
 		} finally {
 
-			this_mon.exit();
+			thisMon.exit();
 		}
 	}
 
 	public void destroy() {
 		destroyed	= true;
 
-		if (precious_timer != null) {
+		if (preciousTimer != null) {
 
-			precious_timer.cancel();
+			preciousTimer.cancel();
 		}
-		if (original_republish_timer != null) {
+		if (originalRepublishTimer != null) {
 
-			original_republish_timer.cancel();
+			originalRepublishTimer.cancel();
 		}
 		if (cache_republish_timer != null) {
 

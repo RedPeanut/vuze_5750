@@ -271,11 +271,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		lastDhtEstimateTime	= SystemTime.getCurrentTime();
 
 		database = DHTDBFactory.create(
-						adapter.getStorageAdapter(),
-						_originalRepublishInterval,
-						_cacheRepublishInterval,
-						transport.getProtocolVersion(),
-						logger);
+				adapter.getStorageAdapter(),
+				_originalRepublishInterval,
+				_cacheRepublishInterval,
+				transport.getProtocolVersion(),
+				logger
+		);
 		
 		internalLookupPool = new ThreadPool("DHTControl:internallookups", lookupConcurrency);
 		internalPutPool = new ThreadPool("DHTControl:internalputs", lookupConcurrency);
@@ -622,9 +623,12 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	public void contactImported(
-		DHTTransportContact	contact,
-		boolean				is_bootstrap) {
-		router.contactKnown(contact.getID(), new DHTControlContactImpl(contact), is_bootstrap);
+			DHTTransportContact	contact,
+			boolean				isBootstrap) {
+		router.contactKnown(
+				contact.getID(), 
+				new DHTControlContactImpl(contact), 
+				isBootstrap);
 	}
 
 	public void contactRemoved(DHTTransportContact	contact) {
@@ -2933,8 +2937,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		// when a new node is added we must check to see if we need to transfer
 		// any of our values to it.
 		Map	keys_to_store	= new HashMap();
-		DHTStorageBlock[]	direct_key_blocks = database.getDirectKeyBlocks();
-		if (database.isEmpty() && direct_key_blocks.length == 0) {
+		DHTStorageBlock[]	directKeyBlocks = database.getDirectKeyBlocks();
+		if (database.isEmpty() && directKeyBlocks.length == 0) {
 			// nothing to do, ping it if it isn't known to be alive
 			if (!newContact.hasBeenAlive()) {
 				requestPing(newContact);
@@ -2969,6 +2973,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			lastNodeAddCheck				= now;
 			nodeAddCheckUninterestingLimit 	= nacul = null;
 		}
+		
 		boolean	close	= false;
 		if (performClosenessCheck) {
 			List	closestContacts = getClosestKContactsList(newContact.getID(), false);
@@ -3132,8 +3137,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		
 		// finally transfer any key-blocks
 		if (t_contact.getProtocolVersion() >= DHTTransportUDP.PROTOCOL_VERSION_BLOCK_KEYS) {
-			for (int i=0;i<direct_key_blocks.length;i++) {
-				final DHTStorageBlock	keyBlock = direct_key_blocks[i];
+			for (int i=0;i<directKeyBlocks.length;i++) {
+				final DHTStorageBlock	keyBlock = directKeyBlocks[i];
 				List	contacts = getClosestKContactsList(keyBlock.getKey(), false);
 				boolean	forward_it = false;
 				
