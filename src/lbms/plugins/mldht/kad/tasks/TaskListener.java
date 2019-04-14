@@ -25,5 +25,5 @@ public interface TaskListener {
 	 * The task is finsihed.
 	 * @param t The Task
 	 */
-	void finished (Task t);
+	void finished(Task t);
 }

@@ -66,7 +66,7 @@ public class DHTDBMapping {
 
 	// 4 bit filter - counts up to 15
 
-	private Object 	ip_count_bloom_filter;
+	private Object 	ipCountBloomFilter;
 
 	protected DHTDBMapping(
 		DHTDBImpl			_db,
@@ -674,17 +674,17 @@ public class DHTDBMapping {
 		DHTTransportContact	originator = value.getOriginator();
 		byte[] bloom_key = originator.getBloomKey();
 		// System.out.println("addToBloom: existing=" + ip_count_bloom_filter);
-		if (ip_count_bloom_filter == null) {
-			ip_count_bloom_filter = bloom_key;
+		if (ipCountBloomFilter == null) {
+			ipCountBloomFilter = bloom_key;
 			return;
 		}
 		BloomFilter filter;
-		if (ip_count_bloom_filter instanceof byte[]) {
-			byte[]	existing_address = (byte[])ip_count_bloom_filter;
-			ip_count_bloom_filter = filter = BloomFilterFactory.createAddRemove4Bit(IP_COUNT_BLOOM_SIZE_INCREASE_CHUNK);
+		if (ipCountBloomFilter instanceof byte[]) {
+			byte[]	existing_address = (byte[])ipCountBloomFilter;
+			ipCountBloomFilter = filter = BloomFilterFactory.createAddRemove4Bit(IP_COUNT_BLOOM_SIZE_INCREASE_CHUNK);
 			filter.add(existing_address);
 		} else {
-			filter = (BloomFilter)ip_count_bloom_filter;
+			filter = (BloomFilter)ipCountBloomFilter;
 		}
 		int	hit_count = filter.add(bloom_key);
 		if (DHTLog.LOCAL_BLOOM_TRACE) {
@@ -702,18 +702,18 @@ public class DHTDBMapping {
 	protected void removeFromBloom(
 		DHTDBValueImpl	value) {
 		DHTTransportContact	originator = value.getOriginator();
-		if (ip_count_bloom_filter == null) {
+		if (ipCountBloomFilter == null) {
 			return;
 		}
 		byte[] bloom_key = originator.getBloomKey();
-		if (ip_count_bloom_filter instanceof byte[]) {
-			byte[]	existing_address = (byte[])ip_count_bloom_filter;
+		if (ipCountBloomFilter instanceof byte[]) {
+			byte[]	existing_address = (byte[])ipCountBloomFilter;
 			if (Arrays.equals( bloom_key, existing_address)) {
-				ip_count_bloom_filter = null;
+				ipCountBloomFilter = null;
 			}
 			return;
 		}
-		BloomFilter filter = (BloomFilter)ip_count_bloom_filter;
+		BloomFilter filter = (BloomFilter)ipCountBloomFilter;
 		int	hit_count = filter.remove(bloom_key);
 		if (DHTLog.LOCAL_BLOOM_TRACE) {
 			System.out.println("direct local remove from " + originator.getAddress() + ", hit count = " + hit_count);
@@ -724,8 +724,8 @@ public class DHTDBMapping {
 		boolean	increase_size) {
 		BloomFilter	new_filter;
 		int	old_size;
-		if (ip_count_bloom_filter instanceof BloomFilter) {
-			old_size = ((BloomFilter)ip_count_bloom_filter).getSize();
+		if (ipCountBloomFilter instanceof BloomFilter) {
+			old_size = ((BloomFilter)ipCountBloomFilter).getSize();
 		} else {
 			old_size = IP_COUNT_BLOOM_SIZE_INCREASE_CHUNK;
 		}
@@ -753,18 +753,18 @@ public class DHTDBMapping {
 				db.log("Rebuilt local IP bloom filter, size = " + new_filter.getSize() + ", entries =" + new_filter.getEntryCount()+", max hits = " + max_hits);
 			}
 		} finally {
-			ip_count_bloom_filter = new_filter;
+			ipCountBloomFilter = new_filter;
 		}
 	}
 
 	protected void print() {
 		int	entries;
-		if (ip_count_bloom_filter == null) {
+		if (ipCountBloomFilter == null) {
 			entries = 0;
-		} else if (ip_count_bloom_filter instanceof byte[]) {
+		} else if (ipCountBloomFilter instanceof byte[]) {
 			entries = 1;
 		} else {
-			entries = ((BloomFilter)ip_count_bloom_filter).getEntryCount();
+			entries = ((BloomFilter)ipCountBloomFilter).getEntryCount();
 		}
 		System.out.println(
 			ByteFormatter.encodeString( key.getBytes()) + ": " +

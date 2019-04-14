@@ -36,7 +36,7 @@ public class DHTPeer implements DownloadAnnounceResultPeer {
 	private String				addr = "localhost";
 	private int					port = 0;
 
-	protected DHTPeer (PeerAddressDBItem item) {
+	protected DHTPeer(PeerAddressDBItem item) {
 		addr = item.getAddressAsString();
 		port = item.getPort();
 	}

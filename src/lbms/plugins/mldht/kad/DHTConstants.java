@@ -51,23 +51,23 @@ public class DHTConstants {
 	// enter survival mode if we don't see new packets after this time
 	public static final int		REACHABILITY_TIMEOUT					= 60 * 1000;
 	// remain in survival mode after we've recieved new packets for this time
-	public static final int		REACHABILITY_RECOVERY					= 2 * 60 * 1000;
+	public static final int		REACHABILITY_RECOVERY					= 2 * 60 * 1000;	// 2min
 
-	public static final long	KBE_QUESTIONABLE_TIME					= 15 * 60 * 1000;
+	public static final long	KBE_QUESTIONABLE_TIME					= 15 * 60 * 1000;	// 15min
 	public static final int		KBE_BAD_IF_FAILED_QUERIES_LARGER_THAN	= 2;
 	public static final int		KBE_BAD_IMMEDIATLY_ON_FAILED_QUERIES	= 8;
 	public static final int		KBE_QUESTIONABLE_TIME_PING_MULTIPLIER	= 4;
 
-	public static final	int		BOOTSTRAP_MIN_INTERVAL					= 4 * 60 * 1000;
+	public static final	int		BOOTSTRAP_MIN_INTERVAL					= 4 * 60 * 1000;	// 4min
 	public static final int		BOOTSTRAP_IF_LESS_THAN_X_PEERS			= 30;
 	public static final int		USE_BT_ROUTER_IF_LESS_THAN_X_PEERS		= 10;
 
 	public static final int		DEFAULT_WANTED_NODE_RESPONSES_ON_NL		= MAX_ENTRIES_PER_BUCKET * 4;
 
-	public static final int		SELF_LOOKUP_INTERVAL					= 30 * 60 * 1000;
-	public static final int		RANDOM_LOOKUP_INTERVAL					= 10 * 60 * 1000;
+	public static final int		SELF_LOOKUP_INTERVAL					= 30 * 60 * 1000;	// 30min
+	public static final int		RANDOM_LOOKUP_INTERVAL					= 10 * 60 * 1000;	// 10min
 
-	public static final int		ANNOUNCE_CACHE_MAX_AGE					= 30 * 60 * 1000;
+	public static final int		ANNOUNCE_CACHE_MAX_AGE					= 30 * 60 * 1000;	// 30min
 
 
 	public static final String[]			BOOTSTRAP_NODES							= new String[]	{ "mldht.wifi.pps.univ-paris-diderot.fr", 	"router.bittorrent.com" };

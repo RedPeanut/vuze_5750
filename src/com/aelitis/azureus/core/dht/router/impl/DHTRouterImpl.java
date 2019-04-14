@@ -279,18 +279,15 @@ public class DHTRouterImpl implements DHTRouter {
 		return (localContact);
 	}
 
-	public void setAdapter(
-		DHTRouterAdapter	_adapter) {
-		adapter	= _adapter;
+	public void setAdapter(DHTRouterAdapter _adapter) {
+		adapter = _adapter;
 	}
 
-	public void setSleeping(
-		boolean	_sleeping) {
+	public void setSleeping(boolean _sleeping) {
 		sleeping = _sleeping;
 	}
 
-	public void setSuspended(
-		boolean			_suspended) {
+	public void setSuspended(boolean _suspended) {
 		suspended = _suspended;
 		if (!suspended) {
 			seedInTicks = 1;
@@ -331,19 +328,16 @@ public class DHTRouterImpl implements DHTRouter {
 	// a replacement becoming "live"
 	// To avoid requesting these actions while synchronised these are recorded
 	// in lists and then kicked off separately here
-
-
-	public DHTRouterContact
-	contactDead(
-		byte[]						node_id,
+	public DHTRouterContact contactDead(
+		byte[]						nodeId,
 		boolean						force) {
 		if (suspended) {
 			return (null);
 		}
-		if (Arrays.equals( routerNodeId, node_id)) {
-				// we should never become dead ourselves as this screws up things like
-				// checking that stored values are close enough to the K livest nodes (as if we are
-				// dead we don't return ourselves and it all goes doo daa )
+		if (Arrays.equals(routerNodeId, nodeId)) {
+			// we should never become dead ourselves as this screws up things like
+			// checking that stored values are close enough to the K livest nodes (as if we are
+			// dead we don't return ourselves and it all goes doo daa )
 			Debug.out("DHTRouter: contactDead called on router node!");
 			return (localContact);
 		}
@@ -356,7 +350,7 @@ public class DHTRouterImpl implements DHTRouter {
 					System.out.println("consecutive_dead: " + consecutive_dead);
 				}
 				*/
-				Object[]	res = findContactSupport(node_id);
+				Object[]	res = findContactSupport(nodeId);
 				DHTRouterNodeImpl		node	= (DHTRouterNodeImpl)res[0];
 				DHTRouterContactImpl	contact = (DHTRouterContactImpl)res[1];
 				if (contact != null) {
@@ -844,7 +838,7 @@ public class DHTRouterImpl implements DHTRouter {
 		//Log.d(TAG, ">>> after...");
 		//print();
 		
-		Log.d(TAG, ">>> ids.size() = " + ids.size());
+		//Log.d(TAG, ">>> ids.size() = " + ids.size());
 		for (int i=0;i<ids.size();i++) {
 			// random id in the node's range.
 			/*String id = Util.toHexString((byte[])ids.get(i));

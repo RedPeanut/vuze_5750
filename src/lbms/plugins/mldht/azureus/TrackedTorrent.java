@@ -33,11 +33,11 @@ public class TrackedTorrent implements Delayed {
 	private boolean		announcing;
 	private int			announceCount;
 
-	public TrackedTorrent (Download download) {
+	public TrackedTorrent(Download download) {
 		this.download = download;
 	}
 
-	public TrackedTorrent (Download download, long delay) {
+	public TrackedTorrent(Download download, long delay) {
 		this.download = download;
 		setDelay(delay);
 	}
@@ -47,7 +47,7 @@ public class TrackedTorrent implements Delayed {
 	 *
 	 * @see java.util.concurrent.Delayed#getDelay(java.util.concurrent.TimeUnit)
 	 */
-	public long getDelay (TimeUnit unit) {
+	public long getDelay(TimeUnit unit) {
 		return unit.convert(timestamp - System.currentTimeMillis(),
 				TimeUnit.MILLISECONDS);
 	}
@@ -105,9 +105,8 @@ public class TrackedTorrent implements Delayed {
 		}
 	}
 
-	public int
-	getAnnounceCount() {
-		return(announceCount);
+	public int getAnnounceCount() {
+		return (announceCount);
 	}
 	
 	public void setDelay (long delay) {

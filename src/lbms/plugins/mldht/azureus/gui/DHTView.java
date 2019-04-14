@@ -110,7 +110,7 @@ public class DHTView implements UISWTViewEventListener {
 			 * 
 			 * @see lbms.plugins.mldht.kad.DHTStatsListener#statsUpdated(lbms.plugins.mldht.kad.DHTStats)
 			 */
-			public void statsUpdated (final DHTStats stats) {
+			public void statsUpdated(final DHTStats stats) {
 				if (!isCreated) {
 					return;
 				}
@@ -122,7 +122,7 @@ public class DHTView implements UISWTViewEventListener {
 						 * @see lbms.plugins.mldht.azureus.gui.SWTSafeRunnable#runSafe()
 						 */
 						@Override
-						public void runSafe () {
+						public void runSafe() {
 							if (!isActivated || peerCount == null
 									|| peerCount.isDisposed()) {
 								deactivate();
@@ -486,22 +486,19 @@ public class DHTView implements UISWTViewEventListener {
 		Label findNodeLabel = new Label(grp, SWT.None);
 		findNodeLabel.setText("Find Node:");
 		for (int i = 0; i < messageLabels[Method.PING.ordinal()].length; i++) {
-			messageLabels[Method.FIND_NODE.ordinal()][i] = new Label(grp,
-					SWT.None);
+			messageLabels[Method.FIND_NODE.ordinal()][i] = new Label(grp, SWT.None);
 		}
 
 		Label getPeersLabel = new Label(grp, SWT.None);
 		getPeersLabel.setText("Get Peers:");
 		for (int i = 0; i < messageLabels[Method.PING.ordinal()].length; i++) {
-			messageLabels[Method.GET_PEERS.ordinal()][i] = new Label(grp,
-					SWT.None);
+			messageLabels[Method.GET_PEERS.ordinal()][i] = new Label(grp, SWT.None);
 		}
 
 		Label announceLabel = new Label(grp, SWT.None);
 		announceLabel.setText("Announce");
 		for (int i = 0; i < messageLabels[Method.PING.ordinal()].length; i++) {
-			messageLabels[Method.ANNOUNCE_PEER.ordinal()][i] = new Label(grp,
-					SWT.None);
+			messageLabels[Method.ANNOUNCE_PEER.ordinal()][i] = new Label(grp, SWT.None);
 		}
 	}
 

@@ -888,8 +888,8 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 		int							priority)
 		throws PRUDPPacketHandlerException {
 		
-		if (SingleCounter0.getInstance().getAndIncreaseCount() <= 5)
-			new Throwable().printStackTrace();
+		/*if (SingleCounter0.getInstance().getAndIncreaseCount() <= 5)
+			new Throwable().printStackTrace();*/
 		
 		/*
 		if (socket == null || socket.isClosed()) {

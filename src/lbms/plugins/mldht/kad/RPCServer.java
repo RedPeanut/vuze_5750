@@ -181,22 +181,19 @@ public class RPCServer implements Runnable, RPCServerBase {
 					sock.receive(packet);
 				} catch (Exception e) {
 					if (running) {
-							// see occasional socket closed errors here, no idea why...
-						
+						// see occasional socket closed errors here, no idea why...
 						if ( 	delay != 1 || 
 								e.getMessage() == null ||
 								!e.getMessage().toLowerCase().contains("socket closed")) {
 						
 							DHT.log(e, LogLevel.Error);
 						}
-						
 						sock.close();
 					}
 					continue;
 				}
 				
-				try
-				{
+				try {
 					handlePacket(packet);
 					if (delay > 1)
 						delay--;
@@ -430,8 +427,8 @@ public class RPCServer implements Runnable, RPCServerBase {
 		else if (msg instanceof PingRequest)
 			Log.d(TAG, "PingRequest is sent...");*/
 		
-		if (SingleCounter9.getInstance().getAndIncreaseCount() == 1)
-			new Throwable().printStackTrace();
+		/*if (SingleCounter9.getInstance().getAndIncreaseCount() == 1)
+			new Throwable().printStackTrace();*/
 		
 		try {
 			if (msg.getID() == null)
@@ -454,15 +451,13 @@ public class RPCServer implements Runnable, RPCServerBase {
 		if (!sock.isClosed()) {
 			DatagramPacket p = new DatagramPacket(msg, msg.length);
 			p.setSocketAddress(addr);
-			try
-			{
+			try {
 				sock.send(p);
 			} catch (BindException e) {
 				if (NetworkInterface.getByInetAddress(sock.getLocalAddress()) == null) {
 					createSocket();
 					sock.send(p);
-				} else
-				{
+				} else {
 					throw e;
 				}
 			}

@@ -113,26 +113,26 @@ public class DHTRouterNodeImpl {
 
 	protected DHTRouterContact addReplacement(
 		DHTRouterContactImpl	replacement,
-		int						max_rep_per_node) {
+		int						maxRepPerNode) {
 
-		if (max_rep_per_node == 0) {
+		if (maxRepPerNode == 0) {
 			return (null);
 		}
 
 		// we ping the oldest bucket entry only if we "improve" matters in the replacement
-		boolean	try_ping	= false;
+		boolean	tryPing	= false;
 		if (replacements == null) {
-			try_ping	= true;
+			tryPing	= true;
 			replacements = new ArrayList<DHTRouterContactImpl>();
 		} else {
-			if (replacements.size() == max_rep_per_node) {
+			if (replacements.size() == maxRepPerNode) {
 				// if this replacement is known to be alive, replace any existing
 				// replacements that haven't been known to be alive
 				if (replacement.hasBeenAlive()) {
 					for (int i=0;i<replacements.size();i++) {
 						DHTRouterContactImpl	r = (DHTRouterContactImpl)replacements.get(i);
 						if (!r.hasBeenAlive()) {
-							try_ping	= true;
+							tryPing	= true;
 							// MGP: kicking out a replacement that was never alive
 							router.notifyRemoved(r);
 							replacements.remove(i);
@@ -142,13 +142,13 @@ public class DHTRouterNodeImpl {
 
 					// no unknown existing replacements but this is "newer" than the existing
 					// ones so replace the oldest one
-					if (replacements.size() == max_rep_per_node) {
+					if (replacements.size() == maxRepPerNode) {
 						DHTRouterContactImpl removed = (DHTRouterContactImpl) replacements.remove(0);
 						// MGP: kicking out the oldest replacement
 						router.notifyRemoved(removed);
 					}
 				} else {
-						// replace old unknown ones with newer unknown ones
+					// replace old unknown ones with newer unknown ones
 					for (int i=0;i<replacements.size();i++) {
 						DHTRouterContactImpl	r = (DHTRouterContactImpl)replacements.get(i);
 						if (!r.hasBeenAlive()) {
@@ -160,21 +160,21 @@ public class DHTRouterNodeImpl {
 					}
 				}
 			} else {
-				try_ping	= true;
+				tryPing	= true;
 			}
 		}
-		if (replacements.size() == max_rep_per_node) {
-				// no room, drop the contact
+		if (replacements.size() == maxRepPerNode) {
+			// no room, drop the contact
 			return (null);
 		}
 		// MGP: notify observers contact added as a replacement
 		replacement.setReplacement();
 		router.notifyAdded(replacement);
 		replacements.add(replacement);
-		if (try_ping) {
+		if (tryPing) {
 			for (int i=0;i<buckets.size();i++) {
 				DHTRouterContactImpl	c = (DHTRouterContactImpl)buckets.get(i);
-					// don't ping ourselves or someone already being pinged
+				// don't ping ourselves or someone already being pinged
 				if (!( router.isID(c.getID()) || c.getPingOutstanding())) {
 					c.setPingOutstanding(true);
 					router.requestPing(c);
@@ -258,14 +258,15 @@ public class DHTRouterNodeImpl {
 				// MGP: notify observers that now alive
 				router.notifyNowAlive(contact);
 			}
-				// this is a good time to probe the contacts as we know a
-				// replacement is alive and therefore in a position to replace a
-				// dead bucket entry. Only do this if we haven't heard from this contact
-				// recently
+			
+			// this is a good time to probe the contacts as we know a
+			// replacement is alive and therefore in a position to replace a
+			// dead bucket entry. Only do this if we haven't heard from this contact
+			// recently
 			if (contact.getLastAliveTime() - lastTime > 30000) {
 				for (int i=0;i<buckets.size();i++) {
 					DHTRouterContactImpl	c = (DHTRouterContactImpl)buckets.get(i);
-						// don't ping ourselves or someone already being pinged
+					// don't ping ourselves or someone already being pinged
 					if (!( router.isID(c.getID()) || c.getPingOutstanding())) {
 						c.setPingOutstanding(true);
 						router.requestPing(c);
@@ -355,7 +356,7 @@ public class DHTRouterNodeImpl {
 	}
 
 	protected long getTimeSinceLastLookup() {
-		long	now = SystemTime.getCurrentTime();
+		long now = SystemTime.getCurrentTime();
 		if (now < lastLookupTime) {
 			// clock changed, don't know so make as large as possible
 			return (Long.MAX_VALUE);

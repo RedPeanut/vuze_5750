@@ -434,9 +434,8 @@ public final class PluginInterfaceImpl
 		return ( ShareManagerImpl.getSingleton());
 	}
 
-	public DownloadManager
-	getDownloadManager() {
-		return ( DownloadManagerImpl.getSingleton(initialiser.getAzureusCore()));
+	public DownloadManager getDownloadManager() {
+		return (DownloadManagerImpl.getSingleton(initialiser.getAzureusCore()));
 	}
 
 	public MainlineDHTManager getMainlineDHTManager() {

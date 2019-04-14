@@ -30,7 +30,6 @@ import lbms.plugins.mldht.kad.Key;
  */
 public class GetPeersRequest extends AbstractLookupRequest {
 
-	
 	boolean noSeeds;
 	boolean scrape;
 
@@ -46,7 +45,7 @@ public class GetPeersRequest extends AbstractLookupRequest {
 	 * @see lbms.plugins.mldht.kad.messages.MessageBase#apply(lbms.plugins.mldht.kad.DHT)
 	 */
 	@Override
-	public void apply (DHT dh_table) {
+	public void apply(DHT dh_table) {
 		dh_table.getPeers(this);
 	}
 	

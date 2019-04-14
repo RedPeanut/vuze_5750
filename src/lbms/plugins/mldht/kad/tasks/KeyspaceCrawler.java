@@ -52,7 +52,7 @@ public class KeyspaceCrawler extends Task {
 			while (todo.size() > 0 && canDoRequest()) {
 				KBucketEntry e = todo.first();
 				todo.remove(e);
-				// only send a findNode if we haven't allready visited the node
+				// only send a findNode if we haven't already visited the node
 				if (!visited.contains(e)) {
 					// send a findNode to the node
 					FindNodeRequest fnr;
@@ -62,7 +62,6 @@ public class KeyspaceCrawler extends Task {
 					fnr.setWant6(rpc.getDHT().getType() == DHTtype.IPV6_DHT || DHT.getDHT(DHTtype.IPV6_DHT).getNode().getNumEntriesInRoutingTable() < DHTConstants.BOOTSTRAP_IF_LESS_THAN_X_PEERS);
 					fnr.setDestination(e.getAddress());
 					rpcCall(fnr,e.getID());
-
 
 					if (canDoRequest()) {
 						fnr = new FindNodeRequest(e.getID());

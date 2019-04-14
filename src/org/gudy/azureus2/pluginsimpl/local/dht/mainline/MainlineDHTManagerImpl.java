@@ -37,11 +37,11 @@ public class MainlineDHTManagerImpl implements MainlineDHTManager {
 	}
 
 	public void setProvider(MainlineDHTProvider provider) {
-		MainlineDHTProvider old_provider = core.getGlobalManager().getMainlineDHTProvider();
+		MainlineDHTProvider oldProvider = core.getGlobalManager().getMainlineDHTProvider();
 		core.getGlobalManager().setMainlineDHTProvider(provider);
 
 		// Registering new provider, so enable global DHT support.
-		if (old_provider == null && provider != null) {
+		if (oldProvider == null && provider != null) {
 			BTHandshake.setMainlineDHTEnabled(true);
 
 			// We no longer dynamically register and unregister the message type.
@@ -53,7 +53,7 @@ public class MainlineDHTManagerImpl implements MainlineDHTManager {
 		}
 
 		// Deregistering existing provider, so disable global DHT support.
-		else if (old_provider != null && provider == null) {
+		else if (oldProvider != null && provider == null) {
 			BTHandshake.setMainlineDHTEnabled(false);
 			//MessageManager.getSingleton().deregisterMessageType(new BTDHTPort(-1));
 		}

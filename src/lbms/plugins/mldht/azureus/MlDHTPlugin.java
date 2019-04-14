@@ -71,15 +71,15 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 	private Tracker					tracker;
 	private BasicPluginConfigModel	configModel;
 
-	private BasicPluginViewModel	view_model;
+	private BasicPluginViewModel	viewModel;
 	private Logger					logger;
 	private LoggerChannel			logChannel;
 	private LoggerChannelListener	logListener;
 	private UIManagerListener		uiListener;
 
-	private LocaleUtilities			locale_utils;
+	private LocaleUtilities			localeUtils;
 	
-	private AlternativeContactHandler	alt_contact_handler;
+	private AlternativeContactHandler	altContactHandler;
 	
 	//private Display					display;
 
@@ -98,7 +98,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 	 * org.gudy.azureus2.plugins.Plugin#initialize(org.gudy.azureus2.plugins
 	 * .PluginInterface)
 	 */
-	public void initialize (final PluginInterface pluginInterface)
+	public void initialize(final PluginInterface pluginInterface)
 			throws PluginException {
 		if (singleton != null) {
 			throw new IllegalStateException("Plugin already initialized");
@@ -108,11 +108,9 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 		this.pluginInterface = pluginInterface;
 		UIManager ui_manager = pluginInterface.getUIManager();
 		
-		locale_utils = pluginInterface.getUtilities().getLocaleUtilities();
+		localeUtils = pluginInterface.getUtilities().getLocaleUtilities();
 		
-		configModel = ui_manager.createBasicPluginConfigModel("plugins",
-				"plugin.mldht");
-
+		configModel = ui_manager.createBasicPluginConfigModel("plugins", "plugin.mldht");
 		configModel.addBooleanParameter2("enable", "mldht.enable", true);
 		configModel.addIntParameter2("port", "mldht.port", 49001);
 
@@ -120,45 +118,38 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 			configModel.addBooleanParameter2("autoopen." + type.shortName,
 					("mldht.autoopen." + type.shortName).toLowerCase(), false);
 		}
-		configModel.addBooleanParameter2("backupOnly", "mldht.backupOnly",
-				false);
-		configModel.addBooleanParameter2("onlyPeerBootstrap",
-				"mldht.onlyPeerBootstrap", false);
-		configModel.addBooleanParameter2("alwaysRestoreID", "mldht.restoreID",
-				true);
-		configModel.addBooleanParameter2("showStatusEntry",
-				"mldht.showStatusEntry", true);
+		configModel.addBooleanParameter2("backupOnly", "mldht.backupOnly", false);
+		configModel.addBooleanParameter2("onlyPeerBootstrap", "mldht.onlyPeerBootstrap", false);
+		configModel.addBooleanParameter2("alwaysRestoreID", "mldht.restoreID", true);
+		configModel.addBooleanParameter2("showStatusEntry", "mldht.showStatusEntry", true);
 		configModel.addBooleanParameter2("multihoming", "mldht.multihoming", false);
 
-		view_model = ui_manager.createBasicPluginViewModel("Mainline DHT Log");
+		viewModel = ui_manager.createBasicPluginViewModel("Mainline DHT Log");
 
-		view_model.getActivity().setVisible(false);
-		view_model.getProgress().setVisible(false);
+		viewModel.getActivity().setVisible(false);
+		viewModel.getProgress().setVisible(false);
 
-		view_model.getStatus().setText("Stopped");
+		viewModel.getStatus().setText("Stopped");
 
 		logger = pluginInterface.getLogger();
 		logChannel = logger.getTimeStampedChannel("Mainline DHT");
 
 		logListener = new LoggerChannelListener() {
 			public void messageLogged (int type, String content) {
-				view_model.getLogArea().appendText(content + "\n");
+				viewModel.getLogArea().appendText(content + "\n");
 			}
 
 			public void messageLogged (String str, Throwable error) {
 				if (str.length() > 0) {
-					view_model.getLogArea().appendText(str + "\n");
+					viewModel.getLogArea().appendText(str + "\n");
 				}
 
 				StringWriter sw = new StringWriter();
-
 				PrintWriter pw = new PrintWriter(sw);
-
 				error.printStackTrace(pw);
-
 				pw.flush();
 
-				view_model.getLogArea().appendText(sw.toString() + "\n");
+				viewModel.getLogArea().appendText(sw.toString() + "\n");
 			}
 		};
 
@@ -206,9 +197,8 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 				 * org.gudy.azureus2.plugins.dht.mainline.MainlineDHTProvider
 				 * #getDHTPort()
 				 */
-				public int getDHTPort () {
-					return pluginInterface.getPluginconfig()
-							.getPluginIntParameter("port");
+				public int getDHTPort() {
+					return pluginInterface.getPluginconfig().getPluginIntParameter("port");
 				}
 
 				/*
@@ -218,18 +208,16 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 				 * org.gudy.azureus2.plugins.dht.mainline.MainlineDHTProvider
 				 * #notifyOfIncomingPort(java.lang.String, int)
 				 */
-				public void notifyOfIncomingPort (String ip_addr, int port) {
+				public void notifyOfIncomingPort(String ipAddr, int port) {
 					for (DHT dht : dhts.values()) {
-						dht.addDHTNode(ip_addr, port);
+						dht.addDHTNode(ipAddr, port);
 					}
 				}
 			};
 			pluginInterface
 					.getMainlineDHTManager()
-					.setProvider(
-							(org.gudy.azureus2.plugins.dht.mainline.MainlineDHTProvider) mlDHTProvider);
+					.setProvider((org.gudy.azureus2.plugins.dht.mainline.MainlineDHTProvider) mlDHTProvider);
 		} catch (Throwable e) {
-
 			e.printStackTrace();
 		}
 
@@ -248,11 +236,8 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 					if (instance.getUIType() == UIInstance.UIT_SWT) {
 						try {
 							Class cla = getClass().getClassLoader().loadClass("lbms.plugins.mldht.azureus.gui.SWTHelper");
-							
 							uiHelper = (UIHelper)cla.getConstructor(MlDHTPlugin.class).newInstance(MlDHTPlugin.this);
-							
 						} catch (Throwable e) {
-							
 							Debug.out(e);
 						}
 					}
@@ -280,21 +265,16 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 		ui_manager.addUIListener(uiListener);
 
 		TableContextMenuItem incompleteMenuItem = ui_manager.getTableManager()
-				.addContextMenuItem(TableManager.TABLE_MYTORRENTS_INCOMPLETE,
-						"tablemenu.main.item");
+				.addContextMenuItem(TableManager.TABLE_MYTORRENTS_INCOMPLETE, "tablemenu.main.item");
 		TableContextMenuItem completeMenuItem = ui_manager.getTableManager()
-				.addContextMenuItem(TableManager.TABLE_MYTORRENTS_COMPLETE,
-						"tablemenu.main.item");
+				.addContextMenuItem(TableManager.TABLE_MYTORRENTS_COMPLETE, "tablemenu.main.item");
 
 		incompleteMenuItem.setStyle(MenuItem.STYLE_MENU);
 		completeMenuItem.setStyle(MenuItem.STYLE_MENU);
 
 		TableContextMenuItem incAnnounceItem = ui_manager.getTableManager()
-				.addContextMenuItem(incompleteMenuItem,
-						"tablemenu.announce.item");
-
-		TableContextMenuItem comAnnounceItem = ui_manager
-				.getTableManager()
+				.addContextMenuItem(incompleteMenuItem, "tablemenu.announce.item");
+		TableContextMenuItem comAnnounceItem = ui_manager.getTableManager()
 				.addContextMenuItem(completeMenuItem, "tablemenu.announce.item");
 
 		MenuItemListener announceItemListener = new MenuItemListener() {
@@ -305,7 +285,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 			 * org.gudy.azureus2.plugins.ui.menus.MenuItemListener#selected(
 			 * org.gudy.azureus2.plugins.ui.menus.MenuItem, java.lang.Object)
 			 */
-			public void selected (MenuItem menu, Object target) {
+			public void selected(MenuItem menu, Object target) {
 				TableRow row = (TableRow) target;
 				Download dl = (Download) row.getDataSource();
 				tracker.announceDownload(dl);
@@ -323,43 +303,40 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 
 	//-------------------------------------------------------------------
 
-	public static MlDHTPlugin getSingleton () {
+	public static MlDHTPlugin getSingleton() {
 		return singleton;
 	}
 
 	/**
 	 * @return the pluginInterface
 	 */
-	public PluginInterface getPluginInterface () {
+	public PluginInterface getPluginInterface() {
 		return pluginInterface;
 	}
 
 	/**
 	 * @return the dht
 	 */
-	public DHT getDHT (DHT.DHTtype type) {
+	public DHT getDHT(DHT.DHTtype type) {
 		return dhts.get(type);
 	}
 
-	public Tracker getTracker () {
+	public Tracker getTracker() {
 		return tracker;
 	}
 
 	/**
 	 * @return the logger
 	 */
-	public Logger getLogger () {
+	public Logger getLogger() {
 		return logger;
 	}
 
-	public String
-	getMessageText(
-		String	key ) {
-		return(locale_utils.getLocalisedMessageText(key));
+	public String getMessageText(String key) {
+		return (localeUtils.getLocalisedMessageText(key));
 	}
-	
-	public void
-	showConfig() {
+
+	public void showConfig() {
 		pluginInterface.getUIManager().showConfigSection("plugin.mldht");
 	}
 	
@@ -412,29 +389,24 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 			}
 	
 			pluginInterface.getUIManager().removeUIListener(uiListener);
-			
 			pluginInterface.removeListener(this);
 		}
 		
-		if (view_model != null) {
-		
-			view_model.destroy();
+		if (viewModel != null) {
+			viewModel.destroy();
 		}
 		
 		if (configModel != null) {
-		
 			configModel.destroy();
 		}
 		
 		if (logChannel != null) {
-			
 			logChannel.removeListener(logListener);
 		}
 			
 		DHT.initStatics();	// reset in case plugin class isn't unloaded (happend when bundled)
 		
 		dhts 		= null;
-		
 		singleton 	= null;
 	}
 
@@ -445,7 +417,6 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 	 */
 	public void closedownComplete () {
 		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -463,17 +434,14 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 	 * @see org.gudy.azureus2.plugins.PluginListener#initializationComplete()
 	 */
 	public void initializationComplete () {
-		registerUPnPMapping(pluginInterface.getPluginconfig()
-				.getPluginIntParameter("port"));
-		if (pluginInterface.getPluginconfig().getPluginBooleanParameter(
-				"enable")) {
+		registerUPnPMapping(pluginInterface.getPluginconfig().getPluginIntParameter("port"));
+		if (pluginInterface.getPluginconfig().getPluginBooleanParameter("enable")) {
 			//start in a separate Thread, since it might block
 			//when getPublicAddress is called and the version server is offline
 			Thread t = new Thread(new Runnable() {
 				public void run () {
 					try {
 						startDHT();
-				
 					} catch (Throwable e) {
 						e.printStackTrace();
 					}
@@ -504,9 +472,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 
 					DHTConfiguration config = new DHTConfiguration() {
 						public boolean noRouterBootstrap() {
-							return pluginInterface.getPluginconfig()
-									.getPluginBooleanParameter(
-											"onlyPeerBootstrap");
+							return pluginInterface.getPluginconfig().getPluginBooleanParameter("onlyPeerBootstrap");
 						}
 
 						public boolean isPersistingID() {
@@ -527,7 +493,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 					}; 
 
 					try {
-						alt_contact_handler = new AlternativeContactHandler();
+						altContactHandler = new AlternativeContactHandler();
 					} catch (Throwable e) {
 					}
 					
@@ -535,10 +501,9 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 							new RPCServerListener() {
 								@Override
 								public void replyReceived(InetSocketAddress from_node) {
-									
-									if (alt_contact_handler != null) {
+									if (altContactHandler != null) {
 										try {
-											alt_contact_handler.nodeAlive(from_node);
+											altContactHandler.nodeAlive(from_node);
 										} catch (Throwable e) {
 											Debug.out(e);
 										}
@@ -546,15 +511,14 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 								}
 							};
 							
-					view_model.getStatus().setText("Initializing");
+					viewModel.getStatus().setText("Initializing");
 					try {
 						for (Map.Entry<DHTtype, DHT> e : dhts.entrySet()) {
 							e.getValue().start(config, serverListener);
 							e.getValue().bootstrap();
 						}
-
 						tracker.start();
-						view_model.getStatus().setText("Running");
+						viewModel.getStatus().setText("Running");
 					} catch (SocketException e) {
 						e.printStackTrace();
 					}
@@ -581,14 +545,14 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 							}
 						}
 						
-						if (alt_contact_handler != null) {
-							alt_contact_handler.destroy();
+						if (altContactHandler != null) {
+							altContactHandler.destroy();
 						}
 						
-						if (view_model != null) {
-							view_model.getStatus().setText("Stopped");
+						if (viewModel != null) {
+							viewModel.getStatus().setText("Stopped");
 						}
-					}finally{
+					} finally {
 						
 						sem.release();
 					}
@@ -596,7 +560,6 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 			});
 		
 		if (!sem.reserve(30*1000)) {
-			
 			Debug.out("Timeout waiting for DHT to stop");
 		}
 	}

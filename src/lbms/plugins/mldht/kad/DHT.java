@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.gudy.azureus2.core3.util.SystemTime;
 
 import hello.util.Log;
+import hello.util.SingleCounter0;
 import lbms.plugins.mldht.DHTConfiguration;
 import lbms.plugins.mldht.kad.Node.RoutingTableEntry;
 import lbms.plugins.mldht.kad.messages.*;
@@ -183,7 +184,15 @@ public class DHT implements DHTBase {
 		node.recieved(this, r);
 	}
 
-	public void findNode (FindNodeRequest r) {
+	public void findNode(FindNodeRequest r) {
+		
+		// response?
+		
+		/*if (SingleCounter0.getInstance().getAndIncreaseCount() == 1) {
+			Log.d(TAG, "findNode(r) is called...");
+			new Throwable().printStackTrace();
+		}*/
+		
 		if (!isRunning()) {
 			return;
 		}
@@ -194,8 +203,8 @@ public class DHT implements DHTBase {
 		}
 
 		node.recieved(this, r);
+		
 		// find the K closest nodes and pack them
-
 		KClosestNodesSearch kns4 = null; 
 		KClosestNodesSearch kns6 = null;
 		
@@ -208,7 +217,6 @@ public class DHT implements DHTBase {
 			kns6 = new KClosestNodesSearch(r.getTarget(), DHTConstants.MAX_ENTRIES_PER_BUCKET, getDHT(DHTtype.IPV6_DHT));
 			kns6.fill(DHTtype.IPV6_DHT != type);
 		}
-
 
 		FindNodeResponse fnr = new FindNodeResponse(r.getMTID(), kns4 != null ? kns4.pack() : null,kns6 != null ? kns6.pack() : null);
 		fnr.setOrigin(r.getOrigin());
@@ -570,36 +578,33 @@ public class DHT implements DHTBase {
 //		scheduler.schedule(new Runnable() {
 //			//PrintWriter		pw;
 //			TaskListener	li	= new TaskListener() {
-//									public synchronized void finished(Task t) {
-//										NodeLookup nl = ((NodeLookup) t);
-//										if (nl.closestSet.size() < DHTConstants.MAX_ENTRIES_PER_BUCKET)
-//											return;
-//										/*
-//										StringBuilder b = new StringBuilder();
-//										b.append(nl.targetKey.toString(false));
-//										b.append(",");
-//										for (Key i : nl.closestSet)
-//											b.append(i.toString(false).substring(0, 12) + ",");
-//										b.deleteCharAt(b.length() - 1);
-//										pw.println(b);
-//										pw.flush();
-//										*/
-//									}
-//								};
+//				public synchronized void finished(Task t) {
+//					NodeLookup nl = ((NodeLookup) t);
+//					if (nl.closestSet.size() < DHTConstants.MAX_ENTRIES_PER_BUCKET)
+//						return;
+//					/*
+//					StringBuilder b = new StringBuilder();
+//					b.append(nl.targetKey.toString(false));
+//					b.append(",");
+//					for (Key i : nl.closestSet)
+//						b.append(i.toString(false).substring(0, 12) + ",");
+//					b.deleteCharAt(b.length() - 1);
+//					pw.println(b);
+//					pw.flush();
+//					*/
+//				}
+//			};
 //
 //			public void run() {
 //				if (type == DHTtype.IPV6_DHT)
 //					return;
 //				/*
-//				try
-//				{
+//				try {
 //					pw = new PrintWriter("H:\\mldht.log");
-//				} catch (FileNotFoundException e)
-//				{
+//				} catch (FileNotFoundException e) {
 //					e.printStackTrace();
 //				}*/
-//				for (int i = 0; i < 10000; i++)
-//				{
+//				for (int i = 0; i < 10000; i++) {
 //					NodeLookup l = new NodeLookup(Key.createRandomKey(), srv, node, false);
 //					if (canStartTask())
 //						l.start();
@@ -623,7 +628,7 @@ public class DHT implements DHTBase {
 	 * 
 	 * @see lbms.plugins.mldht.kad.DHTBase#started()
 	 */
-	protected void started (final RPCServerListener serverListener) {
+	protected void started(final RPCServerListener serverListener) {
 		
 		if (stopped) {
 			return;
@@ -652,14 +657,11 @@ public class DHT implements DHTBase {
 			public void run() {
 				try {
 					long now = System.currentTimeMillis();
-
-
 					db.expire(now);
 					cache.cleanup(now);					
 				} catch (Throwable e) {
 					log(e, LogLevel.Fatal);
 				}
-
 			}
 		}, 1000, DHTConstants.CHECK_FOR_EXPIRED_ENTRIES, TimeUnit.MILLISECONDS));
 		
@@ -869,23 +871,17 @@ public class DHT implements DHTBase {
 			
 			try {
 				InetAddress[] result = InetAddress.getAllByName(hostname);
-				
 				for (InetAddress addr : result) {
-				
 					nodeAddresses.add(new InetSocketAddress(addr, port));
 				}
-				
 				cache[0]	= now;
 				cache[1]	= 0L;
 				cache[2] 	= result;
-				
 			} catch (Throwable e) {
-			
 				cache[1] = ((Long)cache[1]) + 1;
 			}
 			
 			synchronized(bn_resolver_history) {
-				
 				bn_resolver_history.put(cache_key, cache);
 			}
 		}
@@ -985,7 +981,13 @@ public class DHT implements DHTBase {
 	 * 
 	 * @param id The id of the key to search
 	 */
-	public NodeLookup findNode (Key id) {
+	public NodeLookup findNode(Key id) {
+		
+		// request
+		
+		Log.d(TAG, ">>> findNode(id) is called...");
+		Log.d(TAG, ">>> is this called?");
+		
 		RPCServer server = getRandomServer();
 		if (server == null) {
 			return(null);

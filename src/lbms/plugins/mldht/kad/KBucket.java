@@ -52,8 +52,8 @@ public class KBucket implements Externalizable {
 	
 	private Node						node;
 	private Map<Key,KBucketEntry>		pendingPings;
-	private long						last_modified;
-	private Task						refresh_task;
+	private long						lastModified;
+	private Task						refreshTask;
 	
 	public KBucket () {
 		entries = new ArrayList<KBucketEntry>(); // using arraylist here since reading/iterating is far more common than writing.
@@ -72,7 +72,7 @@ public class KBucket implements Externalizable {
 	 * Notify bucket of new incoming packet from a node, perform update or insert existing nodes where appropriate
 	 * @param entry The entry to insert
 	 */
-	public void insertOrRefresh (KBucketEntry entry) {
+	public void insertOrRefresh(KBucketEntry entry) {
 		if (entry == null)
 			return;
 		
@@ -234,19 +234,19 @@ public class KBucket implements Externalizable {
 	 */
 	public boolean needsToBeRefreshed () {
 		long now = System.currentTimeMillis();
-		if (refresh_task != null && refresh_task.isFinished())
-			refresh_task = null;
+		if (refreshTask != null && refreshTask.isFinished())
+			refreshTask = null;
 		
 
-		return (now - last_modified > DHTConstants.BUCKET_REFRESH_INTERVAL
-				&& refresh_task == null && entries.size() > 0);
+		return (now - lastModified > DHTConstants.BUCKET_REFRESH_INTERVAL
+				&& refreshTask == null && entries.size() > 0);
 	}
 
 	/**
 	 * Resets the last modified for this Bucket
 	 */
 	public void updateRefreshTimer () {
-		last_modified = System.currentTimeMillis();
+		lastModified = System.currentTimeMillis();
 	}
 	
 
@@ -255,8 +255,8 @@ public class KBucket implements Externalizable {
 	}
 
 	private void adjustTimerOnInsert(KBucketEntry entry) {
-		if (entry.getLastSeen() > last_modified) {
-			last_modified = entry.getLastSeen();
+		if (entry.getLastSeen() > lastModified) {
+			lastModified = entry.getLastSeen();
 		}
 	}
 
@@ -484,7 +484,7 @@ public class KBucket implements Externalizable {
 	 * @param refresh_task the refresh_task to set
 	 */
 	public void setRefreshTask (Task refresh_task) {
-		this.refresh_task = refresh_task;
+		this.refreshTask = refresh_task;
 	}
 	
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
@@ -497,7 +497,7 @@ public class KBucket implements Externalizable {
 			replacementBucket.addAll((Collection<KBucketEntry>)obj);
 		obj = serialized.get("lastModifiedTime");
 		if (obj instanceof Long)
-			last_modified = (Long)obj;
+			lastModified = (Long)obj;
 		obj = serialized.get("prefix");
 		
 		entries.removeAll(Collections.singleton(null));
@@ -511,7 +511,7 @@ public class KBucket implements Externalizable {
 		// put entries as any type of collection, will convert them on deserialisation
 		serialized.put("mainBucket", entries);
 		serialized.put("replacementBucket", replacementBucket);
-		serialized.put("lastModifiedTime", last_modified);
+		serialized.put("lastModifiedTime", lastModified);
 
 		out.writeObject(serialized);
 	}

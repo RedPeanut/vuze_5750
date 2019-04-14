@@ -38,19 +38,19 @@ import lbms.plugins.mldht.kad.utils.PackUtil;
  */
 public class NodeLookup extends Task {
 	private int						validReponsesSinceLastClosestSetModification;
-	SortedSet<Key>			closestSet;
+	SortedSet<Key>					closestSet;
 	private Map<MessageBase, Key>	lookupMap;
 	private boolean forBootstrap = false;
 	
-	public NodeLookup (Key node_id, RPCServerBase rpc, Node node, boolean isBootstrap) {
-		super(node_id, rpc, node);
+	public NodeLookup(Key nodeId, RPCServerBase rpc, Node node, boolean isBootstrap) {
+		super(nodeId, rpc, node);
 		forBootstrap = isBootstrap;
 		this.closestSet = new TreeSet<Key>(new Key.DistanceOrder(targetKey));
 		this.lookupMap = new HashMap<MessageBase, Key>();
 	}
 
 	@Override
-	void update () {
+	void update() {
 		// go over the todo list and send find node calls
 		// until we have nothing left
 		synchronized (todo) {
@@ -58,7 +58,7 @@ public class NodeLookup extends Task {
 			while (todo.size() > 0 && canDoRequest() && validReponsesSinceLastClosestSetModification < DHTConstants.MAX_CONCURRENT_REQUESTS) {
 				KBucketEntry e = todo.first();
 				todo.remove(e);
-				// only send a findNode if we haven't allready visited the node
+				// only send a findNode if we haven't already visited the node
 				if (!visited.contains(e)) {
 					// send a findNode to the node
 					FindNodeRequest fnr = new FindNodeRequest(targetKey);
@@ -68,7 +68,7 @@ public class NodeLookup extends Task {
 					synchronized (lookupMap) {
 						lookupMap.put(fnr, e.getID());
 					}
-					rpcCall(fnr,e.getID());
+					rpcCall(fnr, e.getID());
 					visited.add(e);
 				}
 				// remove the entry from the todo list

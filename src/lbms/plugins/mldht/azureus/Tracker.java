@@ -39,12 +39,17 @@ import org.gudy.azureus2.plugins.download.DownloadScrapeResult;
 import org.gudy.azureus2.plugins.download.DownloadTrackerListener;
 import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 
+import hello.util.Log;
+import hello.util.SingleCounter0;
+
 /**
  * @author Damokles
  *
  */
 public class Tracker {
 
+	private static String TAG = Tracker.class.getSimpleName();
+	
 	public static final int					MAX_CONCURRENT_ANNOUNCES	= 8;
 	public static final int					MAX_CONCURRENT_SCRAPES		= 1;
 
@@ -70,8 +75,8 @@ public class Tracker {
 	private Random							random						= new Random();
 	private ScheduledFuture<?>				timer;
 
-	private TorrentAttribute				ta_networks;
-	private TorrentAttribute				ta_peer_sources;
+	private TorrentAttribute				taNetworks;
+	private TorrentAttribute				taPeerSources;
 	
 	private ListenerBundle					listener					= new ListenerBundle();
 
@@ -82,16 +87,13 @@ public class Tracker {
 
 	private AsyncDispatcher	dispatcher = new AsyncDispatcher();
 	
-	protected Tracker (MlDHTPlugin plugin) {
+	protected Tracker(MlDHTPlugin plugin) {
 		this.plugin = plugin;
-		ta_networks = plugin.getPluginInterface().getTorrentManager().getAttribute(
-				TorrentAttribute.TA_NETWORKS);
-		ta_peer_sources = plugin.getPluginInterface().getTorrentManager().getAttribute(
-				TorrentAttribute.TA_PEER_SOURCES);
-
+		taNetworks = plugin.getPluginInterface().getTorrentManager().getAttribute(TorrentAttribute.TA_NETWORKS);
+		taPeerSources = plugin.getPluginInterface().getTorrentManager().getAttribute(TorrentAttribute.TA_PEER_SOURCES);
 	}
 
-	protected void start () {
+	protected void start() {
 		if (running) {
 			return;
 		}
@@ -125,7 +127,13 @@ public class Tracker {
 		running = false;
 	}
 
-	protected void announceDownload (final Download dl) {
+	protected void announceDownload(final Download dl) {
+		int count = SingleCounter0.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format("announceDownload() is called... #%d", count));
+		if (count == 1) {
+			new Throwable().printStackTrace();
+		}
+		
 		if (running) {
 			if (dl.getTorrent() == null) {
 				return;
@@ -159,6 +167,9 @@ public class Tracker {
 			
 			
 			new TaskListener() {
+				
+				private String TAG = "Tracker$TaskListener";
+				
 				Set<PeerAddressDBItem> items = new HashSet<PeerAddressDBItem>();
 				ScrapeResponseHandler scrapeHandler = new ScrapeResponseHandler();
 				AnnounceResponseHandler announceHandler = 
@@ -167,18 +178,12 @@ public class Tracker {
 					new AnnounceResponseHandler() {
 						private Set<PeerAddressDBItem> interim_items = new HashSet<PeerAddressDBItem>();
 						
-						public void
-						itemsUpdated(
-							PeerLookupTask	task ) {
+						public void itemsUpdated(PeerLookupTask task) {
 							if (interim_items.size() >= 200) {
-								
 								return;
 							}
-							
 							interim_items.addAll(task.getReturnedItems());
-							
 							DHTAnnounceResult res = new DHTAnnounceResult(dl, interim_items, 0);
-							
 							dl.setAnnounceResult(res);
 						}
 					};
@@ -207,6 +212,8 @@ public class Tracker {
 				
 				@Override
 				public void finished(Task t) {
+					//Log.d(TAG, ">>> finished() is called...");
+					//Log.d(TAG, ">>> is this called?");
 					DHT.logDebug("DHT Task done: " + t.getClass().getSimpleName());
 					if (t instanceof PeerLookupTask) {
 						PeerLookupTask peerLookup = (PeerLookupTask) t;
@@ -214,9 +221,9 @@ public class Tracker {
 							items.addAll(peerLookup.getReturnedItems());
 						}
 						
-							// no announce for metadata downloads
+						// no announce for metadata downloads
 						if (!dl.getFlag(Download.FLAG_METADATA_DOWNLOAD)) {
-								// if we're not just scraping the torrent... send announces
+							// if we're not just scraping the torrent... send announces
 							if (!scrapeOnly) {
 								t.getRPC().getDHT().announce(peerLookup, dl.isComplete(true),plugin.getPluginInterface().getPluginconfig().getUnsafeIntParameter("TCP.Listen.Port"));
 							}
@@ -264,7 +271,8 @@ public class Tracker {
 		}
 	}
 
-	private void scheduleTorrent (final Download dl, boolean shortDelay) {
+	private void scheduleTorrent(final Download dl, boolean shortDelay) {
+		
 		if (!running) {
 			return;
 		}
@@ -286,25 +294,18 @@ public class Tracker {
 				if (shortDelay) {
 					
 					if (dl.getFlag(Download.FLAG_METADATA_DOWNLOAD)) {
-						
-							// wanna kick this in ASAP
-
+						// wanna kick this in ASAP
 						delay = 0;
 						
-					}else{
-						
+					} else {
 						if (t.getAnnounceCount() == 0 && !dl.isComplete(true)) {
-						
-								// first announce for an incomplete download, let's get some urgency into this!
-							
+							// first announce for an incomplete download, let's get some urgency into this!
 							delay = VERY_SHORT_DELAY + random.nextInt(VERY_SHORT_DELAY);
-						}else{
-						
+						} else {
 							delay = SHORT_DELAY + random.nextInt(SHORT_DELAY);
 						}
 					}
-				}else{
-					
+				} else {
 					delay = MIN_ANNOUNCE_INTERVAL + random.nextInt(MAX_ANNOUNCE_INTERVAL);
 				}
 			}
@@ -321,32 +322,23 @@ public class Tracker {
 					+ t.getDelay(TimeUnit.SECONDS) + "sec for: " + dl.getName());
 			
 			if (delay == 0) {
-				
-				dispatcher.dispatch(
-						new AERunnable() {
-							public void 
-							runSupport() 
-							{
-								announceDownload(dl);
-							}
-						});
-			}else{
-				
+				dispatcher.dispatch(new AERunnable() {
+					public void runSupport() {
+						announceDownload(dl);
+					}
+				});
+			} else {
 				targetQueue.add(t);
 			}
 		}
 	}
 
-	private void
-	checkQueues() {
-		dispatcher.dispatch(
-			new AERunnable() {
-				public void 
-				runSupport() 
-				{
-					checkQueuesSupport();
-				}
-			});
+	private void checkQueues() {
+		dispatcher.dispatch(new AERunnable() {
+			public void runSupport() {
+				checkQueuesSupport();
+			}
+		});
 	}
 	
 	private void checkQueuesSupport () {
@@ -378,8 +370,8 @@ public class Tracker {
 		if (!running || dl.getTorrent() == null || dl.getTorrent().isPrivate())
 			return;
 		
-		String[] sources = dl.getListAttribute(ta_peer_sources);
-		String[] networks = dl.getListAttribute(ta_networks);
+		String[] sources = dl.getListAttribute(taPeerSources);
+		String[] networks = dl.getListAttribute(taNetworks);
 
 		boolean ok = false;
 
@@ -486,9 +478,9 @@ public class Tracker {
 	DownloadManagerListener {
 		
 		public void cleanup(Download download) {
-			download.removeAttributeListener(this, ta_networks,
+			download.removeAttributeListener(this, taNetworks,
 				DownloadAttributeListener.WRITTEN);
-			download.removeAttributeListener(this, ta_peer_sources,
+			download.removeAttributeListener(this, taPeerSources,
 				DownloadAttributeListener.WRITTEN);
 			download.removeListener(this);
 			download.removeTrackerListener(this);
@@ -518,7 +510,7 @@ public class Tracker {
 		public void attributeEventOccurred (Download download,
 				TorrentAttribute attribute, int event_type) {
 			if (event_type == DownloadAttributeListener.WRITTEN
-					&& (attribute == ta_networks || attribute == ta_peer_sources)) {
+					&& (attribute == taNetworks || attribute == taPeerSources)) {
 				checkDownload(download);
 			}
 
@@ -544,9 +536,9 @@ public class Tracker {
 		 * @see org.gudy.azureus2.plugins.download.DownloadManagerListener#downloadAdded(org.gudy.azureus2.plugins.download.Download)
 		 */
 		public void downloadAdded (Download download) {
-			download.addAttributeListener(this, ta_networks,
+			download.addAttributeListener(this, taNetworks,
 					DownloadAttributeListener.WRITTEN);
-			download.addAttributeListener(this, ta_peer_sources,
+			download.addAttributeListener(this, taPeerSources,
 					DownloadAttributeListener.WRITTEN);
 			download.addListener(this);
 			download.addTrackerListener(this);

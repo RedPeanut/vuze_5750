@@ -130,14 +130,14 @@ public class DHTRouterContactImpl implements DHTRouterContact {
 		if (failCount == 1) {
 			firstFailOrLastAliveTime = SystemTime.getCurrentTime();
 		}
-		return ( hasFailed());
+		return (hasFailed());
 	}
 
 	protected boolean hasFailed() {
 		if (hasBeenAlive) {
-			return ( failCount >= attachment.getMaxFailForLiveCount());
+			return (failCount >= attachment.getMaxFailForLiveCount());
 		} else {
-			return ( failCount >= attachment.getMaxFailForUnknownCount());
+			return (failCount >= attachment.getMaxFailForUnknownCount());
 		}
 	}
 
@@ -161,13 +161,11 @@ public class DHTRouterContactImpl implements DHTRouterContact {
 		return (lastAddedTime);
 	}
 
-	protected void setLastAddedTime(
-		long	l) {
-		lastAddedTime	= l;
+	protected void setLastAddedTime(long l) {
+		lastAddedTime = l;
 	}
 
-	protected void setPingOutstanding(
-		boolean	b) {
+	protected void setPingOutstanding(boolean b) {
 		pingOutstanding = b;
 	}
 

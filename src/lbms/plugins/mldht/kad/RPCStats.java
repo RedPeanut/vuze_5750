@@ -136,7 +136,7 @@ public class RPCStats {
 		this.sentBytes += sentBytes;
 	}
 
-	protected void addSentMessageToCount (MessageBase msg) {
+	protected void addSentMessageToCount(MessageBase msg) {
 		sentMessages[msg.getMethod().ordinal()][msg.getType().ordinal()]++;
 	}
 

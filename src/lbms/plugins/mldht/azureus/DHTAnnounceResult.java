@@ -37,13 +37,13 @@ import org.gudy.azureus2.plugins.download.DownloadAnnounceResultPeer;
 public class DHTAnnounceResult implements DownloadAnnounceResult {
 
 	private Download						dl;
-	private Collection<PeerAddressDBItem>				peers;
+	private Collection<PeerAddressDBItem>	peers;
 	private DownloadAnnounceResultPeer[]	resultPeers;
 	int delay;
 	int scrapeSeeds;
 	int scrapePeers;
 
-	public DHTAnnounceResult (Download dl, Collection<PeerAddressDBItem> peers, int delay) {
+	public DHTAnnounceResult(Download dl, Collection<PeerAddressDBItem> peers, int delay) {
 		this.dl = dl;
 		this.peers = peers;
 		this.delay = delay;
@@ -55,11 +55,9 @@ public class DHTAnnounceResult implements DownloadAnnounceResult {
 	private void convertPeers () {
 		resultPeers = new DownloadAnnounceResultPeer[peers.size()];
 		
-		
 		int i = 0;		
 		for (PeerAddressDBItem it : peers)
 			resultPeers[i++] = new DHTPeer(it);
-		
 	}
 
 	public void setScrapeSeeds(int scrapeSeeds) {

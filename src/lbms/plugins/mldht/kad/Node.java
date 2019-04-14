@@ -63,14 +63,14 @@ public class Node {
 	private Object routingTableCoWLock = new Object();
 	private volatile List<RoutingTableEntry> routingTable = new ArrayList<RoutingTableEntry>();
 	private DHT dht;
-	private int num_receives;
+	private int numReceives;
 	
 	private int numReceivesAtLastCheck;
 	private long timeOfLastPingCheck;
 	private long timeOfLastReceiveCountChange;
 	private long timeOfRecovery;
 	private boolean survivalMode;
-	private int num_entries;
+	private int numEntries;
 	private ConcurrentHashMap<Key, RPCServer> usedIDs = new ConcurrentHashMap<Key, RPCServer>();
 	private volatile Map<InetSocketAddress,RoutingTableEntry> knownNodes = new HashMap<InetSocketAddress, RoutingTableEntry>();
 	
@@ -81,8 +81,8 @@ public class Node {
 	 */
 	public Node(DHT dht) {
 		this.dht = dht;
-		num_receives = 0;
-		num_entries = 0;
+		numReceives = 0;
+		numEntries = 0;
 		
 		routingTable.add(new RoutingTableEntry(new Prefix(), new KBucket(this)));		
 	}
@@ -93,7 +93,7 @@ public class Node {
 	 * @param dht The DHT
 	 * @param msg The message
 	 */
-	void recieved (DHTBase dht, MessageBase msg) {
+	void recieved(DHTBase dht, MessageBase msg) {
 		
 		KBucketEntry newEntry = new KBucketEntry(msg.getOrigin(), msg.getID());
 		newEntry.setVersion(msg.getVersion());
@@ -118,7 +118,7 @@ public class Node {
 		
 
 
-		num_receives++;
+		numReceives++;
 		
 	}
 	
@@ -149,7 +149,7 @@ public class Node {
 			tableEntry.bucket.insertOrRefresh(entry);
 		
 		// add delta to the global counter. inaccurate, but will be rebuilt by the bucket checks
-		num_entries += tableEntry.bucket.getNumEntries() - oldSize;
+		numEntries += tableEntry.bucket.getNumEntries() - oldSize;
 		
 	}
 	
@@ -273,7 +273,7 @@ public class Node {
 		*/
 		
 		// don't do pings too often if we're not receiving anything (connection might be dead)
-		if (num_receives != numReceivesAtLastCheck) {
+		if (numReceives != numReceivesAtLastCheck) {
 			if (survivalMode) {
 				if (timeOfRecovery == 0) {
 					// received a packet! ping entries but don't exist survival mode yet
@@ -289,7 +289,7 @@ public class Node {
 			}
 
 			timeOfLastReceiveCountChange = now;
-			numReceivesAtLastCheck = num_receives;
+			numReceivesAtLastCheck = numReceives;
 			
 		} else if (now - timeOfLastReceiveCountChange > DHTConstants.REACHABILITY_TIMEOUT) {
 			// haven't seen a packet for too long
@@ -403,13 +403,13 @@ public class Node {
 
 		}
 		
-		num_entries = newEntryCount;
+		numEntries = newEntryCount;
 		
 		rebuildAddressCache();
 	}
 	
 	private void rebuildAddressCache() {
-		Map<InetSocketAddress, RoutingTableEntry> newKnownMap = new LightHashMap<InetSocketAddress, RoutingTableEntry>(num_entries);
+		Map<InetSocketAddress, RoutingTableEntry> newKnownMap = new LightHashMap<InetSocketAddress, RoutingTableEntry>(numEntries);
 		List<RoutingTableEntry> table = routingTable;
 		for (int i = 0, n = table.size(); i < n; i++) {
 			RoutingTableEntry entry = table.get(i);
@@ -424,9 +424,9 @@ public class Node {
 	/**
 	 * Check if a buckets needs to be refreshed, and refresh if necesarry
 	 *
-	 * @param dhtTable
+	 * @param control
 	 */
-	public void fillBuckets(DHTBase dhtTable) {
+	public void fillBuckets(DHTBase control) {
 
 		for (int i = 0; i < routingTable.size(); i++) {
 			RoutingTableEntry entry = routingTable.get(i);
@@ -434,7 +434,7 @@ public class Node {
 			if (entry.bucket.getNumEntries() < DHTConstants.MAX_ENTRIES_PER_BUCKET) {
 				DHT.logDebug("Filling Bucket: " + entry.prefix);
 
-				NodeLookup nl = dhtTable.fillBucket(entry.prefix.createRandomKeyFromPrefix(), entry.bucket);
+				NodeLookup nl = control.fillBucket(entry.prefix.createRandomKeyFromPrefix(), entry.bucket);
 				if (nl != null) {
 					entry.bucket.setRefreshTask(nl);
 					nl.setInfo("Filling Bucket #" + entry.prefix);
@@ -602,7 +602,7 @@ public class Node {
 	 * @return
 	 */
 	public int getNumEntriesInRoutingTable () {
-		return num_entries;
+		return numEntries;
 	}
 
 	public List<RoutingTableEntry> getBuckets () {
