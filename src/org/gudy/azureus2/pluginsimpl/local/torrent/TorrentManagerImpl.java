@@ -47,10 +47,9 @@ import org.gudy.azureus2.core3.torrent.impl.TorrentOpenOptions;
 
 import com.aelitis.azureus.core.util.CopyOnWriteList;
 
-public class
-TorrentManagerImpl
-	implements TorrentManager, TOTorrentProgressListener
-{
+public class TorrentManagerImpl 
+		implements TorrentManager, TOTorrentProgressListener {
+	
 	private static TorrentManagerImpl	singleton;
 	private static AEMonitor 			class_mon 	= new AEMonitor("TorrentManager");
 
@@ -65,7 +64,7 @@ TorrentManagerImpl
 
 	private static Map<String,TorrentAttribute>	attribute_map = new HashMap<String,TorrentAttribute>();
 
-	static{
+	static {
 		attribute_map.put(TorrentAttribute.TA_CATEGORY, 				category_attribute);
 		attribute_map.put(TorrentAttribute.TA_SHARE_PROPERTIES, 		share_properties_attribute);
 		attribute_map.put(TorrentAttribute.TA_NETWORKS, 				networks_attribute);
@@ -76,180 +75,116 @@ TorrentManagerImpl
 		attribute_map.put( TorrentAttribute.TA_RELATIVE_SAVE_PATH,      relative_save_path_attribute);
 	}
 
-	public static TorrentManagerImpl
-	getSingleton() {
+	public static TorrentManagerImpl getSingleton() {
 		try {
 			class_mon.enter();
-
 			if (singleton == null) {
-
-					// default singleton not attached to a plugin
-
+				// default singleton not attached to a plugin
 				singleton = new TorrentManagerImpl(null);
 			}
-
 			return (singleton);
-
 		} finally {
-
 			class_mon.exit();
 		}
 	}
 
 	protected static CopyOnWriteList<TorrentManagerListener>		listeners = new CopyOnWriteList<TorrentManagerListener>();
 
-	protected PluginInterface	plugin_interface;
+	protected PluginInterface	pluginInterface;
 
-	protected TorrentManagerImpl(
-		PluginInterface		_pi) {
-		plugin_interface	= _pi;
+	protected TorrentManagerImpl(PluginInterface _pi) {
+		pluginInterface = _pi;
 	}
 
-	public TorrentManager
-	specialise(
-		PluginInterface		_pi) {
-			// specialised one attached to plugin
-
-		return (new TorrentManagerImpl( _pi));
+	public TorrentManager specialise(PluginInterface _pi) {
+		// specialised one attached to plugin
+		return (new TorrentManagerImpl(_pi));
 	}
 
-	public TorrentDownloader
-	getURLDownloader(
-		URL		url )
-
-		throws TorrentException
-	{
-		return (new TorrentDownloaderImpl( this, url));
+	public TorrentDownloader getURLDownloader(URL url)
+			throws TorrentException {
+		return (new TorrentDownloaderImpl(this, url));
 	}
 
-	public TorrentDownloader
-	getURLDownloader(
+	public TorrentDownloader getURLDownloader(
 		URL		url,
-		String	user_name,
-		String	password )
-
-		throws TorrentException
-	{
-		return (new TorrentDownloaderImpl( this, url, user_name, password));
+		String	userName,
+		String	password)
+		throws TorrentException {
+		return (new TorrentDownloaderImpl(this, url, userName, password));
 	}
 
-	public Torrent
-	createFromBEncodedFile(
-		File		file )
-
-		throws TorrentException
-	{
-		return (createFromBEncodedFile( file, false));
+	public Torrent createFromBEncodedFile(File file)
+			throws TorrentException {
+		return (createFromBEncodedFile(file, false));
 	}
 
-	public Torrent
-	createFromBEncodedFile(
-		File		file,
-		boolean		for_seeding )
-
-		throws TorrentException
-	{
+	public Torrent createFromBEncodedFile(File file, boolean forSeeding)
+			throws TorrentException {
 		try {
-			TOTorrent	torrent;
-
-			if (for_seeding) {
-
+			TOTorrent torrent;
+			if (forSeeding) {
 				torrent = TorrentUtils.readFromFile(file, true, true);
-
 			} else {
-
 				torrent = TorrentUtils.readFromFile(file, false);
 			}
-
-			return (new TorrentImpl(plugin_interface,torrent));
-
+			return (new TorrentImpl(pluginInterface, torrent));
 		} catch (TOTorrentException e) {
-
 			throw (new TorrentException("TorrentManager::createFromBEncodedFile Fails", e));
 		}
 	}
 
-	public Torrent
-	createFromBEncodedInputStream(
-		InputStream		data )
-
-		throws TorrentException
-	{
+	public Torrent createFromBEncodedInputStream(InputStream data)
+			throws TorrentException {
 		try {
-			return (new TorrentImpl(plugin_interface,TorrentUtils.readFromBEncodedInputStream( data)));
-
+			return (new TorrentImpl(pluginInterface, TorrentUtils.readFromBEncodedInputStream(data)));
 		} catch (TOTorrentException e) {
-
 			throw (new TorrentException("TorrentManager::createFromBEncodedFile Fails", e));
 		}
 	}
 
-	public Torrent
-	createFromBEncodedData(
-		byte[]		data )
-
-		throws TorrentException
-	{
+	public Torrent createFromBEncodedData(byte[] data)
+		throws TorrentException {
+		
 		ByteArrayInputStream	is = null;
-
 		try {
 			is = new ByteArrayInputStream(data);
-
-			return (new TorrentImpl(plugin_interface,TorrentUtils.readFromBEncodedInputStream(is)));
-
+			return (new TorrentImpl(pluginInterface,TorrentUtils.readFromBEncodedInputStream(is)));
 		} catch (TOTorrentException e) {
-
 			throw (new TorrentException("TorrentManager::createFromBEncodedData Fails", e));
-
 		} finally {
-
 			try {
 				is.close();
-
 			} catch (Throwable e) {
-
 				Debug.printStackTrace(e);
 			}
 		}
 	}
 
-	public Torrent
-	createFromDataFile(
-		File		data,
-		URL			announce_url )
-
-		throws TorrentException
-	{
-		return (createFromDataFile( data, announce_url, false));
+	public Torrent createFromDataFile(File data, URL announce_url)
+			throws TorrentException {
+		return (createFromDataFile(data, announce_url, false));
 	}
 
-	public Torrent
-	createFromDataFile(
+	public Torrent createFromDataFile(
 		File		data,
 		URL			announce_url,
-		boolean		include_other_hashes )
-
+		boolean		include_other_hashes)
 		throws TorrentException
 	{
 		try {
 			TOTorrentCreator c = TOTorrentFactory.createFromFileOrDirWithComputedPieceLength( data, announce_url, include_other_hashes);
-
 			c.addListener(this);
-
-			return (new TorrentImpl(plugin_interface,c.create()));
-
+			return (new TorrentImpl(pluginInterface,c.create()));
 		} catch (TOTorrentException e) {
-
 			throw (new TorrentException("TorrentManager::createFromDataFile Fails", e));
 		}
 	}
 
-	public TorrentCreator
-	createFromDataFileEx(
+	public TorrentCreator createFromDataFileEx(
 		File					data,
 		URL						announce_url,
 		boolean					include_other_hashes )
-
 		throws TorrentException
 	{
 		try {
@@ -284,7 +219,7 @@ TorrentManagerImpl
 								try {
 									TOTorrent	t = c.create();
 
-									Torrent	torrent = new TorrentImpl(plugin_interface, t);
+									Torrent	torrent = new TorrentImpl(pluginInterface, t);
 
 									for (Iterator<TorrentCreatorListener> it=listeners.iterator();it.hasNext();) {
 
@@ -324,89 +259,56 @@ TorrentManagerImpl
 		}
 	}
 
-	public TorrentAttribute[]
-	getDefinedAttributes() {
+	public TorrentAttribute[] getDefinedAttributes() {
 		try {
 			class_mon.enter();
-
 			Collection<TorrentAttribute>	entries = attribute_map.values();
-
 			TorrentAttribute[]	res = new TorrentAttribute[entries.size()];
-
 			entries.toArray(res);
-
 			return (res);
-
 		} finally {
-
 			class_mon.exit();
 		}
 	}
 
-	public TorrentAttribute
-	getAttribute(
-		String		name) {
+	public TorrentAttribute getAttribute(String name) {
 		try {
 			class_mon.enter();
-
 			TorrentAttribute	res = (TorrentAttribute)attribute_map.get(name);
-
 			if (res == null && name.startsWith("Plugin.")) {
-
 				res = new TorrentAttributePluginImpl(name);
-
 				attribute_map.put(name, res);
 			}
-
 			if (res == null) {throw new IllegalArgumentException("No such attribute: \"" + name + "\"");}
 			return (res);
-
 		} finally {
-
 			class_mon.exit();
 		}
 	}
 
-	public TorrentAttribute
-	getPluginAttribute(
-		String		name) {
-			// this prefix is RELIED ON ELSEWHERE!!!!
-
-		name	= "Plugin." + plugin_interface.getPluginID() + "." + name;
-
+	public TorrentAttribute getPluginAttribute(String name) {
+		// this prefix is RELIED ON ELSEWHERE!!!!
+		name	= "Plugin." + pluginInterface.getPluginID() + "." + name;
 		try {
 			class_mon.enter();
-
 			TorrentAttribute	res = (TorrentAttribute)attribute_map.get(name);
-
 			if (res != null) {
-
 				return (res);
 			}
-
 			res = new TorrentAttributePluginImpl(name);
-
 			attribute_map.put(name, res);
-
 			return (res);
-
 		} finally {
-
 			class_mon.exit();
 		}
 	}
 
-	public Torrent
-	createFromBEncodedData(
-			byte[] data,
-			int preserve)
-
-			throws TorrentException
-	{
+	public Torrent createFromBEncodedData(byte[] data, int preserve)
+			throws TorrentException {
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		try {
 			TOTorrent torrent = TOTorrentFactory.deserialiseFromBEncodedInputStream(bais);
-			return new TorrentImpl(plugin_interface, preserveFields(torrent,preserve));
+			return new TorrentImpl(pluginInterface, preserveFields(torrent,preserve));
 		} catch (TOTorrentException e) {
 			throw new TorrentException ("Failed to read TorrentData", e);
 		} finally {
@@ -428,7 +330,7 @@ TorrentManagerImpl
 		try {
 			fis = new FileInputStream (file);
 			TOTorrent torrent = TOTorrentFactory.deserialiseFromBEncodedInputStream(fis);
-			return new TorrentImpl(plugin_interface, preserveFields(torrent,preserve));
+			return new TorrentImpl(pluginInterface, preserveFields(torrent,preserve));
 		} catch (FileNotFoundException e) {
 			throw new TorrentException ("Failed to read from TorrentFile", e);
 		} catch (TOTorrentException e) {
@@ -446,7 +348,7 @@ TorrentManagerImpl
 	{
 		try {
 			TOTorrent torrent = TOTorrentFactory.deserialiseFromBEncodedInputStream(data);
-			return new TorrentImpl(plugin_interface, preserveFields(torrent,preserve));
+			return new TorrentImpl(pluginInterface, preserveFields(torrent,preserve));
 		} catch (TOTorrentException e) {
 			throw new TorrentException ("Failed to read TorrentData", e);
 		}

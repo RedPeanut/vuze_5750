@@ -467,7 +467,7 @@ public class Node {
 			tableMap.put("oldKey", getRootID());
 			
 			KBucket[] bucket = new KBucket[routingTable.size()];
-			for (int i=0;i<bucket.length;i++)
+			for (int i=0;i<routingTable.size()/*bucket.length*/;i++)
 				bucket[i] = routingTable.get(i).bucket;
 				
 			tableMap.put("bucket", bucket);

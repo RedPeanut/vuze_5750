@@ -32,7 +32,7 @@ public class AsyncDispatcher {
 
 	private int						numPriority;
 
-	final int quiesce_after_millis;
+	final int quiesceAfterMillis;
 
 	public AsyncDispatcher() {
 		this("AsyncDispatcher: " + Debug.getLastCallerShort(), 10000);
@@ -50,29 +50,28 @@ public class AsyncDispatcher {
 		String		_name,
 		int			_quiesce_after_millis) {
 		name					= _name;
-		quiesce_after_millis	= _quiesce_after_millis;
+		quiesceAfterMillis	= _quiesce_after_millis;
 	}
 
-	public void dispatch(
-		AERunnable	target) {
+	public void dispatch(AERunnable target) {
 		dispatch(target, false);
 	}
 
 	public void dispatch(
 		AERunnable	target,
-		boolean		is_priority) {
+		boolean		isPriority) {
 		
 		synchronized(this) {
 			if (queueHead == null) {
 				queueHead = target;
-				if (is_priority) {
+				if (isPriority) {
 					numPriority++;
 				}
 			} else {
 				if (queueTail == null) {
 					queueTail = new LinkedList<AERunnable>();
 				}
-				if (is_priority) {
+				if (isPriority) {
 					if (numPriority == 0) {
 						queueTail.add(0, queueHead);
 						queueHead = target;
@@ -89,7 +88,7 @@ public class AsyncDispatcher {
 					new AEThread2(name, true) {
 						public void run() {
 							while (true) {
-								queueSem.reserve(quiesce_after_millis);
+								queueSem.reserve(quiesceAfterMillis);
 								AERunnable	toRun = null;
 								synchronized(AsyncDispatcher.this) {
 									if (queueHead == null) {
@@ -130,27 +129,21 @@ public class AsyncDispatcher {
 
 	public int getQueueSize() {
 		synchronized(this) {
-
 			int	result = queueHead == null?0:1;
-
 			if (queueTail != null) {
-
 				result += queueTail.size();
 			}
-
 			return (result);
 		}
 	}
 
-	public void setPriority(
-		int		p) {
+	public void setPriority(int p) {
 		priority = p;
 	}
 
 	public boolean isDispatchThread() {
-		synchronized(this) {
-
-			return ( thread != null && thread.isCurrentThread());
+		synchronized (this) {
+			return (thread != null && thread.isCurrentThread());
 		}
 	}
 }

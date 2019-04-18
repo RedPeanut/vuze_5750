@@ -137,9 +137,7 @@ public class DHT implements DHTBase {
 	private final DHTtype					type;
 	private List<ScheduledFuture<?>>		scheduledActions = new ArrayList<ScheduledFuture<?>>();
 	
-	
 	static Map<DHTtype,DHT> dhts; 
-
 
 	public synchronized static Map<DHTtype, DHT> createDHTs() {
 		if (dhts == null) {

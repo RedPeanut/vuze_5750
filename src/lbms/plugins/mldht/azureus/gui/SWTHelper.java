@@ -16,20 +16,12 @@
  */
 package lbms.plugins.mldht.azureus.gui;
 
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import lbms.plugins.mldht.azureus.MlDHTPlugin;
-import lbms.plugins.mldht.azureus.UIHelper;
-import lbms.plugins.mldht.kad.*;
-import lbms.plugins.mldht.kad.DHT.DHTtype;
-import lbms.plugins.mldht.kad.utils.PopulationListener;
-
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.gudy.azureus2.core3.util.Debug;
 import org.gudy.azureus2.plugins.ui.UIInstance;
 import org.gudy.azureus2.plugins.ui.UIManagerListener;
 import org.gudy.azureus2.plugins.ui.menus.MenuContext;
@@ -39,6 +31,14 @@ import org.gudy.azureus2.plugins.ui.menus.MenuManager;
 import org.gudy.azureus2.ui.swt.plugins.UISWTInstance;
 import org.gudy.azureus2.ui.swt.plugins.UISWTStatusEntry;
 import org.gudy.azureus2.ui.swt.plugins.UISWTStatusEntryListener;
+
+import lbms.plugins.mldht.azureus.MlDHTPlugin;
+import lbms.plugins.mldht.azureus.UIHelper;
+import lbms.plugins.mldht.kad.DHT;
+import lbms.plugins.mldht.kad.DHT.DHTtype;
+import lbms.plugins.mldht.kad.DHTStatus;
+import lbms.plugins.mldht.kad.DHTStatusListener;
+import lbms.plugins.mldht.kad.utils.PopulationListener;
 
 /**
  * @author Leonard
@@ -80,7 +80,6 @@ public class SWTHelper implements UIHelper, UIManagerListener, PopulationListene
 		}
 		
 		for (MenuItem mi: menuItems) {
-			
 			mi.remove();
 		}
 	}
@@ -114,13 +113,13 @@ public class SWTHelper implements UIHelper, UIManagerListener, PopulationListene
 							}
 						});
 				
-				MenuContext menu_context = statusEntry.getMenuContext();
+				MenuContext menuContext = statusEntry.getMenuContext();
 				
 				MenuManager menuManager = plugin.getPluginInterface().getUIManager().getMenuManager();
 				
 				for (final DHTtype type : DHTtype.values()) {
 
-					MenuItem item = menuManager.addMenuItem(menu_context,
+					MenuItem item = menuManager.addMenuItem(menuContext,
 							"Views.plugins." + DHTView.VIEWID + "." + type.shortName + ".title");
 
 					menuItems.add(item);
@@ -147,7 +146,6 @@ public class SWTHelper implements UIHelper, UIManagerListener, PopulationListene
 				if (plugin.isPluginAutoOpen(type.shortName)) {
 					swtInstance.openMainView(DHTView.VIEWID+"."+type.shortName, view, null);
 				}
-
 			}
 
 			updateStatusEntry();

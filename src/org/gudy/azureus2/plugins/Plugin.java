@@ -1,7 +1,7 @@
 /*
- * File    : Plugin.java
+ * File		: Plugin.java
  * Created : 2 nov. 2003 18:43:21
- * By      : Olivier
+ * By			: Olivier
  *
  * Azureus - a Java Bittorrent client
  *
@@ -12,12 +12,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
  * GNU General Public License for more details (see the LICENSE file).
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
  */
 
 package org.gudy.azureus2.plugins;
@@ -37,20 +37,16 @@ public interface Plugin {
 	 */
 	public void initialize(PluginInterface pluginInterface) throws PluginException;
 
-  /**
-   * This method is invoke by reflection, if it exists. It couldn't be added to the interface as
-   * doing so would have broken existing plugins.
-   * It is called at load time, and as such *most* of the plugin framework is unavailable. Therefore
-   * it should only be used for bootstrap situations where the plugin must perform some action before
-   * the rest of Azureus initialises.
-   * The only framework guaranteed to be available is the plugin-configuration.
-   *
-   * public static void
-   * load(
-   * 	PluginInterface	pluginInterface )
-   *
-   * 	throws PluginException;
-   * @author parg
-   * @since 2.2.0.3
-   */
+	/**
+	 * This method is invoke by reflection, if it exists. It couldn't be added to the interface as
+	 * doing so would have broken existing plugins.
+	 * It is called at load time, and as such *most* of the plugin framework is unavailable. Therefore
+	 * it should only be used for bootstrap situations where the plugin must perform some action before
+	 * the rest of Azureus initialises.
+	 * The only framework guaranteed to be available is the plugin-configuration.
+	 *
+	 * @author parg
+	 * @since 2.2.0.3
+	 */
+	//public static void load(PluginInterface pluginInterface) throws PluginException;
 }

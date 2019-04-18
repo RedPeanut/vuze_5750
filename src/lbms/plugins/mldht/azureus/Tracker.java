@@ -91,15 +91,18 @@ public class Tracker {
 		this.plugin = plugin;
 		taNetworks = plugin.getPluginInterface().getTorrentManager().getAttribute(TorrentAttribute.TA_NETWORKS);
 		taPeerSources = plugin.getPluginInterface().getTorrentManager().getAttribute(TorrentAttribute.TA_PEER_SOURCES);
+		Log.d(TAG, "taNetworks = " + taNetworks);
+		Log.d(TAG, "taPeerSources = " + taPeerSources);
 	}
 
 	protected void start() {
-		if (running) {
+		
+		if (running)
 			return;
-		}
+		
 		DHT.logInfo("Tracker: starting...");
 		timer = DHT.getScheduler().scheduleAtFixedRate(new Runnable() {
-			public void run () {
+			public void run() {
 				checkQueues();
 			}
 		}, 100 * 1000, TRACKER_UPDATE_INTERVAL, TimeUnit.MILLISECONDS);
@@ -128,11 +131,11 @@ public class Tracker {
 	}
 
 	protected void announceDownload(final Download dl) {
-		int count = SingleCounter0.getInstance().getAndIncreaseCount();
+		/*int count = SingleCounter0.getInstance().getAndIncreaseCount();
 		Log.d(TAG, String.format("announceDownload() is called... #%d", count));
 		if (count == 1) {
 			new Throwable().printStackTrace();
-		}
+		}*/
 		
 		if (running) {
 			if (dl.getTorrent() == null) {
@@ -341,10 +344,14 @@ public class Tracker {
 		});
 	}
 	
-	private void checkQueuesSupport () {
+	private void checkQueuesSupport() {
+		
 		if (!running) {
 			return;
 		}
+		
+		//Log.d(TAG, "checkQueuesSupport() is called...");
+		
 		TrackedTorrent t;
 		Download dl;
 
@@ -367,6 +374,7 @@ public class Tracker {
 	}
 
 	private void checkDownload (Download dl) {
+		
 		if (!running || dl.getTorrent() == null || dl.getTorrent().isPrivate())
 			return;
 		
@@ -444,7 +452,7 @@ public class Tracker {
 
 	}
 
-	private void addTrackedTorrent (Download dl, String reason) {
+	private void addTrackedTorrent(Download dl, String reason) {
 		if (!trackedTorrents.containsKey(dl)) {
 			DHT.logInfo("Tracker: starting to track Torrent reason: " + reason
 					+ ", Torrent; " + dl.getName());
@@ -453,7 +461,7 @@ public class Tracker {
 		}
 	}
 
-	private void removeTrackedTorrent (Download dl, String reason) {
+	private void removeTrackedTorrent(Download dl, String reason) {
 		if (trackedTorrents.containsKey(dl)) {
 			DHT.logInfo("Tracker: stop tracking of Torrent reason: " + reason
 					+ ", Torrent; " + dl.getName());
@@ -473,15 +481,12 @@ public class Tracker {
 
 	
 
-	private class ListenerBundle implements DownloadListener,
-	DownloadAttributeListener, DownloadTrackerListener,
-	DownloadManagerListener {
+	private class ListenerBundle
+			implements DownloadListener, DownloadAttributeListener, DownloadTrackerListener, DownloadManagerListener {
 		
 		public void cleanup(Download download) {
-			download.removeAttributeListener(this, taNetworks,
-				DownloadAttributeListener.WRITTEN);
-			download.removeAttributeListener(this, taPeerSources,
-				DownloadAttributeListener.WRITTEN);
+			download.removeAttributeListener(this, taNetworks, DownloadAttributeListener.WRITTEN);
+			download.removeAttributeListener(this, taPeerSources, DownloadAttributeListener.WRITTEN);
 			download.removeListener(this);
 			download.removeTrackerListener(this);
 		}
@@ -491,14 +496,13 @@ public class Tracker {
 		/* (non-Javadoc)
 		 * @see org.gudy.azureus2.plugins.download.DownloadListener#positionChanged(org.gudy.azureus2.plugins.download.Download, int, int)
 		 */
-		public void positionChanged (Download download, int oldPosition,
-				int newPosition) {
+		public void positionChanged(Download download, int oldPosition, int newPosition) {
 		}
 
 		/* (non-Javadoc)
 		 * @see org.gudy.azureus2.plugins.download.DownloadListener#stateChanged(org.gudy.azureus2.plugins.download.Download, int, int)
 		 */
-		public void stateChanged (Download download, int old_state, int new_state) {
+		public void stateChanged(Download download, int old_state, int new_state) {
 			checkDownload(download);
 		}
 
@@ -507,20 +511,18 @@ public class Tracker {
 		/* (non-Javadoc)
 		 * @see org.gudy.azureus2.plugins.download.DownloadAttributeListener#attributeEventOccurred(org.gudy.azureus2.plugins.download.Download, org.gudy.azureus2.plugins.torrent.TorrentAttribute, int)
 		 */
-		public void attributeEventOccurred (Download download,
-				TorrentAttribute attribute, int event_type) {
+		public void attributeEventOccurred(Download download, TorrentAttribute attribute, int event_type) {
 			if (event_type == DownloadAttributeListener.WRITTEN
 					&& (attribute == taNetworks || attribute == taPeerSources)) {
 				checkDownload(download);
 			}
-
 		}
 
 		//---------------------[DownloadTrackerListener]---------------------------------
 		/* (non-Javadoc)
 		 * @see org.gudy.azureus2.plugins.download.DownloadTrackerListener#announceResult(org.gudy.azureus2.plugins.download.DownloadAnnounceResult)
 		 */
-		public void announceResult (DownloadAnnounceResult result) {
+		public void announceResult(DownloadAnnounceResult result) {
 			checkDownload(result.getDownload());
 		}
 
@@ -535,11 +537,9 @@ public class Tracker {
 		/* (non-Javadoc)
 		 * @see org.gudy.azureus2.plugins.download.DownloadManagerListener#downloadAdded(org.gudy.azureus2.plugins.download.Download)
 		 */
-		public void downloadAdded (Download download) {
-			download.addAttributeListener(this, taNetworks,
-					DownloadAttributeListener.WRITTEN);
-			download.addAttributeListener(this, taPeerSources,
-					DownloadAttributeListener.WRITTEN);
+		public void downloadAdded(Download download) {
+			download.addAttributeListener(this, taNetworks, DownloadAttributeListener.WRITTEN);
+			download.addAttributeListener(this, taPeerSources, DownloadAttributeListener.WRITTEN);
 			download.addListener(this);
 			download.addTrackerListener(this);
 			checkDownload(download);
@@ -548,7 +548,7 @@ public class Tracker {
 		/* (non-Javadoc)
 		 * @see org.gudy.azureus2.plugins.download.DownloadManagerListener#downloadRemoved(org.gudy.azureus2.plugins.download.Download)
 		 */
-		public void downloadRemoved (Download download) {
+		public void downloadRemoved(Download download) {
 			cleanup(download);
 			removeTrackedTorrent(download, "Download was removed");
 		}

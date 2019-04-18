@@ -25,11 +25,6 @@ package org.gudy.azureus2.plugins;
  * @since 2.1.0.0
  */
 
-public interface
-UnloadablePlugin
-	extends Plugin
-{
-	public void unload()
-
-		throws PluginException;
+public interface UnloadablePlugin extends Plugin {
+	public void unload() throws PluginException;
 }

@@ -60,12 +60,16 @@ import com.aelitis.azureus.core.networkmanager.admin.NetworkAdmin;
 import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminPropertyChangeListener;
 import com.aelitis.azureus.plugins.upnp.UPnPPlugin;
 
+import hello.util.Log;
+
 /**
  * @author Damokles
  * 
  */
 public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdminPropertyChangeListener {
 
+	private static String TAG = MlDHTPlugin.class.getSimpleName();
+	
 	private PluginInterface			pluginInterface;
 	private Map<DHTtype, DHT>		dhts;
 	private Tracker					tracker;
@@ -84,11 +88,8 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 	//private Display					display;
 
 	private volatile boolean		unloaded;
-	
 	private UIHelper				uiHelper;
-
 	private Object					mlDHTProvider;
-
 	private static MlDHTPlugin		singleton;
 
 	/*
@@ -98,22 +99,24 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 	 * org.gudy.azureus2.plugins.Plugin#initialize(org.gudy.azureus2.plugins
 	 * .PluginInterface)
 	 */
+	@Override
 	public void initialize(final PluginInterface pluginInterface)
 			throws PluginException {
+		
 		if (singleton != null) {
 			throw new IllegalStateException("Plugin already initialized");
 		}
 		singleton = this;
 		
 		this.pluginInterface = pluginInterface;
-		UIManager ui_manager = pluginInterface.getUIManager();
+		UIManager uiManager = pluginInterface.getUIManager();
 		
 		localeUtils = pluginInterface.getUtilities().getLocaleUtilities();
 		
-		configModel = ui_manager.createBasicPluginConfigModel("plugins", "plugin.mldht");
+		configModel = uiManager.createBasicPluginConfigModel("plugins", "plugin.mldht");
 		configModel.addBooleanParameter2("enable", "mldht.enable", true);
 		configModel.addIntParameter2("port", "mldht.port", 49001);
-
+		
 		for (DHTtype type : DHTtype.values()) {
 			configModel.addBooleanParameter2("autoopen." + type.shortName,
 					("mldht.autoopen." + type.shortName).toLowerCase(), false);
@@ -124,7 +127,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 		configModel.addBooleanParameter2("showStatusEntry", "mldht.showStatusEntry", true);
 		configModel.addBooleanParameter2("multihoming", "mldht.multihoming", false);
 
-		viewModel = ui_manager.createBasicPluginViewModel("Mainline DHT Log");
+		viewModel = uiManager.createBasicPluginViewModel("Mainline DHT Log");
 
 		viewModel.getActivity().setVisible(false);
 		viewModel.getProgress().setVisible(false);
@@ -135,11 +138,11 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 		logChannel = logger.getTimeStampedChannel("Mainline DHT");
 
 		logListener = new LoggerChannelListener() {
-			public void messageLogged (int type, String content) {
+			public void messageLogged(int type, String content) {
 				viewModel.getLogArea().appendText(content + "\n");
 			}
 
-			public void messageLogged (String str, Throwable error) {
+			public void messageLogged(String str, Throwable error) {
 				if (str.length() > 0) {
 					viewModel.getLogArea().appendText(str + "\n");
 				}
@@ -262,19 +265,19 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 			}
 		};
 
-		ui_manager.addUIListener(uiListener);
+		uiManager.addUIListener(uiListener);
 
-		TableContextMenuItem incompleteMenuItem = ui_manager.getTableManager()
+		TableContextMenuItem incompleteMenuItem = uiManager.getTableManager()
 				.addContextMenuItem(TableManager.TABLE_MYTORRENTS_INCOMPLETE, "tablemenu.main.item");
-		TableContextMenuItem completeMenuItem = ui_manager.getTableManager()
+		TableContextMenuItem completeMenuItem = uiManager.getTableManager()
 				.addContextMenuItem(TableManager.TABLE_MYTORRENTS_COMPLETE, "tablemenu.main.item");
 
 		incompleteMenuItem.setStyle(MenuItem.STYLE_MENU);
 		completeMenuItem.setStyle(MenuItem.STYLE_MENU);
 
-		TableContextMenuItem incAnnounceItem = ui_manager.getTableManager()
+		TableContextMenuItem incAnnounceItem = uiManager.getTableManager()
 				.addContextMenuItem(incompleteMenuItem, "tablemenu.announce.item");
-		TableContextMenuItem comAnnounceItem = ui_manager.getTableManager()
+		TableContextMenuItem comAnnounceItem = uiManager.getTableManager()
 				.addContextMenuItem(completeMenuItem, "tablemenu.announce.item");
 
 		MenuItemListener announceItemListener = new MenuItemListener() {
@@ -466,27 +469,35 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 
 				@Override
 				public void runSupport() {
+					
 					if (unloaded) {
 						return;
 					}
-
+					
+					/*
+					 * onlyPeerBootstrap: 	false
+					 * alwaysRestoreID: 	true
+					 * dht.cache:			?
+					 * port: 				49001
+					 * multihoming: 		false
+					 */
 					DHTConfiguration config = new DHTConfiguration() {
 						public boolean noRouterBootstrap() {
 							return pluginInterface.getPluginconfig().getPluginBooleanParameter("onlyPeerBootstrap");
 						}
-
+						
 						public boolean isPersistingID() {
 							return pluginInterface.getPluginconfig().getPluginBooleanParameter("alwaysRestoreID");
 						}
-
+						
 						public File getNodeCachePath() {
 							return pluginInterface.getPluginconfig().getPluginUserFile("dht.cache");
 						}
-
+						
 						public int getListeningPort() {
 							return pluginInterface.getPluginconfig().getPluginIntParameter("port");
 						}
-
+						
 						public boolean allowMultiHoming() {
 							return pluginInterface.getPluginconfig().getPluginBooleanParameter("multihoming");
 						}
@@ -500,10 +511,10 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 					RPCServerListener serverListener = 
 							new RPCServerListener() {
 								@Override
-								public void replyReceived(InetSocketAddress from_node) {
+								public void replyReceived(InetSocketAddress fromNode) {
 									if (altContactHandler != null) {
 										try {
-											altContactHandler.nodeAlive(from_node);
+											altContactHandler.nodeAlive(fromNode);
 										} catch (Throwable e) {
 											Debug.out(e);
 										}
@@ -546,6 +557,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 						}
 						
 						if (altContactHandler != null) {
+							Log.d(TAG, ">>> altContactHandler != null");
 							altContactHandler.destroy();
 						}
 						
@@ -553,7 +565,6 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 							viewModel.getStatus().setText("Stopped");
 						}
 					} finally {
-						
 						sem.release();
 					}
 				}

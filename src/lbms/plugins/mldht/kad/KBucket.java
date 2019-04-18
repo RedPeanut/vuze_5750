@@ -149,7 +149,6 @@ public class KBucket implements Externalizable {
 			if (toRemove != null)
 				removed = newEntries.remove(toRemove);
 			
-			
 
 			if (toInsert != null) {
 				int oldSize = newEntries.size();

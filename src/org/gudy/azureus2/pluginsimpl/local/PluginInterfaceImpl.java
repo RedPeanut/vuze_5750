@@ -442,9 +442,8 @@ public final class PluginInterfaceImpl
 		return new MainlineDHTManagerImpl(initialiser.getAzureusCore());
 	}
 
-	public TorrentManager
-	getTorrentManager() {
-		return (TorrentManagerImpl.getSingleton().specialise( this));
+	public TorrentManager getTorrentManager() {
+		return (TorrentManagerImpl.getSingleton().specialise(this));
 	}
 
 	public Logger getLogger() {
