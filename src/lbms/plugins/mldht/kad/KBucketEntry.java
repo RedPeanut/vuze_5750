@@ -132,7 +132,7 @@ public class KBucketEntry implements Serializable {
 	 * @param addr socket address
 	 * @param id ID of node
 	 */
-	public KBucketEntry (InetSocketAddress addr, Key id) {
+	public KBucketEntry(InetSocketAddress addr, Key id) {
 		lastSeen = System.currentTimeMillis();
 		timeCreated = lastSeen;
 		this.addr = addr;
@@ -145,7 +145,7 @@ public class KBucketEntry implements Serializable {
 	 * @param id ID of node
 	 * @param timestamp the timestamp when this node last responded
 	 */
-	public KBucketEntry (InetSocketAddress addr, Key id, long timestamp) {
+	public KBucketEntry(InetSocketAddress addr, Key id, long timestamp) {
 		lastSeen = timestamp;
 		timeCreated = timestamp;
 		this.addr = addr;
@@ -245,7 +245,7 @@ public class KBucketEntry implements Serializable {
 	 *
 	 * @return true if the node as responded in the last 15 min.
 	 */
-	public boolean isGood () {
+	public boolean isGood() {
 		return !isQuestionable();
 	}
 
@@ -256,7 +256,7 @@ public class KBucketEntry implements Serializable {
 	 *
 	 * @return true if peer hasn't responded in the last 15 min.
 	 */
-	public boolean isQuestionable () {
+	public boolean isQuestionable() {
 		return (System.currentTimeMillis() - lastSeen > DHTConstants.KBE_QUESTIONABLE_TIME || isBad());
 	}
 
@@ -268,7 +268,7 @@ public class KBucketEntry implements Serializable {
 	 *
 	 * @return true if bad
 	 */
-	public boolean isBad () {
+	public boolean isBad() {
 		if (failedQueries >= DHTConstants.KBE_BAD_IMMEDIATLY_ON_FAILED_QUERIES) {
 	        return true;
         }

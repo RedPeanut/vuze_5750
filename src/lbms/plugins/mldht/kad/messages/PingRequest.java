@@ -34,7 +34,7 @@ public class PingRequest extends MessageBase {
 	/**
 	 * @param id
 	 */
-	public PingRequest () {
+	public PingRequest() {
 		super(new byte[] {(byte) 0xFF}, Method.PING, Type.REQ_MSG);
 	}
 
@@ -42,10 +42,9 @@ public class PingRequest extends MessageBase {
 	 * @see lbms.plugins.mldht.kad.messages.MessageBase#apply(lbms.plugins.mldht.kad.DHT)
 	 */
 	@Override
-	public void apply (DHT dh_table) {
-		dh_table.ping(this);
+	public void apply(DHT dht) {
+		dht.ping(this);
 	}
-	
 
 	@Override
 	public Map<String, Object> getInnerMap() {

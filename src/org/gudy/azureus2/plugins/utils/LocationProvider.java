@@ -24,18 +24,15 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.Locale;
 
-public abstract class
-LocationProvider
-{
+public abstract class LocationProvider {
+	
 	public static final long CAP_COUNTY_BY_IP		= 0x00000001;
 	public static final long CAP_ISO3166_BY_IP		= 0x00000002;
 	public static final long CAP_FLAG_BY_IP			= 0x00000004;
 
-	public abstract String
-	getProviderName();
+	public abstract String getProviderName();
 
-	public abstract long
-	getCapabilities();
+	public abstract long getCapabilities();
 
 	public boolean hasCapability(
 		long		capability) {
@@ -47,40 +44,32 @@ LocationProvider
 		return ((getCapabilities()&capabilities) == capabilities);
 	}
 
-	public String getCountryNameForIP(
-		InetAddress		address,
-		Locale			locale) {
+	public String getCountryNameForIP(InetAddress address, Locale locale) {
 		return (null);
 	}
 
-	public String getISO3166CodeForIP(
-		InetAddress		address) {
+	public String getISO3166CodeForIP(InetAddress address) {
 		return (null);
 	}
 
-		/**
-		 * Array of [width, height] pairs, smallest to largest
-		 * @return
-		 */
-
-	public int[][]
-	getCountryFlagSizes() {
+	/**
+	 * Array of [width, height] pairs, smallest to largest
+	 * @return
+	 */
+	public int[][] getCountryFlagSizes() {
 		return (null);
 	}
 
-		/**
-		 *
-		 * @param address
-		 * @param size_index - index in getCountryFlagSizes response of desired size
-		 * @return
-		 */
+	/**
+	 *
+	 * @param address
+	 * @param size_index - index in getCountryFlagSizes response of desired size
+	 * @return
+	 */
 
-	public InputStream getCountryFlagForIP(
-		InetAddress		address,
-		int				size_index) {
+	public InputStream getCountryFlagForIP(InetAddress address, int size_index) {
 		return (null);
 	}
 
-	public abstract boolean
-	isDestroyed();
+	public abstract boolean isDestroyed();
 }

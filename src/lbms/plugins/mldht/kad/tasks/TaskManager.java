@@ -37,7 +37,7 @@ public class TaskManager {
 	private Deque<Task>			queued;
 	private AtomicInteger		nextId = new AtomicInteger();
 
-	public TaskManager () {
+	public TaskManager() {
 		tasks = new HashMap<Integer, Task>();
 		queued = new LinkedList<Task>();
 		nextId.set(1);
@@ -51,7 +51,7 @@ public class TaskManager {
 	 * Add a task to manage.
 	 * @param task
 	 */
-	public void addTask (Task task, boolean isPriority) {
+	public void addTask(Task task, boolean isPriority) {
 		int id = nextId.incrementAndGet();
 		task.setTaskID(id);
 		if (task.isQueued()) {

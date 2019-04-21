@@ -34,13 +34,13 @@ public interface RPCCallBase {
 	 * Called by the server if a response is received.
 	 * @param rsp
 	 */
-	public void response (MessageBase rsp);
+	public void response(MessageBase rsp);
 
 	/**
 	 * Add a listener for this call
 	 * @param cl The listener
 	 */
-	public void addListener (RPCCallListener cl);
+	public void addListener(RPCCallListener cl);
 
 	/**
 	 * Remove a listener for this call

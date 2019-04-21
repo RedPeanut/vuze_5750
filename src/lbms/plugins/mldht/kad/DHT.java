@@ -26,6 +26,7 @@ import org.gudy.azureus2.core3.util.SystemTime;
 
 import hello.util.Log;
 import hello.util.SingleCounter0;
+import hello.util.Util;
 import lbms.plugins.mldht.DHTConfiguration;
 import lbms.plugins.mldht.kad.Node.RoutingTableEntry;
 import lbms.plugins.mldht.kad.messages.*;
@@ -202,6 +203,9 @@ public class DHT implements DHTBase {
 
 		node.recieved(this, r);
 		
+		//Log.d(TAG, "findNode() is called...");
+		//Util.printRequest(TAG, r);
+		
 		// find the K closest nodes and pack them
 		KClosestNodesSearch kns4 = null; 
 		KClosestNodesSearch kns6 = null;
@@ -216,12 +220,13 @@ public class DHT implements DHTBase {
 			kns6.fill(DHTtype.IPV6_DHT != type);
 		}
 
-		FindNodeResponse fnr = new FindNodeResponse(r.getMTID(), kns4 != null ? kns4.pack() : null,kns6 != null ? kns6.pack() : null);
+		FindNodeResponse fnr = new FindNodeResponse(r.getMTID(), kns4 != null ? kns4.pack() : null, kns6 != null ? kns6.pack() : null);
 		fnr.setOrigin(r.getOrigin());
 		r.getServer().sendMessage(fnr);
 	}
 
-	public void response (MessageBase r) {
+	public void response(MessageBase r) {
+		
 		if (!isRunning()) {
 			return;
 		}
@@ -229,7 +234,8 @@ public class DHT implements DHTBase {
 		node.recieved(this, r);
 	}
 
-	public void getPeers (GetPeersRequest r) {
+	public void getPeers(GetPeersRequest r) {
+		
 		if (!isRunning()) {
 			return;
 		}
@@ -238,10 +244,13 @@ public class DHT implements DHTBase {
 		if (node.allLocalIDs().contains(r.getID())) {
 			return;
 		}
-
+		
+		//Log.d(TAG, "getPeers() is called...");
+		//Util.printRequest(TAG, r);
+		
 		node.recieved(this, r);
 		
-		List<DBItem> dbl = db.sample(r.getInfoHash(), 50,type, r.isNoSeeds());
+		List<DBItem> dbl = db.sample(r.getInfoHash(), 50, type, r.isNoSeeds());
 		for (DHTIndexingListener listener : indexingListeners) {
 			List<PeerAddressDBItem> toAdd = listener.incomingPeersRequest(r.getInfoHash(), r.getOrigin().getAddress(), r.getID());
 			if (dbl == null && !toAdd.isEmpty())
@@ -249,11 +258,9 @@ public class DHT implements DHTBase {
 			if (dbl != null && !toAdd.isEmpty())
 				dbl.addAll(toAdd);
 		}
-			
 
 		// generate a token
-		Token token = db.genToken(r.getOrigin().getAddress(), r
-				.getOrigin().getPort(), r.getInfoHash());
+		Token token = db.genToken(r.getOrigin().getAddress(), r.getOrigin().getPort(), r.getInfoHash());
 
 		KClosestNodesSearch kns4 = null; 
 		KClosestNodesSearch kns6 = null;
@@ -268,7 +275,6 @@ public class DHT implements DHTBase {
 			kns6.fill(DHTtype.IPV6_DHT != type);
 		}
 
-		
 		GetPeersResponse resp = new GetPeersResponse(r.getMTID(), 
 			kns4 != null ? kns4.pack() : null,
 			kns6 != null ? kns6.pack() : null,
@@ -278,14 +284,13 @@ public class DHT implements DHTBase {
 			resp.setScrapePeers(db.createScrapeFilter(r.getInfoHash(), false));
 			resp.setScrapeSeeds(db.createScrapeFilter(r.getInfoHash(), true));			
 		}
-
 		
 		resp.setPeerItems(dbl);
 		resp.setDestination(r.getOrigin());
 		r.getServer().sendMessage(resp);
 	}
 
-	public void announce (AnnounceRequest r) {
+	public void announce(AnnounceRequest r) {
 		
 		if (!isRunning()) {
 			return;
@@ -296,6 +301,14 @@ public class DHT implements DHTBase {
 			return;
 		}
 
+		Log.d(TAG, "announce() is called...");
+		//Util.printRequest(TAG, r);
+		InetSocketAddress isa = r.getOrigin();
+		String hash = Util.toHexString(r.getTarget().getHash());
+		//if (hash.length() > 10)
+			//hash = hash.substring(0, 10)+"...";
+		Log.d(TAG, "addr="+isa+",hash="+hash);
+		
 		node.recieved(this, r);
 		// first check if the token is OK
 		Token token = r.getToken();
@@ -359,7 +372,7 @@ public class DHT implements DHTBase {
 	 * 
 	 * @see lbms.plugins.mldht.kad.DHTBase#announce(byte[], int)
 	 */
-	public PeerLookupTask createPeerLookup (byte[] info_hash) {
+	public PeerLookupTask createPeerLookup (byte[] infoHash) {
 		if (!isRunning()) {
 			return null;
 		}
@@ -368,7 +381,7 @@ public class DHT implements DHTBase {
 			return(null);
 		}
 		
-		Key id = new Key(info_hash);
+		Key id = new Key(infoHash);
 
 		PeerLookupTask lookupTask = new PeerLookupTask(server, node, id);
 
@@ -516,8 +529,8 @@ public class DHT implements DHTBase {
 	public void start(DHTConfiguration config, final RPCServerListener serverListener)
 			throws SocketException {
 		
-		Log.d(TAG, ">>> start() is called...");
-		new Throwable().printStackTrace();
+		//Log.d(TAG, ">>> start() is called...");
+		//new Throwable().printStackTrace();
 		
 		if (running || stopped) {
 			return;
@@ -749,9 +762,7 @@ public class DHT implements DHTBase {
 	 * @see lbms.plugins.mldht.kad.DHTBase#stopped()
 	 */
 	public void stopped () {
-		
 		stopped = true;
-
 	}
 
 	/*

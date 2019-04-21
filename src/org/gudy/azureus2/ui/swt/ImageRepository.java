@@ -55,8 +55,8 @@ import com.aelitis.azureus.ui.swt.imageloader.ImageLoader;
  * @author Olivier
  *
  */
-public class ImageRepository
-{
+public class ImageRepository {
+	
 	private static final String[] noCacheExtList = new String[] {
 		".exe"
 	};
@@ -197,6 +197,7 @@ public class ImageRepository
 	}
 
 	private static Image force16height(Image image) {
+		
 		if (image == null) {
 			return image;
 		}
@@ -210,7 +211,6 @@ public class ImageRepository
 					// drawImage doesn't work on GTK when advanced is on
 					gc.setAdvanced(true);
 				}
-
 				gc.drawImage(image, 0, 0, bounds.width, bounds.height, 0, 0, 16, 16);
 			} finally {
 				gc.dispose();
@@ -229,8 +229,8 @@ public class ImageRepository
 	* @param path Absolute path to the file or directory
 	* @return The image
 	*/
-	public static Image getPathIcon(final String path, boolean bBig,
-			boolean minifolder) {
+	public static Image getPathIcon(final String path, boolean bBig, boolean minifolder) {
+		
 		if (path == null)
 			return null;
 
@@ -372,252 +372,167 @@ public class ImageRepository
 		return getIconFromExtension(file, ext, bBig, minifolder);
 	}
 
-	private static LocationProvider	flag_provider;
-	private static long				flag_provider_last_check;
+	private static LocationProvider	flagProvider;
+	private static long				flagProviderLastCheck;
 
-	private static Image	flag_none		= ImageLoader.getNoImage();
+	private static Image	flagNone		= ImageLoader.getNoImage();
 	private static Object	flag_small_key 	= new Object();
 	private static Object	flag_big_key 	= new Object();
 
-	private static Map<String,Image>	flag_cache = new HashMap<String, Image>();
+	private static Map<String,Image>	flagCache = new HashMap<String, Image>();
 
-	private static LocationProvider
-	getFlagProvider() {
-		if (flag_provider != null) {
-
-			if (flag_provider.isDestroyed()) {
-
-				flag_provider 				= null;
-				flag_provider_last_check	= 0;
+	private static LocationProvider getFlagProvider() {
+		if (flagProvider != null) {
+			if (flagProvider.isDestroyed()) {
+				flagProvider 				= null;
+				flagProviderLastCheck	= 0;
 			}
 		}
-
-		if (flag_provider == null) {
-
-			long	now = SystemTime.getMonotonousTime();
-
-			if (flag_provider_last_check == 0 || now - flag_provider_last_check > 20*1000) {
-
-				flag_provider_last_check = now;
-
+		
+		if (flagProvider == null) {
+			long now = SystemTime.getMonotonousTime();
+			if (flagProviderLastCheck == 0 || now - flagProviderLastCheck > 20*1000) {
+				flagProviderLastCheck = now;
 				java.util.List<LocationProvider> providers = AzureusCoreFactory.getSingleton().getPluginManager().getDefaultPluginInterface().getUtilities().getLocationProviders();
-
 				for (LocationProvider provider: providers) {
-
 					if (	provider.hasCapabilities(
 								LocationProvider.CAP_ISO3166_BY_IP |
 								LocationProvider.CAP_FLAG_BY_IP )) {
-
-						flag_provider = provider;
+						flagProvider = provider;
 					}
 				}
 			}
 		}
-
-		return (flag_provider);
+		return (flagProvider);
 	}
 
-	public static boolean
-	hasCountryFlags(
-		boolean		small) {
+	public static boolean hasCountryFlags(boolean small) {
 		if (!Utils.isSWTThread()) {
-
 			Debug.out("Needs to be swt thread...");
-
 			return (false);
 		}
-
 		LocationProvider fp = getFlagProvider();
-
 		if (fp == null) {
-
 			return (false);
 		}
-
 		return (true);
 	}
 
-	public static Image
-	getCountryFlag(
-		Peer		peer,
-		boolean		small) {
-		return (getCountryFlag( PluginCoreUtils.unwrap( peer ), small));
+	public static Image getCountryFlag(Peer peer, boolean small) {
+		return (getCountryFlag(PluginCoreUtils.unwrap(peer), small));
 	}
 
 	private static Map<String,Image>	net_images = new HashMap<String, Image>();
 
-	public static Image
-	getCountryFlag(
+	public static Image getCountryFlag(
 		PEPeer		peer,
 		boolean		small) {
 		if (peer == null) {
-
 			return (null);
 		}
-
 		Object	peer_key = small?flag_small_key:flag_big_key;
-
 		Image flag = (Image)peer.getUserData(peer_key);
-
 		if (flag == null) {
-
 			LocationProvider fp = getFlagProvider();
-
 			if (fp != null) {
-
 				try {
 					String ip = peer.getIp();
-
-					if (HostNameToIPResolver.isDNSName( ip)) {
-
+					if (HostNameToIPResolver.isDNSName(ip)) {
 						InetAddress peer_address = HostNameToIPResolver.syncResolve(ip);
-
 						String cc_key = fp.getISO3166CodeForIP(peer_address) + (small?".s":".l");
-
-						flag = flag_cache.get(cc_key);
-
+						flag = flagCache.get(cc_key);
 						if (flag != null) {
-
 							peer.setUserData(peer_key, flag);
-
 						} else {
-
 							InputStream is = fp.getCountryFlagForIP(peer_address, small?0:1);
-
 							if (is != null) {
-
 								try {
 									Display display = Display.getDefault();
-
 									flag = new Image( display, is);
-
 									flag = Utils.adjustPXForDPI(display, flag);
-
 									//System.out.println("Created flag image for " + cc_key);
-
 								} finally {
-
 									is.close();
 								}
 							} else {
-
-								flag = flag_none;
+								flag = flagNone;
 							}
-
-							flag_cache.put(cc_key, flag);
-
+							flagCache.put(cc_key, flag);
 							peer.setUserData(peer_key, flag);
 						}
 					} else {
-
 						String cat =  AENetworkClassifier.categoriseAddress(ip);
-
 						if (cat != AENetworkClassifier.AT_PUBLIC) {
-
 							final String key = "net_" + cat + (small?"_s":"_b");
-
 							Image i = net_images.get(key);
-
 							if (i == null) {
-
 								Utils.execSWTThread(
 									new Runnable() {
 										public void run() {
 											Image i = ImageLoader.getInstance().getImage(key);
-
 											net_images.put(key, i);
 										}
 									},
 									false);
-
 								i = net_images.get(key);
 							}
-
 							if (ImageLoader.isRealImage( i)) {
-
 								return (i);
 							}
 						}
 					}
-
 				} catch (Throwable e) {
-
 				}
 			}
 		}
-
-		if (flag == flag_none) {
-
+		if (flag == flagNone) {
 			return (null);
 		}
-
 		return (flag);
 	}
 
-	public static Image
-	getCountryFlag(
+	public static Image getCountryFlag(
 		InetAddress		address,
 		boolean			small) {
-		if (address == null) {
-
+		
+		if (address == null)
 			return (null);
-		}
-
+		
 		Image flag = null;
-
 		LocationProvider fp = getFlagProvider();
-
 		if (fp != null) {
-
 			try {
-				String cc_key = fp.getISO3166CodeForIP(address) + (small?".s":".l");
-
-				flag = flag_cache.get(cc_key);
-
+				String ccKey = fp.getISO3166CodeForIP(address) + (small?".s":".l");
+				flag = flagCache.get(ccKey);
 				if (flag == null) {
-
 					InputStream is = fp.getCountryFlagForIP(address, small?0:1);
-
 					if (is != null) {
-
 						try {
 							Display display = Display.getDefault();
-
-							flag = new Image( display, is);
-
+							flag = new Image(display, is);
 							flag = Utils.adjustPXForDPI(display, flag);
-
 							//System.out.println("Created flag image for " + cc_key);
-
 						} finally {
-
 							is.close();
 						}
 					} else {
-
-						flag = flag_none;
+						flag = flagNone;
 					}
-
-					flag_cache.put(cc_key, flag);
+					flagCache.put(ccKey, flag);
 				}
-
 			} catch (Throwable e) {
-
 			}
 		}
-
-		if (flag == flag_none) {
-
+		if (flag == flagNone) {
 			return (null);
 		}
-
 		return (flag);
 	}
 
-
-
 	public static void main(String[] args) {
+		
 		Display display = new Display();
+		
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
 		shell.setLayout(new FillLayout(SWT.VERTICAL));
 
@@ -625,7 +540,6 @@ public class ImageRepository
 
 		final Text text = new Text(shell, SWT.BORDER);
 		text.addModifyListener(new ModifyListener() {
-
 			public void modifyText(ModifyEvent e) {
 				Image pathIcon = getPathIcon(text.getText(), false, false);
 				label.setImage(pathIcon);

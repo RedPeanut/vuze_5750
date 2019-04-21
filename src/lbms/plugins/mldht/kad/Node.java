@@ -98,7 +98,6 @@ public class Node {
 		KBucketEntry newEntry = new KBucketEntry(msg.getOrigin(), msg.getID());
 		newEntry.setVersion(msg.getVersion());
 		
-		
 		boolean nodeIDchanged = false;
 		// to avoid scanning all buckets on each incoming packet we use a cache of Addresses we have in our buckets
 		// this is inaccurate, but good enough to catch most node ID changes
@@ -114,9 +113,6 @@ public class Node {
 			
 			insertEntry(newEntry,false);
 		}
-			
-		
-
 
 		numReceives++;
 		

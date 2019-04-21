@@ -615,15 +615,11 @@ public interface Download
 	 *
 	 * @since 2.0.7.0
 	 */
-	public boolean canBeRemoved()
+	public boolean canBeRemoved() throws DownloadRemovalVetoException;
 
-		throws DownloadRemovalVetoException;
+	public void setAnnounceResult(DownloadAnnounceResult result);
 
-	public void setAnnounceResult(
-		DownloadAnnounceResult	result);
-
-	public void setScrapeResult(
-		DownloadScrapeResult	result);
+	public void setScrapeResult(DownloadScrapeResult result);
 
 	/**
 	 * Gives access to the last announce result received from the tracker for the download

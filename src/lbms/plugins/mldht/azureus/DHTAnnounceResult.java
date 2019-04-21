@@ -52,7 +52,7 @@ public class DHTAnnounceResult implements DownloadAnnounceResult {
 	/**
 	 * Converts the DBItems into DHTPeers
 	 */
-	private void convertPeers () {
+	private void convertPeers() {
 		resultPeers = new DownloadAnnounceResultPeer[peers.size()];
 		
 		int i = 0;		
@@ -71,35 +71,35 @@ public class DHTAnnounceResult implements DownloadAnnounceResult {
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResult#getDownload()
 	 */
-	public Download getDownload () {
+	public Download getDownload() {
 		return dl;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResult#getError()
 	 */
-	public String getError () {
+	public String getError() {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResult#getExtensions()
 	 */
-	public Map getExtensions () {
+	public Map getExtensions() {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResult#getNonSeedCount()
 	 */
-	public int getNonSeedCount () {
+	public int getNonSeedCount() {
 		return scrapePeers;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResult#getPeers()
 	 */
-	public DownloadAnnounceResultPeer[] getPeers () {
+	public DownloadAnnounceResultPeer[] getPeers() {
 		if (resultPeers == null) {
 			convertPeers();
 		}

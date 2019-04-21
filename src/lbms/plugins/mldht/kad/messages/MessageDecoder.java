@@ -125,8 +125,9 @@ public class MessageDecoder {
 	 * @param mtid
 	 * @return
 	 */
-	private static MessageBase parseResponse (Map<String, Object> map,
+	private static MessageBase parseResponse(Map<String, Object> map,
 			Method msgMethod, byte[] mtid,RPCCallBase base) {
+		
 		Map<String, Object> args = (Map<String, Object>) map.get(Type.RSP_MSG.innerKey());
 		if (args == null || !args.containsKey("id")) {
 			return null;
@@ -143,64 +144,57 @@ public class MessageDecoder {
 		MessageBase msg = null;
 
 		switch (msgMethod) {
-		case PING:
-			msg = new PingResponse(mtid);
-			break;
-		case ANNOUNCE_PEER:
-			msg = new AnnounceResponse(mtid);
-			break;
-		case FIND_NODE:
-			if (!args.containsKey("nodes") && !args.containsKey("nodes6"))
-				return null;
-			
-			msg = new FindNodeResponse(mtid, (byte[]) args.get("nodes"),(byte[])args.get("nodes6"));
-			break;
-		case GET_PEERS:
-			Object their_token = args.get("token");
-			
-			
-			byte[] nodes = (byte[]) args.get("nodes");
-			byte[] nodes6 = (byte[]) args.get("nodes6");
-			
-			Object _values = args.get("values");
-			
-			List<byte[]> vals = null;
-			
-			if (_values instanceof List) {
-				
-				vals = (List<byte[]>)_values;
-				
-			}else if (_values instanceof byte[]) {
-				
-					// seen this a few times...
-				
-				vals = new ArrayList<byte[]>();
-				
-				vals.add((byte[])_values);
-			}
-			
-			List<DBItem> dbl = null;
-			if (vals != null && vals.size() > 0) {
-				dbl = new ArrayList<DBItem>(vals.size());
-				for (int i = 0; i < vals.size(); i++) {
-					// only accept ipv4 or ipv6 for now
-					if (vals.get(i).length != DHTtype.IPV4_DHT.ADDRESS_ENTRY_LENGTH && vals.get(i).length != DHTtype.IPV6_DHT.ADDRESS_ENTRY_LENGTH)
-						continue;
-					dbl.add(new PeerAddressDBItem((byte[]) vals.get(i), false));
-				}
-			}
-
-			if (dbl != null || nodes != null || nodes6 != null) {
-				GetPeersResponse resp = new GetPeersResponse(mtid, nodes, nodes6, their_token==null?null:new Token.TheirToken(their_token));
-				resp.setPeerItems(dbl);
-				msg = resp; 
+			case PING:
+				msg = new PingResponse(mtid);
 				break;
-			}
-			DHT.logDebug("No nodes or values in get_peers response");
-			return null;
- 
-		default:
-			return null;
+			case ANNOUNCE_PEER:
+				msg = new AnnounceResponse(mtid);
+				break;
+			case FIND_NODE:
+				if (!args.containsKey("nodes") && !args.containsKey("nodes6"))
+					return null;
+				msg = new FindNodeResponse(mtid, (byte[]) args.get("nodes"),(byte[])args.get("nodes6"));
+				break;
+			case GET_PEERS:
+				Object their_token = args.get("token");
+				
+				byte[] nodes = (byte[]) args.get("nodes");
+				byte[] nodes6 = (byte[]) args.get("nodes6");
+				
+				Object _values = args.get("values");
+				
+				List<byte[]> vals = null;
+				
+				if (_values instanceof List) {
+					vals = (List<byte[]>)_values;
+				} else if (_values instanceof byte[]) {
+					// seen this a few times...
+					vals = new ArrayList<byte[]>();
+					vals.add((byte[])_values);
+				}
+				
+				List<DBItem> dbl = null;
+				if (vals != null && vals.size() > 0) {
+					dbl = new ArrayList<DBItem>(vals.size());
+					for (int i = 0; i < vals.size(); i++) {
+						// only accept ipv4 or ipv6 for now
+						if (vals.get(i).length != DHTtype.IPV4_DHT.ADDRESS_ENTRY_LENGTH && vals.get(i).length != DHTtype.IPV6_DHT.ADDRESS_ENTRY_LENGTH)
+							continue;
+						dbl.add(new PeerAddressDBItem((byte[]) vals.get(i), false));
+					}
+				}
+	
+				if (dbl != null || nodes != null || nodes6 != null) {
+					GetPeersResponse resp = new GetPeersResponse(mtid, nodes, nodes6, their_token==null?null:new Token.TheirToken(their_token));
+					resp.setPeerItems(dbl);
+					msg = resp; 
+					break;
+				}
+				DHT.logDebug("No nodes or values in get_peers response");
+				return null;
+	 
+			default:
+				return null;
 		}
 		
 		msg.setID(id);

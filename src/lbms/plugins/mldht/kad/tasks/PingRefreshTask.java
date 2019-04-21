@@ -39,7 +39,7 @@ public class PingRefreshTask extends Task {
 	 * @param node
 	 * @param cleanOnTimeout if true Nodes that fail to respond are removed. should be false for normal use.
 	 */
-	public PingRefreshTask (RPCServerBase rpc, Node node, boolean cleanOnTimeout) {
+	public PingRefreshTask(RPCServerBase rpc, Node node, boolean cleanOnTimeout) {
 		this(rpc, node, node.getBuckets(), cleanOnTimeout);
 	}
 

@@ -1,9 +1,12 @@
 package hello.util;
 
+import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lbms.plugins.mldht.kad.messages.AbstractLookupRequest;
 
 public class Util {
 
@@ -90,5 +93,12 @@ public class Util {
 		}
 	}
 	
+	public static void printRequest(String tag, AbstractLookupRequest r) {
+		InetSocketAddress isa = r.getOrigin();
+		String hash = toHexString(r.getTarget().getHash());
+		if (hash.length() > 10)
+			hash = hash.substring(0, 10)+"...";
+		Log.d(tag, "addr="+isa+",hash="+hash);
+	}
 	
 }

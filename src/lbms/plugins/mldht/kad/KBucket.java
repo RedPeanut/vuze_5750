@@ -132,7 +132,7 @@ public class KBucket implements Externalizable {
 	
 	
 	/**
-	 * mostly meant for internal use or transfering entries into a new bucket.
+	 * mostly meant for internal use or transferring entries into a new bucket.
 	 * to update a bucket properly use {@link #insertOrRefresh(KBucketEntry)} 
 	 */
 	public void modifyMainBucket(KBucketEntry toRemove, KBucketEntry toInsert) {
@@ -149,7 +149,6 @@ public class KBucket implements Externalizable {
 			if (toRemove != null)
 				removed = newEntries.remove(toRemove);
 			
-
 			if (toInsert != null) {
 				int oldSize = newEntries.size();
 				boolean wasFull = oldSize >= DHTConstants.MAX_ENTRIES_PER_BUCKET;
@@ -301,9 +300,9 @@ public class KBucket implements Externalizable {
 		return false;
 	}
 	
-	private void pingQuestionable (final KBucketEntry replacement_entry) {
+	private void pingQuestionable(final KBucketEntry replacementEntry) {
 		if (pendingPings.size() >= 2) {
-			insertInReplacementBucket(replacement_entry);
+			insertInReplacementBucket(replacementEntry);
 			return;
 		}
 
@@ -311,7 +310,7 @@ public class KBucket implements Externalizable {
 		for (final KBucketEntry toTest : entries) {
 			if (toTest.isQuestionable() && pingEntry(toTest, new RPCCallListener() {
 				public void onTimeout(RPCCallBase c) {
-					modifyMainBucket(toTest, replacement_entry);
+					modifyMainBucket(toTest, replacementEntry);
 					// we could replace this one, try another one.
 					KBucketEntry nextReplacementEntry;
 					nextReplacementEntry = getYoungestReplacementEntry();
@@ -324,8 +323,8 @@ public class KBucket implements Externalizable {
 
 				public void onResponse(RPCCallBase c, MessageBase rsp) {
 					// it's alive, check another one
-					if (!replaceBadEntry(replacement_entry)) {
-						pingQuestionable(replacement_entry);
+					if (!replaceBadEntry(replacementEntry)) {
+						pingQuestionable(replacementEntry);
 					}
 				}
 			})) {
@@ -334,7 +333,7 @@ public class KBucket implements Externalizable {
 		}
 
 		//save the entry if all are good
-		insertInReplacementBucket(replacement_entry);
+		insertInReplacementBucket(replacementEntry);
 
 	}
 

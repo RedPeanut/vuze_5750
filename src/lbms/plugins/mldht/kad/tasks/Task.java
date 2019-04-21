@@ -90,7 +90,7 @@ public abstract class Task implements RPCCallListener {
 	/* (non-Javadoc)
 	 * @see lbms.plugins.mldht.kad.RPCCallListener#onResponse(lbms.plugins.mldht.kad.RPCCall, lbms.plugins.mldht.kad.messages.MessageBase)
 	 */
-	public void onResponse (RPCCallBase c, MessageBase rsp) {
+	public void onResponse(RPCCallBase c, MessageBase rsp) {
 		if (!c.wasStalled())
 			outstandingRequestsExcludingStalled.decrementAndGet();
 		outstandingRequests.decrementAndGet();
@@ -112,7 +112,6 @@ public abstract class Task implements RPCCallListener {
 		if (!isFinished())
 			callStalled(c);
 			
-		
 		if (canDoRequest() && !isFinished()) {
 			update();
 		}
@@ -190,7 +189,7 @@ public abstract class Task implements RPCCallListener {
 	 * @param req THe request to send
 	 * @return true if call was made, false if not
 	 */
-	boolean rpcCall (MessageBase req, Key expectedID) {
+	boolean rpcCall(MessageBase req, Key expectedID) {
 		if (!canDoRequest()) {
 			return false;
 		}
@@ -206,7 +205,7 @@ public abstract class Task implements RPCCallListener {
 	}
 
 	/// See if we can do a request
-	boolean canDoRequest () {
+	boolean canDoRequest() {
 		return rpc.isRunning() && outstandingRequestsExcludingStalled.get() < DHTConstants.MAX_CONCURRENT_REQUESTS;
 	}
 	
@@ -215,49 +214,49 @@ public abstract class Task implements RPCCallListener {
 	}
 
 	/// Is the task finished
-	public boolean isFinished () {
+	public boolean isFinished() {
 		return taskFinished;
 	}
 
 	/// Set the task ID
-	void setTaskID (int tid) {
+	void setTaskID(int tid) {
 		taskID = tid;
 	}
 
 	/// Get the task ID
-	public int getTaskID () {
+	public int getTaskID() {
 		return taskID;
 	}
 
 	/**
 	 * @return the Count of Failed Requests
 	 */
-	public int getFailedReqs () {
+	public int getFailedReqs() {
 		return failedReqs;
 	}
 
 	/**
 	 * @return the Count of Received Responses
 	 */
-	public int getRecvResponses () {
+	public int getRecvResponses() {
 		return recvResponses;
 	}
 
 	/**
 	 * @return the Count of Sent Requests
 	 */
-	public int getSentReqs () {
+	public int getSentReqs() {
 		return sentReqs;
 	}
 
-	public int getTodoCount () {
+	public int getTodoCount() {
 		return todo.size();
 	}
 
 	/**
 	 * @return the targetKey
 	 */
-	public Key getTargetKey () {
+	public Key getTargetKey() {
 		return targetKey;
 	}
 
@@ -356,11 +355,11 @@ public abstract class Task implements RPCCallListener {
 		}
 	}
 
-	protected void done () {
+	protected void done() {
 		finished();
 	}
 
-	public void addListener (TaskListener listener) {
+	public void addListener(TaskListener listener) {
 		if (listeners == null) {
 			listeners = new ArrayList<TaskListener>(1);
 		}
@@ -370,7 +369,7 @@ public abstract class Task implements RPCCallListener {
 		listeners.add(listener);
 	}
 
-	public void removeListener (TaskListener listener) {
+	public void removeListener(TaskListener listener) {
 		if (listeners != null) {
 			listeners.remove(listener);
 		}

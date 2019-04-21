@@ -43,7 +43,7 @@ public class GetPeersResponse extends MessageBase {
 	 * @param nodes
 	 * @param token
 	 */
-	public GetPeersResponse (byte[] mtid, byte[] nodes, byte[] nodes6, Token token) {
+	public GetPeersResponse(byte[] mtid, byte[] nodes, byte[] nodes6, Token token) {
 		super(mtid, Method.GET_PEERS, Type.RSP_MSG);
 		this.nodes = nodes;
 		this.nodes6 = nodes6;
@@ -55,8 +55,8 @@ public class GetPeersResponse extends MessageBase {
 	 * @see lbms.plugins.mldht.kad.messages.MessageBase#apply(lbms.plugins.mldht.kad.DHT)
 	 */
 	@Override
-	public void apply (DHT dh_table) {
-		dh_table.response(this);
+	public void apply(DHT dht) {
+		dht.response(this);
 	}
 	
 	@Override
@@ -97,7 +97,7 @@ public class GetPeersResponse extends MessageBase {
 		this.items = items;
 	}
 
-	public List<DBItem> getPeerItems () {
+	public List<DBItem> getPeerItems() {
 		return items == null ? (List<DBItem>)Collections.EMPTY_LIST : Collections.unmodifiableList(items);
 	}
 	

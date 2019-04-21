@@ -30,7 +30,7 @@ public interface RPCCallListener {
 	 * @param c The call
 	 * @param rsp The response
 	 */
-	public void onResponse (RPCCallBase c, MessageBase rsp);
+	public void onResponse(RPCCallBase c, MessageBase rsp);
 	
 	
 	/**
@@ -42,5 +42,5 @@ public interface RPCCallListener {
 	 * The call has timed out.
 	 * @param c The call
 	 */
-	public void onTimeout (RPCCallBase c);
+	public void onTimeout(RPCCallBase c);
 }

@@ -42,7 +42,7 @@ public class PackUtil {
 	 * @param off Offset to use
 	 * @throws IllegalArgumentException if buffer is too small
 	 */
-	public static void PackBucketEntry (KBucketEntry e, byte[] buffer, int off, DHTtype type) {
+	public static void PackBucketEntry(KBucketEntry e, byte[] buffer, int off, DHTtype type) {
 		// first check size
 		if (off + type.NODES_ENTRY_LENGTH > buffer.length) {
 			throw new IllegalArgumentException("Not enough room in buffer");

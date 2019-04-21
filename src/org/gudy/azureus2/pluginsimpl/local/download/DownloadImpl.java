@@ -1307,19 +1307,18 @@ public class DownloadImpl
 			});
 	}
 
-	private String getTrackingName(
-		Object		obj) {
-		String	name = obj.getClass().getName();
-		int	pos = name.lastIndexOf('.');
-		name = name.substring(pos+1);
+	private String getTrackingName(Object obj) {
+		String name = obj.getClass().getName();
+		int pos = name.lastIndexOf('.');
+		name = name.substring(pos + 1);
 		pos = name.indexOf('$');
 		if (pos != -1) {
 			name = name.substring(0, pos);
 		}
-			// hack alert - could use classloader to find plugin I guess
+		// hack alert - could use classloader to find plugin I guess
 		pos = name.indexOf("DHTTrackerPlugin");
 		if (pos == 0) {
-				// built in
+			// built in
 			name = null;
 		} else if (pos > 0) {
 			name = name.substring(0, pos);
@@ -1329,14 +1328,14 @@ public class DownloadImpl
 		return (name);
 	}
 
-	public void setAnnounceResult(
-		DownloadAnnounceResult	result) {
-		String class_name = getTrackingName(result);
-		if (class_name != null) {
+	public void setAnnounceResult(DownloadAnnounceResult	result) {
+		
+		String className = getTrackingName(result);
+		if (className != null) {
 			int	seeds 		= result.getSeedCount();
 			int	leechers 	= result.getNonSeedCount();
 			DownloadAnnounceResultPeer[] peers = result.getPeers();
-			int	peer_count = peers==null?0:peers.length;
+			int	peerCount = peers==null?0:peers.length;
 			try {
 				peerListenersMon.enter();
 				if (announceResponseMap == null) {
@@ -1347,14 +1346,14 @@ public class DownloadImpl
 						announceResponseMap.clear();
 					}
 				}
-				int[]	data = (int[])announceResponseMap.get(class_name);
+				int[]	data = (int[])announceResponseMap.get(className);
 				if (data == null) {
 					data = new int[4];
-					announceResponseMap.put(class_name, data);
+					announceResponseMap.put(className, data);
 				}
 				data[0]	= seeds;
 				data[1]	= leechers;
-				data[2]	= peer_count;
+				data[2]	= peerCount;
 				data[3] = (int)(SystemTime.getCurrentTime()/1000);
 			} finally {
 				peerListenersMon.exit();

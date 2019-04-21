@@ -40,7 +40,7 @@ public class FindNodeResponse extends MessageBase {
 	 * @param id
 	 * @param nodes
 	 */
-	public FindNodeResponse (byte[] mtid, byte[] nodes, byte[] nodes6) {
+	public FindNodeResponse(byte[] mtid, byte[] nodes, byte[] nodes6) {
 		super(mtid, Method.FIND_NODE, Type.RSP_MSG);
 		this.nodes = nodes;
 		this.nodes6 = nodes6;
@@ -50,8 +50,8 @@ public class FindNodeResponse extends MessageBase {
 	 * @see lbms.plugins.mldht.kad.messages.MessageBase#apply(lbms.plugins.mldht.kad.DHT)
 	 */
 	@Override
-	public void apply (DHT dh_table) {
-		dh_table.response(this);
+	public void apply(DHT dht) {
+		dht.response(this);
 	}
 	
 	@Override
@@ -63,7 +63,6 @@ public class FindNodeResponse extends MessageBase {
 		if (nodes6 != null)
 			inner.put("nodes6", nodes6);
 		
-
 		return inner;		
 	}
 	
@@ -78,14 +77,14 @@ public class FindNodeResponse extends MessageBase {
 	/**
 	 * @return the nodes
 	 */
-	public byte[] getNodes () {
+	public byte[] getNodes() {
 		return nodes;
 	}
 	
 	/**
 	 * @return the nodes
 	 */
-	public byte[] getNodes6 () {
+	public byte[] getNodes6() {
 		return nodes6;
 	}
 	

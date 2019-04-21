@@ -26,7 +26,6 @@ import lbms.plugins.mldht.kad.DHT.DHTtype;
 
 public class PeerAddressDBItem extends DBItem {
 	
-	
 	boolean seed;
 	
 	public static PeerAddressDBItem createFromAddress(InetAddress addr, int port, boolean isSeed) {

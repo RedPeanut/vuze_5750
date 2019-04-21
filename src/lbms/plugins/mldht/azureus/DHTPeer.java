@@ -44,35 +44,35 @@ public class DHTPeer implements DownloadAnnounceResultPeer {
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResultPeer#getAddress()
 	 */
-	public String getAddress () {
+	public String getAddress() {
 		return addr;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResultPeer#getPeerID()
 	 */
-	public byte[] getPeerID () {
+	public byte[] getPeerID() {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResultPeer#getPort()
 	 */
-	public int getPort () {
+	public int getPort() {
 		return port;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResultPeer#getProtocol()
 	 */
-	public short getProtocol () {
+	public short getProtocol() {
 		return DownloadAnnounceResultPeer.PROTOCOL_NORMAL;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.gudy.azureus2.plugins.download.DownloadAnnounceResultPeer#getSource()
 	 */
-	public String getSource () {
+	public String getSource() {
 		return PEER_SOURCE;
 	}
 

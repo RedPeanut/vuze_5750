@@ -16,17 +16,19 @@
  */
 package lbms.plugins.mldht.azureus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import lbms.plugins.mldht.kad.*;
-import lbms.plugins.mldht.kad.DHT.DHTtype;
-import lbms.plugins.mldht.kad.tasks.PeerLookupTask;
-import lbms.plugins.mldht.kad.tasks.Task;
-import lbms.plugins.mldht.kad.tasks.TaskListener;
 
 import org.gudy.azureus2.core3.util.AERunnable;
 import org.gudy.azureus2.core3.util.AsyncDispatcher;
@@ -41,6 +43,15 @@ import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 
 import hello.util.Log;
 import hello.util.SingleCounter0;
+import hello.util.SingleCounter9;
+import lbms.plugins.mldht.kad.AnnounceResponseHandler;
+import lbms.plugins.mldht.kad.DHT;
+import lbms.plugins.mldht.kad.DHT.DHTtype;
+import lbms.plugins.mldht.kad.PeerAddressDBItem;
+import lbms.plugins.mldht.kad.ScrapeResponseHandler;
+import lbms.plugins.mldht.kad.tasks.PeerLookupTask;
+import lbms.plugins.mldht.kad.tasks.Task;
+import lbms.plugins.mldht.kad.tasks.TaskListener;
 
 /**
  * @author Damokles
@@ -131,9 +142,9 @@ public class Tracker {
 	}
 
 	protected void announceDownload(final Download dl) {
-		/*int count = SingleCounter0.getInstance().getAndIncreaseCount();
+		int count = SingleCounter9.getInstance().getAndIncreaseCount();
 		Log.d(TAG, String.format("announceDownload() is called... #%d", count));
-		if (count == 1) {
+		/*if (count == 1) {
 			new Throwable().printStackTrace();
 		}*/
 		
@@ -179,14 +190,14 @@ public class Tracker {
 					(scrapeOnly||tor==null||tor.getAnnounceCount()>1)?
 					null:
 					new AnnounceResponseHandler() {
-						private Set<PeerAddressDBItem> interim_items = new HashSet<PeerAddressDBItem>();
+						private Set<PeerAddressDBItem> interimItems = new HashSet<PeerAddressDBItem>();
 						
 						public void itemsUpdated(PeerLookupTask task) {
-							if (interim_items.size() >= 200) {
+							if (interimItems.size() >= 200) {
 								return;
 							}
-							interim_items.addAll(task.getReturnedItems());
-							DHTAnnounceResult res = new DHTAnnounceResult(dl, interim_items, 0);
+							interimItems.addAll(task.getReturnedItems());
+							DHTAnnounceResult res = new DHTAnnounceResult(dl, interimItems, 0);
 							dl.setAnnounceResult(res);
 						}
 					};
@@ -208,7 +219,7 @@ public class Tracker {
 							lookupTask.setInfo(dl.getName());
 							lookupTask.setNoSeeds(dl.isComplete(true));
 							dht.getTaskManager().addTask(lookupTask);
-						}	
+						}
 					}
 
 				}
@@ -220,6 +231,11 @@ public class Tracker {
 					DHT.logDebug("DHT Task done: " + t.getClass().getSimpleName());
 					if (t instanceof PeerLookupTask) {
 						PeerLookupTask peerLookup = (PeerLookupTask) t;
+						
+						int count = SingleCounter0.getInstance().getAndIncreaseCount();
+						int size = peerLookup.getReturnedItems().size();
+						Log.d(TAG, String.format("[#%d] size = %d", count, size));
+						
 						synchronized (items) {
 							items.addAll(peerLookup.getReturnedItems());
 						}
@@ -234,8 +250,9 @@ public class Tracker {
 						
 						if (pendingCount.decrementAndGet() > 0)
 							return;
+						
 						allFinished(peerLookup.getInfoHash().getHash());
-					}					
+					}
 				}
 				
 				private void allFinished(byte[] hash) {

@@ -19,6 +19,8 @@ package lbms.plugins.mldht.kad.tasks;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import hello.util.Log;
+import hello.util.SingleCounter0;
 import lbms.plugins.mldht.kad.*;
 import lbms.plugins.mldht.kad.DHT.DHTtype;
 import lbms.plugins.mldht.kad.KBucketEntry.DistanceOrder;
@@ -33,6 +35,8 @@ import lbms.plugins.mldht.kad.utils.PackUtil;
  */
 public class PeerLookupTask extends Task {
 
+	private static String TAG = PeerLookupTask.class.getSimpleName();
+	
 	private boolean							scrapeOnly;
 	private boolean							noSeeds;
 	private boolean							fastLookup;
@@ -47,7 +51,6 @@ public class PeerLookupTask extends Task {
 	
 	private int								validReponsesSinceLastClosestSetModification;
 	AnnounceNodeCache						cache;
-
 
 
 	public PeerLookupTask(RPCServerBase rpc, Node node, Key infoHash) {
@@ -92,7 +95,7 @@ public class PeerLookupTask extends Task {
 	 * @see lbms.plugins.mldht.kad.Task#callFinished(lbms.plugins.mldht.kad.RPCCall, lbms.plugins.mldht.kad.messages.MessageBase)
 	 */
 	@Override
-	void callFinished (RPCCallBase c, MessageBase rsp) {
+	void callFinished(RPCCallBase c, MessageBase rsp) {
 
 		if (c.getMessageMethod() != Method.GET_PEERS) {
 			return;
@@ -105,7 +108,6 @@ public class PeerLookupTask extends Task {
 		} else {
 			return;
 		}
-		
 		
 		for (DHTtype type : DHTtype.values()) {
 			byte[] nodes = gpr.getNodes(type);
@@ -136,9 +138,12 @@ public class PeerLookupTask extends Task {
 		//if (items.size() > 0)
 		//	System.out.println("unique:"+new HashSet<DBItem>(items).size()+" all:"+items.size()+" ver:"+gpr.getVersion()+" entries:"+items);
 		for (DBItem item : items) {
+			
 			if (!(item instanceof PeerAddressDBItem))
 				continue;
+			
 			PeerAddressDBItem it = (PeerAddressDBItem) item;
+			
 			// also add the items to the returned_items list
 			if (!AddressUtils.isBogon(it)) {
 				if (returnedItems.add(it)) {
@@ -207,7 +212,7 @@ public class PeerLookupTask extends Task {
 	/* (non-Javadoc)
 	 * @see lbms.plugins.mldht.kad.Task#update()
 	 */
-	void update () {
+	void update() {
 		synchronized (todo) {
 			// check if the cache has any closer nodes after the initial query
 			todo.addAll(cache.get(targetKey, 3, visited));
@@ -283,8 +288,13 @@ public class PeerLookupTask extends Task {
 	 * @see lbms.plugins.mldht.kad.Task#start()
 	 */
 	@Override
-	public
-	void start () {
+	public void start() {
+		
+		/*if (SingleCounter0.getInstance().getAndIncreaseCount() == 1) {
+			Log.d(TAG, "start() is called...");
+			new Throwable().printStackTrace();
+		}*/
+		
 		//delay the filling of the todo list until we actually start the task
 		KClosestNodesSearch kns = new KClosestNodesSearch(targetKey,
 				DHTConstants.MAX_ENTRIES_PER_BUCKET * 4,rpc.getDHT());

@@ -369,121 +369,47 @@ Utilities
 
 	public DelayedTask createDelayedTask(Runnable r);
 
-	public void registerSearchProvider(
-		SearchProvider		provider )
+	public void registerSearchProvider(SearchProvider provider)
+			throws SearchException;
+	public void unregisterSearchProvider(SearchProvider provider)
+			throws SearchException;
+	public SearchInitiator getSearchInitiator()
+			throws SearchException;
+	public SubscriptionManager getSubscriptionManager()
+			throws SubscriptionException;
+	public FeatureManager getFeatureManager();
+	public boolean supportsPowerStateControl(int state);
+	public void addPowerManagementListener(PowerManagementListener listener);
+	public void removePowerManagementListener(PowerManagementListener listener);
+	public List<LocationProvider> getLocationProviders();
+	public void addLocationProvider(LocationProvider provider);
+	public void removeLocationProvider(LocationProvider provider);
+	public void addLocationProviderListener(LocationProviderListener listener);
+	public void removeLocationProviderListener(LocationProviderListener listener);
+	public void registerJSONRPCServer(JSONServer server);
+	public void unregisterJSONRPCServer(JSONServer server);
+	public void registerJSONRPCClient(JSONClient client);
+	public void unregisterJSONRPCClient(JSONClient client);
+	public List<DistributedDatabase> getDistributedDatabases(String[] networks);
+	public List<DistributedDatabase> getDistributedDatabases(String[] networks, Map<String, Object> options);
+	public List<ScriptProvider> getScriptProviders();
+	public void registerScriptProvider(ScriptProvider provider);
+	public void unregisterScriptProvider(ScriptProvider provider);
+	public void addScriptProviderListener(ScriptProviderListener provider);
+	public void removeScriptProviderListener(ScriptProviderListener provider);
+	public TagManager getTagManager();
+	public Tag lookupTag(String name);
 
-		throws SearchException;
-
-	public void unregisterSearchProvider(
-		SearchProvider		provider )
-
-		throws SearchException;
-
-	public SearchInitiator
-	getSearchInitiator()
-
-		throws SearchException;
-
-	public SubscriptionManager
-	getSubscriptionManager()
-
-		throws SubscriptionException;
-
-	public FeatureManager
-	getFeatureManager();
-
-	public boolean supportsPowerStateControl(
-		int		state);
-
-	public void addPowerManagementListener(
-		PowerManagementListener	listener);
-
-	public void removePowerManagementListener(
-		PowerManagementListener	listener);
-
-	public List<LocationProvider>
-	getLocationProviders();
-
-	public void addLocationProvider(
-		LocationProvider	provider);
-
-	public void removeLocationProvider(
-		LocationProvider	provider);
-
-	public void addLocationProviderListener(
-		LocationProviderListener		listener);
-
-	public void removeLocationProviderListener(
-		LocationProviderListener		listener);
-
-
-	public void registerJSONRPCServer(
-		JSONServer		server);
-
-	public void unregisterJSONRPCServer(
-		JSONServer		server);
-
-	public void registerJSONRPCClient(
-		JSONClient		client);
-
-	public void unregisterJSONRPCClient(
-		JSONClient		client);
-
-	public List<DistributedDatabase>
-	getDistributedDatabases(
-		String[]		networks);
-
-	public List<DistributedDatabase>
-	getDistributedDatabases(
-		String[]			networks,
-		Map<String,Object>	options);
-
-	public List<ScriptProvider>
-	getScriptProviders();
-
-	public void registerScriptProvider(
-		ScriptProvider	provider);
-
-	public void unregisterScriptProvider(
-		ScriptProvider	provider);
-
-	public void addScriptProviderListener(
-		ScriptProviderListener	provider);
-
-	public void removeScriptProviderListener(
-		ScriptProviderListener	provider);
-
-	public TagManager
-	getTagManager();
-
-	public Tag
-	lookupTag(
-		String		name);
-
-	public interface
-	JSONServer
-	{
+	public interface JSONServer {
 		public String getName();
-
-		public List<String>
-		getSupportedMethods();
-
-		public Map
-		call(
-			String			method,
-			Map		args )
-
-			throws PluginException;
+		public List<String> getSupportedMethods();
+		public Map call(String method, Map args)
+				throws PluginException;
 	}
-
-	public interface
-	JSONClient
-	{
-		public void serverRegistered(
-			JSONServer	server);
-
-		public void serverUnregistered(
-			JSONServer	server);
+	
+	public interface JSONClient {
+		public void serverRegistered(JSONServer server);
+		public void serverUnregistered(JSONServer server);
 	}
 
 }

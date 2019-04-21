@@ -45,7 +45,7 @@ public abstract class MessageBase {
 	protected String			version;
 	protected RPCServer			srv;
 
-	public MessageBase (byte[] mtid, Method m, Type type) {
+	public MessageBase(byte[] mtid, Method m, Type type) {
 		this.mtid = mtid;
 		this.method = m;
 		this.type = type;
@@ -54,9 +54,9 @@ public abstract class MessageBase {
 	/**
 	 * When this message arrives this function will be called upon the DHT.
 	 * The message should then call the appropriate DHT function (double dispatch)
-	 * @param dh_table Pointer to DHT
+	 * @param dht Pointer to DHT
 	 */
-	public void apply (DHT dh_table) {
+	public void apply(DHT dht) {
 	}
 
 	/**
@@ -77,14 +77,12 @@ public abstract class MessageBase {
 		base.put(TRANSACTION_KEY, mtid);
 		// version
 		base.put(VERSION_KEY, DHTConstants.getVersion());
-		
 	
 		// message type
 		base.put(Type.TYPE_KEY, getType().getRPCTypeName());
 		// message method if we're a request
 		if (getType() == Type.REQ_MSG)
 			base.put(getType().getRPCTypeName(), getMethod().getRPCName());
-
 
 		return base;
 	}
@@ -95,71 +93,71 @@ public abstract class MessageBase {
 
 
 	/// Set the origin (i.e. where the message came from)
-	public void setOrigin (InetSocketAddress o) {
+	public void setOrigin(InetSocketAddress o) {
 		origin = o;
 	}
 
 	/// Get the origin
-	public InetSocketAddress getOrigin () {
+	public InetSocketAddress getOrigin() {
 		return origin;
 	}
 
 	/// Set the origin (i.e. where the message came from)
-	public void setDestination (InetSocketAddress o) {
+	public void setDestination(InetSocketAddress o) {
 		origin = o;
 	}
 
 	/// Get the origin
-	public InetSocketAddress getDestination () {
+	public InetSocketAddress getDestination() {
 		return origin;
 	}
 
 	/// Get the MTID
-	public byte[] getMTID () {
+	public byte[] getMTID() {
 		return mtid;
 	}
 
 	/// Set the MTID
-	public void setMTID (byte[] m) {
+	public void setMTID(byte[] m) {
 		mtid = m;
 	}
 
-	public void setMTID (short m) {
+	public void setMTID(short m) {
 		mtid = new byte[] {(byte)(m>>8),(byte)(m&0xff)};
 	}
 
-	public String getVersion () {
-    	return version;
-    }
+	public String getVersion() {
+		return version;
+	}
 
-	public void setVersion (String version) {
-    	this.version = version;
-    }
-	
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
 	public void setServer(RPCServer srv) {
 		this.srv = srv;
 	}
-	
+
 	public RPCServer getServer() {
 		return srv;
 	}
-	
+
 	public void setID(Key id) {
 		this.id = id;
 	}
 
 	/// Get the id of the sender
-	public Key getID () {
+	public Key getID() {
 		return id;
 	}
 
 	/// Get the type of the message
-	public Type getType () {
+	public Type getType() {
 		return type;
 	}
 
 	/// Get the message it's method
-	public Method getMethod () {
+	public Method getMethod() {
 		return method;
 	}
 	

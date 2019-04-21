@@ -26,24 +26,24 @@ import java.util.Comparator;
 public class DBItem {
 
 	protected byte[] item;
-	private final long	time_stamp;
+	private final long	timeStamp;
 
 	private DBItem () {
-		time_stamp = System.currentTimeMillis();
+		timeStamp = System.currentTimeMillis();
 	}
 
-	public DBItem (final byte[] ip_port) {
+	public DBItem(final byte[] ipPort) {
 		this();
-		item = ip_port.clone();
+		item = ipPort.clone();
 	}
 
 	/// See if the item is expired
-	public boolean expired (final long now) {
-		return (now - time_stamp >= DHTConstants.MAX_ITEM_AGE);
+	public boolean expired(final long now) {
+		return (now - timeStamp >= DHTConstants.MAX_ITEM_AGE);
 	}
 
 	/// Get the data of an item
-	public byte[] getData () {
+	public byte[] getData() {
 		return item;
 	}
 
@@ -68,7 +68,7 @@ public class DBItem {
 
 	public static final Comparator<DBItem> ageOrdering = new Comparator<DBItem>() {
 		public int compare(final DBItem o1, final DBItem o2) {
-			return (int)(o1.time_stamp - o2.time_stamp);
+			return (int)(o1.timeStamp - o2.timeStamp);
 		}
 	};
 }

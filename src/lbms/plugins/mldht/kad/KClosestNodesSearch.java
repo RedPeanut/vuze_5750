@@ -28,6 +28,7 @@ import lbms.plugins.mldht.kad.utils.PackUtil;
  *
  */
 public class KClosestNodesSearch {
+	
 	private Key							targetKey;
 	private List<KBucketEntry>			entries;
 	private int							max_entries;
@@ -37,21 +38,21 @@ public class KClosestNodesSearch {
 	/**
 	 * Constructor sets the key to compare with
 	 * @param key The key to compare with
-	 * @param max_entries The maximum number of entries can be in the map
+	 * @param maxEntries The maximum number of entries can be in the map
 	 * @return
 	 */
-	public KClosestNodesSearch (Key key, int max_entries, DHT owner) {
+	public KClosestNodesSearch(Key key, int maxEntries, DHT owner) {
 		this.targetKey = key;
 		this.owner = owner;
-		this.max_entries = max_entries;
+		this.max_entries = maxEntries;
 		this.comp = new KBucketEntry.DistanceOrder(key);
-		entries = new ArrayList<KBucketEntry>(max_entries + DHTConstants.MAX_ENTRIES_PER_BUCKET);
+		entries = new ArrayList<KBucketEntry>(maxEntries + DHTConstants.MAX_ENTRIES_PER_BUCKET);
 	}
 
 	/**
 	 * @return the Target key of the search
 	 */
-	public Key getSearchTarget () {
+	public Key getSearchTarget() {
 		return targetKey;
 	}
 
@@ -98,8 +99,7 @@ public class KClosestNodesSearch {
 			reachedMax = reachedMax || center+i >= table.size() || insertBucket(table.get(center+i).getBucket());
 		}
 		
-		
-		if (		includeOurself) {
+		if (includeOurself) {
 			
 			RPCServer srv = owner.getRandomServer();
 			
@@ -129,14 +129,14 @@ public class KClosestNodesSearch {
 		int entryLength = owner.getType().NODES_ENTRY_LENGTH;
 		
 		byte[] buffer = new byte[entries.size() * entryLength];
-		int max_items = buffer.length / 26;
+		int maxItems = buffer.length / 26;
 		int j = 0;
 
 		for (KBucketEntry e : entries) {
-			if (j >= max_items) {
+			if (j >= maxItems) {
 				break;
 			}
-			PackUtil.PackBucketEntry(e, buffer, j * entryLength, owner.getType());
+			PackUtil.PackBucketEntry(e, buffer, j*entryLength, owner.getType());
 			j++;
 		}
 		return buffer;
