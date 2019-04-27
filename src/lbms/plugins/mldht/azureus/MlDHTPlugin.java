@@ -155,7 +155,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 				viewModel.getLogArea().appendText(sw.toString() + "\n");
 			}
 		};
-
+		
 		logChannel.addListener(logListener);
 
 		String version = pluginInterface.getPluginVersion();
@@ -462,7 +462,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 	
 	private AsyncDispatcher	dispatcher = new AsyncDispatcher("MLDHT:disp", 2500);
 	
-	public void startDHT () {
+	public void startDHT() {
 		
 		dispatcher.dispatch(
 			new AERunnable() {
@@ -508,19 +508,18 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 					} catch (Throwable e) {
 					}
 					
-					RPCServerListener serverListener = 
-							new RPCServerListener() {
-								@Override
-								public void replyReceived(InetSocketAddress fromNode) {
-									if (altContactHandler != null) {
-										try {
-											altContactHandler.nodeAlive(fromNode);
-										} catch (Throwable e) {
-											Debug.out(e);
-										}
-									}
+					RPCServerListener serverListener = new RPCServerListener() {
+						@Override
+						public void replyReceived(InetSocketAddress fromNode) {
+							if (altContactHandler != null) {
+								try {
+									altContactHandler.nodeAlive(fromNode);
+								} catch (Throwable e) {
+									Debug.out(e);
 								}
-							};
+							}
+						}
+					};
 							
 					viewModel.getStatus().setText("Initializing");
 					try {
@@ -537,7 +536,7 @@ public class MlDHTPlugin implements UnloadablePlugin, PluginListener, NetworkAdm
 			});
 	}
 
-	public void stopDHT () {
+	public void stopDHT() {
 		
 		final AESemaphore sem = new AESemaphore("MLDHT:Stopper");
 				

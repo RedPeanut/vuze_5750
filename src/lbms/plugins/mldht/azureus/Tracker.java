@@ -122,7 +122,7 @@ public class Tracker {
 		running = true;
 	}
 
-	protected void stop () {
+	protected void stop() {
 		if (!running) {
 			return;
 		}
@@ -390,7 +390,7 @@ public class Tracker {
 
 	}
 
-	private void checkDownload (Download dl) {
+	private void checkDownload(Download dl) {
 		
 		if (!running || dl.getTorrent() == null || dl.getTorrent().isPrivate())
 			return;

@@ -6,7 +6,7 @@ public class TestMonitor {
 	
 	public static void main(String[] args) {
 		
-		AEMonitor mon = new AEMonitor("Test monitor");
+		final AEMonitor mon = new AEMonitor("Test monitor");
 		
 		Thread a = new Thread(new Runnable() {
 			@Override

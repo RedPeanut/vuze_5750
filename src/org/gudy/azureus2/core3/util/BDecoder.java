@@ -117,26 +117,20 @@ public class BDecoder {
 		return (decode(new BDecoderInputStreamArray(data), true));
 	}
 
-	public Map<String, Object>
-	decodeByteArray(
+	public Map<String, Object> decodeByteArray(
 		byte[] 	data,
 		int		offset,
 		int		length )
-
-		throws IOException
-	{
+		throws IOException {
 		return (decode(new BDecoderInputStreamArray(data, offset, length),true));
 	}
 
-	public Map<String, Object>
-	decodeByteArray(
+	public Map<String, Object> decodeByteArray(
 		byte[] 	data,
 		int		offset,
 		int		length,
 		boolean internKeys)
-
-		throws IOException
-	{
+		throws IOException {
 		return (decode(new BDecoderInputStreamArray(data, offset, length),internKeys));
 	}
 
@@ -989,26 +983,19 @@ public class BDecoder {
 		}
 	}
 
-	public static List
-	decodeFromJSONArray(
-		List		j_list ) {
-		List	b_list = new ArrayList();
-
-		for (Object o: j_list) {
-
-			b_list.add(decodeFromJSONGeneric( o));
+	public static List decodeFromJSONArray(List j_list) {
+		List b_list = new ArrayList();
+		for (Object o : j_list) {
+			b_list.add(decodeFromJSONGeneric(o));
 		}
-
 		return (b_list);
 	}
 
 
-	public static Map
-	decodeFromJSONObject(
-		Map<Object,Object>		j_map ) {
+	public static Map decodeFromJSONObject(Map<Object, Object> j_map) {
 		Map	b_map = new HashMap();
 
-		for ( Map.Entry<Object,Object> entry: j_map.entrySet()) {
+		for (Map.Entry<Object,Object> entry: j_map.entrySet()) {
 
 			Object	key = entry.getKey();
 			Object	val	= entry.getValue();
@@ -1019,120 +1006,66 @@ public class BDecoder {
 		return (b_map);
 	}
 
-	public static Map
-	decodeFromJSON(
-		String	json ) {
+	public static Map decodeFromJSON(String json) {
 		Map j_map = JSONUtils.decodeJSON(json);
-
-		return (decodeFromJSONObject( j_map));
+		return (decodeFromJSONObject(j_map));
 	}
 
-
-/*
-	private interface
-	BDecoderInputStream
-	{
-		public int read()
-
-			throws IOException;
-
-		public int read(
-			byte[] buffer )
-
-			throws IOException;
-
-		public int read(
-			byte[] 	buffer,
-			int		offset,
-			int		length )
-
-			throws IOException;
-
-		public int available()
-
-			throws IOException;
-
+	/*
+	private interface BDecoderInputStream {
+		public int read() throws IOException;
+		public int read(byte[] buffer) throws IOException;
+		public int read(byte[] buffer, int offset, int length) throws IOException;
+		public int available() throws IOException;
 		public boolean markSupported();
-
-		public void mark(
-				int	limit);
-
-		public void reset()
-
-			throws IOException;
+		public void mark(int limit);
+		public void reset() throws IOException;
 	}
 
-	private class
-	BDecoderInputStreamStream
+	private class BDecoderInputStreamStream implements BDecoderInputStream {
+		
+		final private BufferedInputStream is;
 
-		implements BDecoderInputStream
-	{
-		final private BufferedInputStream		is;
-
-		private BDecoderInputStreamStream(
-			BufferedInputStream	_is) {
-			is	= _is;
+		private BDecoderInputStreamStream(BufferedInputStream _is) {
+			is = _is;
 		}
 
-		public int read()
-
-		throws IOException
-		{
-			return ( is.read());
+		public int read() throws IOException {
+			return (is.read());
 		}
 
-		public int read(
-			byte[] buffer )
-
-		throws IOException
-		{
-			return (is.read( buffer));
+		public int read(byte[] buffer) throws IOException {
+			return (is.read(buffer));
 		}
 
-		public int read(
-			byte[] 	buffer,
-			int		offset,
-			int		length )
-
-			throws IOException
-		{
-			return (is.read( buffer, offset, length));
+		public int read(byte[] buffer, int offset, int length) throws IOException {
+			return (is.read(buffer, offset, length));
 		}
 
-		public int available()
-
-			throws IOException
-		{
-			return ( is.available());
+		public int available() throws IOException {
+			return (is.available());
 		}
 
 		public boolean markSupported() {
-			return ( is.markSupported());
+			return (is.markSupported());
 		}
 
-		public void mark(
-			int	limit) {
+		public void mark(int limit) {
 			is.mark(limit);
 		}
 
-		public void reset()
-
-			throws IOException
-		{
+		public void reset() throws IOException {
 			is.reset();
 		}
 	}
-*/
-	private static class
-	BDecoderInputStreamArray
-
-		extends InputStream
-	{
+	//*/
+	
+	private static class BDecoderInputStreamArray
+		extends InputStream {
 		final private byte[] bytes;
 		private int pos = 0;
 		private int markPos;
 		private final int overPos;
-
 
 		public BDecoderInputStreamArray(ByteBuffer buffer) {
 			bytes = buffer.array();
@@ -1161,32 +1094,22 @@ public class BDecoder {
 			}
 		}
 
-		public int read()
-
-			throws IOException
-		{
+		public int read() throws IOException {
 			if (pos < overPos) {
 				return bytes[pos++] & 0xFF;
 			}
 			return -1;
 		}
 
-		public int read(
-			byte[] buffer )
-
-			throws IOException
-		{
-			return (read( buffer, 0, buffer.length));
+		public int read(byte[] buffer) throws IOException {
+			return (read(buffer, 0, buffer.length));
 		}
 
 		public int read(
 			byte[] 	b,
 			int		offset,
 			int		length )
-
-			throws IOException
-		{
-
+			throws IOException {
 			if (pos < overPos) {
 				int toRead = Math.min(length, overPos - pos);
 				System.arraycopy(bytes, pos, b, offset, toRead);
@@ -1194,13 +1117,9 @@ public class BDecoder {
 				return toRead;
 			}
 			return -1;
-
 		}
 
-		public int available()
-
-			throws IOException
-		{
+		public int available() throws IOException {
 			return overPos - pos;
 		}
 
@@ -1208,22 +1127,17 @@ public class BDecoder {
 			return (true);
 		}
 
-		public void mark(
-			int	limit) {
+		public void mark(int limit) {
 			markPos = pos;
 		}
 
-		public void reset()
-
-			throws IOException
-		{
+		public void reset() throws IOException {
 			pos = markPos;
 		}
 	}
 
 
-	public static void main(
-			String[]	args) {
+	public static void main(String[] args) {
 		print(	new File("C:\\Temp\\tables.config"),
 				new File("C:\\Temp\\tables.txt"));
 	}

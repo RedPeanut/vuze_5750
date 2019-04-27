@@ -30,7 +30,7 @@ public class Debug {
 
 	private static final boolean STOP_AT_INITIALIZER = System.getProperty("debug.stacktrace.full", "0").equals("0");
 
-	private static final AEDiagnosticsLogger	diag_logger;
+	private static final AEDiagnosticsLogger	diagLogger;
 
 	static{
 		// store in local variable first, so we can have diag_logger final
@@ -43,56 +43,47 @@ public class Debug {
 		} catch (Throwable e) {
 
 		}
-		diag_logger = temp_diag_logger;
+		diagLogger = temp_diag_logger;
 	}
 
 
-  /**
-   * Prints out the given debug message to System.out,
-   * prefixed by the calling class name, method and
-   * line number.
-   */
-  public static void out(final String _debug_message) {
-    out(_debug_message, null);
-  }
+	/**
+	 * Prints out the given debug message to System.out,
+	 * prefixed by the calling class name, method and
+	 * line number.
+	 */
+	public static void out(final String _debugMessage) {
+		out(_debugMessage, null);
+	}
 
-  /**
-   * Prints out the given exception stacktrace to System.out,
-   * prefixed by the calling class name, method and
-   * line number.
-   */
-  public static void out(final Throwable _exception) {
-    out("", _exception);
-  }
+	/**
+	 * Prints out the given exception stacktrace to System.out,
+	 * prefixed by the calling class name, method and
+	 * line number.
+	 */
+	public static void out(final Throwable _exception) {
+		out("", _exception);
+	}
 
-  public static void
-  outNoStack(
-  	String		str )
-  {
-  	outNoStack(str, false);
-  }
+	public static void outNoStack(String str) {
+		outNoStack(str, false);
+	}
 
-  public static void
-  outNoStack(
-  	String		str,
-	boolean		stderr)
-  {
-    diagLoggerLogAndOut("DEBUG::"+ new Date(SystemTime.getCurrentTime()).toString() + "  " + str, stderr);
-  }
+	public static void outNoStack(String str, boolean stderr) {
+		diagLoggerLogAndOut("DEBUG::" + new Date(SystemTime.getCurrentTime()).toString() + "  " + str, stderr);
+	}
 
-  public static void
-  outDiagLoggerOnly(
-  	String		str)
-  {
-    diagLoggerLog(str);
-  }
+	public static void outDiagLoggerOnly(String str) {
+		diagLoggerLog(str);
+	}
 
 	/**
 	 * Prints out the given debug message to System.out,
 	 * prefixed by the calling class name, method and
 	 * line number, appending the stacktrace of the given exception.
 	 */
-	public static void out(final String _debug_msg, final Throwable _exception) {
+	public static void out(final String _debugMsg, final Throwable _exception) {
+		
 		if ((_exception instanceof ConnectException) && _exception.getMessage().startsWith("No route to host")) {
 			diagLoggerLog(_exception.toString());
 			return;
@@ -101,32 +92,33 @@ public class Debug {
 			diagLoggerLog(_exception.toString());
 			return;
 		}
+		
 		String header = "DEBUG::";
 		header = header + new Date(SystemTime.getCurrentTime()).toString() + "::";
 		String className;
 		String methodName;
 		int lineNumber;
-		String	trace_trace_tail = null;
+		String	traceTraceTail = null;
 
 		try {
 			throw new Exception();
 		} catch (Exception e) {
 			StackTraceElement[]	st = e.getStackTrace();
 
-			StackTraceElement first_line = st[2];
-			className = first_line.getClassName() + "::";
-			methodName = first_line.getMethodName() + "::";
-			lineNumber = first_line.getLineNumber();
+			StackTraceElement firstLine = st[2];
+			className = firstLine.getClassName() + "::";
+			methodName = firstLine.getMethodName() + "::";
+			lineNumber = firstLine.getLineNumber();
 
-			trace_trace_tail = getCompressedStackTrace(e, 3, 200, false);
+			traceTraceTail = getCompressedStackTrace(e, 3, 200, false);
 		}
 
 		diagLoggerLogAndOut(header+className+(methodName)+lineNumber+":", true);
-		if (_debug_msg.length() > 0) {
-			diagLoggerLogAndOut("	" + _debug_msg, true);
+		if (_debugMsg.length() > 0) {
+			diagLoggerLogAndOut("	" + _debugMsg, true);
 		}
-		if (trace_trace_tail != null) {
-			diagLoggerLogAndOut("		" + trace_trace_tail, true);
+		if (traceTraceTail != null) {
+			diagLoggerLogAndOut("		" + traceTraceTail, true);
 		}
 		if (_exception != null) {
 			diagLoggerLogAndOut(_exception);
@@ -215,16 +207,16 @@ public class Debug {
 
 	private static String getCompressedStackTrace(
 		Throwable t,
-		int frames_to_skip) {
-		return getCompressedStackTrace(t, frames_to_skip, 200);
+		int framesToSkip) {
+		return getCompressedStackTrace(t, framesToSkip, 200);
 	}
 
 
 	public static String getCompressedStackTrace(
 		Throwable t,
-		int frames_to_skip,
+		int framesToSkip,
 		int iMaxLines) {
-		return getCompressedStackTrace(t, frames_to_skip, iMaxLines, true);
+		return getCompressedStackTrace(t, framesToSkip, iMaxLines, true);
 	}
 
 
@@ -233,6 +225,7 @@ public class Debug {
 		int framesToSkip,
 		int iMaxLines,
 		boolean showErrString) {
+		
 		StringBuilder sbStackTrace = new StringBuilder(showErrString ? (t.toString() + "; ") : "");
 		StackTraceElement[]	st = t.getStackTrace();
 
@@ -250,7 +243,7 @@ public class Debug {
 			}
 
 			String classname = st[i].getClassName();
-			String cnShort = classname.substring( classname.lastIndexOf(".")+1);
+			String cnShort = classname.substring(classname.lastIndexOf(".")+1);
 
 			if (Constants.IS_CVS_VERSION) {
 				if (STOP_AT_INITIALIZER
@@ -345,20 +338,17 @@ public class Debug {
 		}
 	}
 
-	public static void dumpThreads(
-		String	name) {
-		out(name+":");
-
-	  	ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-
-	  	dumpThreads(threadGroup, "\t");
+	public static void dumpThreads(String name) {
+		out(name + ":");
+		ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+		dumpThreads(threadGroup, "\t");
 	}
 
-   public static void
-   dumpThreads(
-   		ThreadGroup	threadGroup,
-   		String		indent )
-   {
+	 public static void
+	 dumpThreads(
+	 		ThreadGroup	threadGroup,
+	 		String		indent )
+	 {
 	  Thread[] threadList = new Thread[threadGroup.activeCount()];
 
 	  threadGroup.enumerate(threadList);
@@ -377,13 +367,13 @@ public class Debug {
 
 	  	dumpThreads(threadGroup.getParent(),indent+"\t");
 	  }
-   }
+	 }
 
-   public static void
-   dumpThreadsLoop(
-   	final String	name )
-   {
-   	new AEThread("Thread Dumper")
+	 public static void
+	 dumpThreadsLoop(
+	 	final String	name )
+	 {
+	 	new AEThread("Thread Dumper")
 	   {
 		   public void
 		   runSupport()
@@ -399,92 +389,62 @@ public class Debug {
 			   }
 		   }
 	   }.start();
-   }
+	 }
 
 	public static void dumpSystemProperties() {
 		out("System Properties:");
-
  		Properties props = System.getProperties();
-
  		Iterator it = props.keySet().iterator();
-
  		while (it.hasNext()) {
-
  			String	name = (String)it.next();
-
  			out("\t".concat(name).concat(" = '").concat(props.get(name).toString()).concat("'"));
  		}
 	}
 
-	public static String getNestedExceptionMessage(
-		Throwable 		e) {
-		String	last_message	= "";
-
+	public static String getNestedExceptionMessage(Throwable e) {
+		
+		String	lastMessage	= "";
 		while (e != null) {
-
-			String	this_message;
-
+			String	thisMessage;
 			if (e instanceof UnknownHostException) {
-
-				this_message = "Unknown host " + e.getMessage();
-
+				thisMessage = "Unknown host " + e.getMessage();
 			} else if (e instanceof FileNotFoundException) {
-
-				this_message = "File not found: " + e.getMessage();
-
+				thisMessage = "File not found: " + e.getMessage();
 			} else {
-
-				this_message = e.getMessage();
+				thisMessage = e.getMessage();
 			}
-
-				// if no exception message then pick up class name. if we have a deliberate
-				// zero length string then we assume that the exception can be ignored for
-				// logging purposes as it is just delegating
-
-			if (this_message == null) {
-
-				this_message = e.getClass().getName();
-
-				int	pos = this_message.lastIndexOf(".");
-
-				this_message = this_message.substring(pos+1).trim();
+			// if no exception message then pick up class name. if we have a deliberate
+			// zero length string then we assume that the exception can be ignored for
+			// logging purposes as it is just delegating
+			if (thisMessage == null) {
+				thisMessage = e.getClass().getName();
+				int	pos = thisMessage.lastIndexOf(".");
+				thisMessage = thisMessage.substring(pos+1).trim();
 			}
-
-			if (this_message.length() > 0 && !last_message.contains(this_message)) {
-
-				last_message	+= (last_message.length()==0?"":", " ) + this_message;
+			if (thisMessage.length() > 0 && !lastMessage.contains(thisMessage)) {
+				lastMessage	+= (lastMessage.length()==0?"":", " ) + thisMessage;
 			}
-
 			e	= e.getCause();
 		}
-
-		return (last_message);
+		return (lastMessage);
 	}
 
-	public static boolean
-	containsException(
-		Throwable					error,
-		Class<? extends Throwable>	cla) {
+	public static boolean containsException(Throwable error, Class<? extends Throwable> cla) {
 		if (error == null) {
-
 			return (false);
-
-		} else if (cla.isInstance( error)) {
-
+		} else if (cla.isInstance(error)) {
 			return (true);
 		}
-
-		return (containsException( error.getCause(), cla));
+		return (containsException(error.getCause(), cla));
 	}
 
-	public static String getNestedExceptionMessageAndStack(
-		Throwable 		e) {
-		return (getNestedExceptionMessage(e) + ", " + getCompressedStackTrace( e, 0));
+	public static String getNestedExceptionMessageAndStack(Throwable e) {
+		return (getNestedExceptionMessage(e) + ", " + getCompressedStackTrace(e, 0));
 	}
 
 	public static String getCompressedStackTraceSkipFrames(
-		int	frames_to_skip) {
-		return (getCompressedStackTrace(new Throwable(), frames_to_skip+1, 200, false));
+		int	framesToSkip) {
+		return (getCompressedStackTrace(new Throwable(), framesToSkip+1, 200, false));
 	}
 
 	public static String getCompressedStackTrace() {
@@ -500,26 +460,17 @@ public class Debug {
 		return (getCompressedStackTrace(new Throwable(), 1, iMaxLines, false));
 	}
 
-	public static String getExceptionMessage(
-		Throwable	e) {
+	public static String getExceptionMessage(Throwable	e) {
 		String	message = e.getMessage();
-
 		if (message == null || message.length() == 0) {
-
 			message = e.getClass().getName();
-
 			int	pos = message.lastIndexOf(".");
-
 			message = message.substring(pos+1);
-
 		} else if (e instanceof ClassNotFoundException) {
-
 			if (!message.toLowerCase().contains("found")) {
-
 				message = "Class " + message + " not found";
 			}
 		}
-
 		return (message);
 	}
 
@@ -531,14 +482,14 @@ public class Debug {
 	public static void printStackTrace(
 		Throwable e,
 		Object context) {
-  	if ((e instanceof ConnectException) && e.getMessage().startsWith("No route to host")) {
-  		diagLoggerLog(e.toString());
-  		return;
-  	}
-  	if ((e instanceof UnknownHostException)) {
-  		diagLoggerLog(e.toString());
-  		return;
-  	}
+		if ((e instanceof ConnectException) && e.getMessage().startsWith("No route to host")) {
+			diagLoggerLog(e.toString());
+			return;
+		}
+		if ((e instanceof UnknownHostException)) {
+			diagLoggerLog(e.toString());
+			return;
+		}
 		String header = "DEBUG::";
 		header = header + new Date(SystemTime.getCurrentTime()).toString() + "::";
 		String className	= "?::";
@@ -608,38 +559,35 @@ public class Debug {
 	}
 
 	private static void diagLoggerLog(String str) {
-		if (diag_logger == null) {
+		if (diagLogger == null) {
 			System.out.println(str);
 		} else {
-			diag_logger.log(str);
+			diagLogger.log(str);
 		}
 	}
 
-	private static void diagLoggerLogAndOut(
-		String	str,
-		boolean	stderr) {
-			// handle possible recursive initialisation problems where the init of diag-logger gets
-			// back here....
-
-		if (diag_logger == null) {
+	private static void diagLoggerLogAndOut(String str, boolean stderr) {
+		// handle possible recursive initialisation problems where the init of diag-logger gets
+		// back here....
+		if (diagLogger == null) {
 			if (stderr) {
 				System.err.println(str);
 			} else {
 				System.out.println(str);
 			}
 		} else {
-			diag_logger.logAndOut(str, stderr);
+			diagLogger.logAndOut(str, stderr);
 		}
 	}
-	private static void diagLoggerLogAndOut(
-		Throwable e) {
+	
+	private static void diagLoggerLogAndOut(Throwable e) {
 			// handle possible recursive initialisation problems where the init of diag-logger gets
 			// back here....
 
-		if (diag_logger == null) {
+		if (diagLogger == null) {
 			e.printStackTrace();
 		} else {
-			diag_logger.logAndOut(e);
+			diagLogger.logAndOut(e);
 		}
 	}
 

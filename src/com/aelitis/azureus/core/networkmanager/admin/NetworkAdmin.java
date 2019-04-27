@@ -70,9 +70,7 @@ public abstract class NetworkAdmin {
 
 	public abstract String getNetworkInterfacesAsString();
 
-	public abstract InetAddress[]
-	getAllBindAddresses(
-		boolean	include_wildcard);
+	public abstract InetAddress[] getAllBindAddresses(boolean include_wildcard);
 
 	/**
 	 * Given an interface name etc this will return the corresponding ip addresses

@@ -21,7 +21,6 @@ package lbms.plugins.mldht.kad;
  *
  */
 public interface DHTLogger {
-	public void log (String message);
-
-	public void log (Throwable e);
+	public void log(String message);
+	public void log(Throwable e);
 }

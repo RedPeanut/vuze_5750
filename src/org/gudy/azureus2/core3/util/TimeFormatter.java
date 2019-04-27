@@ -32,7 +32,7 @@ import org.gudy.azureus2.core3.internat.MessageText.MessageTextListener;
  *
  */
 public class TimeFormatter {
-  // XXX should be i18n'd
+	// XXX should be i18n'd
 	static final String[] TIME_SUFFIXES 	= { "s", "m", "h", "d", "y" };
 
 	static final String[] TIME_SUFFIXES_2 	= { "sec", "min", "hr", "day", "wk", "mo", "yr" };
@@ -101,21 +101,22 @@ public class TimeFormatter {
 	 * @param time time in seconds
 	 * @return Formatted time string
 	 */
-	public static String format(long time_secs) {
-		if (time_secs == Constants.CRAPPY_INFINITY_AS_INT || time_secs >= Constants.CRAPPY_INFINITE_AS_LONG)
+	public static String format(long timeSecs) {
+		
+		if (timeSecs == Constants.CRAPPY_INFINITY_AS_INT || timeSecs >= Constants.CRAPPY_INFINITE_AS_LONG)
 			return Constants.INFINITY_STRING;
 
-		if (time_secs < 0)
+		if (timeSecs < 0)
 			return "";
 
 		// secs, mins, hours, days
 		int[] vals = {
-			(int) time_secs % 60,
-			(int) (time_secs / 60) % 60,
-			(int) (time_secs / 3600) % 24,
-			(int) (time_secs / 86400) % 365,
-			(int) (time_secs / 31536000)
-			};
+			(int) timeSecs % 60,
+			(int) (timeSecs / 60) % 60,
+			(int) (timeSecs / 3600) % 24,
+			(int) (timeSecs / 86400) % 365,
+			(int) (timeSecs / 31536000)
+		};
 
 		int end = vals.length - 1;
 		while (vals[end] == 0 && end > 0) {
@@ -290,55 +291,35 @@ public class TimeFormatter {
       return (i < 10) ? "0" + i : String.valueOf(i);
     }
 
-    	/**
-    	 * parse time in h:m:s format to SECONDS
-    	 * @param str
-    	 * @return
-    	 */
-
-    public static int
-    parseColon(
-    	String	str )
-    {
-    	final int[]	multipliers = { 1, 60, 3600, 86400, 31536000 };
-
-    	String[]	bits = str.split(":");
-
-    	int	result = 0;
-
-    	for (int i=0;i<bits.length;i++) {
-
-    		String bit = bits[bits.length-(i+1)].trim();
-
-    		if (bit.length() > 0) {
-
-    			result += multipliers[i] * Integer.parseInt(bit);
-    		}
-    	}
-
-    	return (result);
-    }
-
-    public static String
-    formatNanoAsMilli(
-    	long	nanos )
-    {
-    	final long truncator = 60*1000000000L;
-
-    	nanos = nanos - ((nanos/truncator) * truncator);
-
-    	return (String.valueOf(((double)nanos)/1000000) + " ms");
-    }
-
-    public static String
-    getHTTPDate(
-    	long		millis )
-    {
-		synchronized(http_date_format) {
-
-			return (http_date_format.format(new Date( millis)));
+	/**
+	 * parse time in h:m:s format to SECONDS
+	 * @param str
+	 * @return
+	 */
+	public static int parseColon(String str) {
+		final int[] multipliers = { 1, 60, 3600, 86400, 31536000 };
+		String[] bits = str.split(":");
+		int result = 0;
+		for (int i = 0; i < bits.length; i++) {
+			String bit = bits[bits.length - (i + 1)].trim();
+			if (bit.length() > 0) {
+				result += multipliers[i] * Integer.parseInt(bit);
+			}
 		}
-    }
+		return (result);
+	}
+
+	public static String formatNanoAsMilli(long nanos) {
+		final long truncator = 60 * 1000000000L;
+		nanos = nanos - ((nanos / truncator) * truncator);
+		return (String.valueOf(((double) nanos) / 1000000) + " ms");
+	}
+
+	public static String getHTTPDate(long millis) {
+		synchronized (http_date_format) {
+			return (http_date_format.format(new Date(millis)));
+		}
+	}
 
     public static long
     parseHTTPDate(

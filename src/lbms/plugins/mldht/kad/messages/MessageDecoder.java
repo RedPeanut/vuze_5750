@@ -102,7 +102,7 @@ public class MessageDecoder {
 	 * @param srv
 	 * @return
 	 */
-	private static MessageBase parseResponse (Map<String, Object> map,RPCServerBase srv) {
+	private static MessageBase parseResponse(Map<String, Object> map, RPCServerBase srv) {
 
 		byte[] mtid = (byte[]) map.get(MessageBase.TRANSACTION_KEY);
 		if (mtid == null || mtid.length < 1)

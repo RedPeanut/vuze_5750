@@ -185,7 +185,7 @@ public class DHTView implements UISWTViewEventListener {
 		};
 	}
 
-	private void initialize (Composite comp) {
+	private void initialize(Composite comp) {
 		//comp.setLayout(new GridLayout(1,false));
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		comp.setLayoutData(gridData);
@@ -333,7 +333,7 @@ public class DHTView implements UISWTViewEventListener {
 		updateDHTRunStatus();
 	}
 
-	private void createDHTStatsGroup (Composite comp) {
+	private void createDHTStatsGroup(Composite comp) {
 		dhtStatsGroup = new Group(comp, SWT.None);
 		Group grp = dhtStatsGroup;
 		grp.setText("DHT Stats");
@@ -502,7 +502,7 @@ public class DHTView implements UISWTViewEventListener {
 		}
 	}
 
-	private void createRoutingTableView (Composite comp) {
+	private void createRoutingTableView(Composite comp) {
 		/*
 		 * ScrolledComposite sc = new ScrolledComposite(comp, SWT.H_SCROLL |
 		 * SWT.V_SCROLL | SWT.BORDER);
@@ -518,7 +518,7 @@ public class DHTView implements UISWTViewEventListener {
 		rtc = new RoutingTableCanvas(sc);
 	}
 
-	private void createTaskTable (Composite comp) {
+	private void createTaskTable(Composite comp) {
 		taskTable = new Table(comp, SWT.VIRTUAL | SWT.BORDER
 				| SWT.FULL_SELECTION);
 
@@ -614,7 +614,7 @@ public class DHTView implements UISWTViewEventListener {
 
 	//----------------------------------------------------------------
 
-	private void updateDHTRunStatus () {
+	private void updateDHTRunStatus() {
 		isRunning = plugin.getDHT(type).isRunning();
 		if (dhtRunStatus != null && !dhtRunStatus.isDisposed()) {
 			dhtRunStatus.setText((plugin.getDHT(type).isRunning()) ? "Running"
@@ -634,7 +634,7 @@ public class DHTView implements UISWTViewEventListener {
 
 	//----------------------------------------------------------------
 
-	private void delete () {
+	private void delete() {
 		deactivate();
 		peerCount = null;
 		taskCount = null;
@@ -650,7 +650,7 @@ public class DHTView implements UISWTViewEventListener {
 		isCreated = false;
 	}
 
-	private void activate () {
+	private void activate() {
 		isRunning = plugin.getDHT(type).isRunning();
 		if (!isCreated || !isRunning || isActivated) {
 			return;
@@ -663,7 +663,7 @@ public class DHTView implements UISWTViewEventListener {
 		isActivated = true;
 	}
 
-	private void deactivate () {
+	private void deactivate() {
 		if (!isActivated) {
 			return;
 		}
@@ -678,7 +678,7 @@ public class DHTView implements UISWTViewEventListener {
 	 * 
 	 * @see org.gudy.azureus2.ui.swt.plugins.UISWTViewEventListener#eventOccurred(org.gudy.azureus2.ui.swt.plugins.UISWTViewEvent)
 	 */
-	public boolean eventOccurred (UISWTViewEvent event) {
+	public boolean eventOccurred(UISWTViewEvent event) {
 		switch (event.getType()) {
 
 		case UISWTViewEvent.TYPE_CREATE:

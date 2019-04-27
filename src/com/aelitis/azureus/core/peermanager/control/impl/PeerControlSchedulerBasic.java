@@ -52,8 +52,8 @@ public class PeerControlSchedulerBasic
 	protected final AEMonitor	this_mon = new AEMonitor("PeerControlSchedulerBasic");
 	private final SpeedTokenDispenserBasic tokenDispenser = new SpeedTokenDispenserBasic();
 
-	private long	latest_time;
-	private long	last_lag_log;
+	private long	latestTime;
+	private long	lastLagLog;
 
 	protected void schedule() {
 		
@@ -92,18 +92,18 @@ public class PeerControlSchedulerBasic
 					this_mon.exit();
 				}
 			}
-			latest_time	= SystemTime.getMonotonousTime();
+			latestTime	= SystemTime.getMonotonousTime();
 			long current_schedule_count = scheduleCount;
 			for (instanceWrapper inst: instances) {
 				long	target = inst.getNextTick();
-				long	diff = latest_time - target;
+				long	diff = latestTime - target;
 				if (diff >= 0) {
 					tick_count++;
-					inst.schedule(latest_time);
+					inst.schedule(latestTime);
 					scheduleCount++;
 					long new_target = target + SCHEDULE_PERIOD_MILLIS;
-					if (new_target <= latest_time) {
-						new_target = latest_time + (target % SCHEDULE_PERIOD_MILLIS);
+					if (new_target <= latestTime) {
+						new_target = latestTime + (target % SCHEDULE_PERIOD_MILLIS);
 					}
 					inst.setNextTick(new_target);
 				}
@@ -124,10 +124,10 @@ public class PeerControlSchedulerBasic
 					Thread.yield();
 				}
 			}
-			long	stats_diff =  latest_time - last_stats_time;
+			long	stats_diff =  latestTime - last_stats_time;
 			if (stats_diff > 10000) {
 				// System.out.println("stats: time = " + stats_diff + ", ticks = " + tick_count + ", inst = " + instances.size());
-				last_stats_time	= latest_time;
+				last_stats_time	= latestTime;
 				tick_count	= 0;
 			}
 		}
@@ -136,7 +136,7 @@ public class PeerControlSchedulerBasic
 	public void register(
 		PeerControlInstance	instance) {
 		instanceWrapper wrapper = new instanceWrapper(instance);
-		wrapper.setNextTick(latest_time + random.nextInt( SCHEDULE_PERIOD_MILLIS));
+		wrapper.setNextTick(latestTime + random.nextInt( SCHEDULE_PERIOD_MILLIS));
 		try {
 			this_mon.enter();
 			Map<PeerControlInstance,instanceWrapper> new_map = new HashMap<PeerControlInstance,instanceWrapper>(instance_map);
@@ -209,8 +209,8 @@ public class PeerControlSchedulerBasic
 			}
 			if (last_schedule > 0) {
 				if (mono_now - last_schedule > 1000) {
-					if (mono_now - last_lag_log > 1000) {
-						last_lag_log = mono_now;
+					if (mono_now - lastLagLog > 1000) {
+						lastLagLog = mono_now;
 						System.out.println("Scheduling lagging: " + (mono_now - last_schedule) + " - instances=" + instance_map.size());
 					}
 				}

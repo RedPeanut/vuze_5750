@@ -79,9 +79,9 @@ public class BEncoder {
 			String tempString = (object instanceof String) ? (String)object : String.valueOf(object);
 			// usually this is simpler to encode by hand as chars < 0x80 map directly in UTF-8
 			boolean	simple = true;
-			int	char_count = tempString.length();
-			byte[]	encoded = new byte[char_count];
-			for (int i=0;i<char_count;i++) {
+			int	charCount = tempString.length();
+			byte[]	encoded = new byte[charCount];
+			for (int i=0;i<charCount;i++) {
 				char c = tempString.charAt(i);
 				if (c < 0x80) {
 					encoded[i] = (byte)c;
@@ -91,7 +91,7 @@ public class BEncoder {
 				}
 			}
 			if (simple) {
-			 	writeInt(char_count);
+			 	writeInt(charCount);
 				writeChar(':');
 				writeBytes(encoded);
 			} else {
@@ -103,12 +103,13 @@ public class BEncoder {
 		} else if (object instanceof Map) {
 			Map tempMap = (Map)object;
 			SortedMap tempTree = null;
-				// unfortunately there are some occasions where we want to ensure that
-				// the 'key' of the map is not mangled by assuming its UTF-8 encodable.
-				// In particular the response from a tracker scrape request uses the
-				// torrent hash as the KEY. Hence the introduction of the type below
-				// to allow the constructor of the Map to indicate that the keys should
-				// be extracted using a BYTE_ENCODING
+			
+			// unfortunately there are some occasions where we want to ensure that
+			// the 'key' of the map is not mangled by assuming its UTF-8 encodable.
+			// In particular the response from a tracker scrape request uses the
+			// torrent hash as the KEY. Hence the introduction of the type below
+			// to allow the constructor of the Map to indicate that the keys should
+			// be extracted using a BYTE_ENCODING
 			boolean	byte_keys = object instanceof ByteEncodedKeyHashMap;
 			//write the d
 			writeChar('d');
@@ -217,10 +218,7 @@ public class BEncoder {
 		return true;
 	}
 
-	private void
-	writeChar(
-		char		c )
-   	{
+	private void writeChar(char c) {
 		int rem = currentBuffer.length - currentBufferPos;
 		if (rem > 0) {
 			currentBuffer[currentBufferPos++] = (byte)c;
@@ -241,11 +239,8 @@ public class BEncoder {
 	 	}
    	}
 
-	private void
-	writeInt(
-		int		i )
-	{
-			// we get a bunch of -1 values, optimise
+	private void writeInt(int i) {
+		// we get a bunch of -1 values, optimise
 		if (i == -1) {
 			writeBytes(MINUS_1_BYTES);
 			return;
@@ -255,8 +250,8 @@ public class BEncoder {
 	}
 
 	private void writeLong(long l) {
-	 	if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
-			writeInt((int)l);
+		if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
+			writeInt((int) l);
 		} else {
 			writeBytes(Long.toString(l).getBytes());
 		}
@@ -303,7 +298,7 @@ public class BEncoder {
 	private String getEncodedSoFar() {
 		return (new String( toByteArray()));
 	}
-
+	
 	private byte[] toByteArray() {
 		if (oldBuffers == null) {
 			byte[]	res = new byte[currentBufferPos];
@@ -392,11 +387,8 @@ public class BEncoder {
 	}
 
 
-	public static boolean
-	objectsAreIdentical(
-		Object		o1,
-		Object		o2 )
-	{
+	public static boolean objectsAreIdentical(Object o1, Object o2) {
+		
 		if (o1 == null && o2 == null) {
 			return (true);
 		} else if (o1 == null || o2 == null) {
@@ -421,9 +413,9 @@ public class BEncoder {
 	 	} else if (o1 instanceof byte[]) {
 	 		return (Arrays.equals((byte[])o1,(byte[])o2));
 		} else if (o1 instanceof List) {
-			return ( listsAreIdentical((List)o1,(List)o2));
+			return (listsAreIdentical((List)o1,(List)o2));
 	   	} else if (o1 instanceof Map) {
-			return ( mapsAreIdentical((Map)o1,(Map)o2));
+			return (mapsAreIdentical((Map)o1,(Map)o2));
 	   	} else if (	o1 instanceof Integer ||
 					o1 instanceof Boolean ||
 					o1 instanceof Float ||
@@ -435,11 +427,7 @@ public class BEncoder {
 		}
 	}
 
-	public static boolean
-	listsAreIdentical(
-		List	list1,
-		List	list2 )
-	{
+	public static boolean listsAreIdentical(List list1, List list2) {
 		if (list1 == null && list2 == null) {
 			return (true);
 		} else if (list1 == null || list2 == null) {
@@ -448,18 +436,15 @@ public class BEncoder {
 		if (list1.size() != list2.size()) {
 			return (false);
 		}
-		for ( int i=0;i<list1.size();i++) {
-			if (!objectsAreIdentical( list1.get(i), list2.get(i))) {
+		for (int i = 0; i < list1.size(); i++) {
+			if (!objectsAreIdentical(list1.get(i), list2.get(i))) {
 				return (false);
 			}
 		}
 		return (true);
 	}
 
-	public static boolean
-	mapsAreIdentical(
-		Map	map1,
-		Map	map2) {
+	public static boolean mapsAreIdentical(Map map1, Map map2) {
 		if (map1 == null && map2 == null) {
 			return (true);
 		} else if (map1 == null || map2 == null) {
@@ -468,11 +453,11 @@ public class BEncoder {
 		if (map1.size() != map2.size()) {
 			return (false);
 		}
-		for (Map.Entry<Object,Object> entry: ((Map<Object,Object>)map1).entrySet()) {
-			Object	key = entry.getKey();
-			Object	v1 = entry.getValue();
-			Object	v2 = map2.get(key);
-			if (!objectsAreIdentical( v1, v2)) {
+		for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) map1).entrySet()) {
+			Object key = entry.getKey();
+			Object v1 = entry.getValue();
+			Object v2 = map2.get(key);
+			if (!objectsAreIdentical(v1, v2)) {
 				return (false);
 			}
 		}
@@ -638,11 +623,7 @@ public class BEncoder {
 	 * @param i
 	 * @return
 	 */
-
-	private int
-	intToBytes(
-		int 	i )
-	{
+	private int intToBytes(int i) {
 		int q, r;
 		int charPos = 12;
 		byte sign = 0;
@@ -655,7 +636,7 @@ public class BEncoder {
 		// Generate two digits per iteration
 		while (i >= 65536) {
 			q = i / 100;
-		// really: r = i - (q * 100);
+			// really: r = i - (q * 100);
 			r = i - ((q << 6) + (q << 5) + (q << 2));
 			i = q;
 			intBuffer [--charPos] = DigitOnes[r];

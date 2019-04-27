@@ -22,10 +22,30 @@ package com.aelitis.azureus.core.networkmanager.admin.impl;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.*;
+import java.net.Authenticator;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.UnsupportedAddressTypeException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.gudy.azureus2.core3.config.COConfigurationManager;
@@ -35,7 +55,21 @@ import org.gudy.azureus2.core3.logging.LogAlert;
 import org.gudy.azureus2.core3.logging.LogEvent;
 import org.gudy.azureus2.core3.logging.LogIDs;
 import org.gudy.azureus2.core3.logging.Logger;
-import org.gudy.azureus2.core3.util.*;
+import org.gudy.azureus2.core3.util.AEDiagnostics;
+import org.gudy.azureus2.core3.util.AEDiagnosticsEvidenceGenerator;
+import org.gudy.azureus2.core3.util.AERunnable;
+import org.gudy.azureus2.core3.util.AESemaphore;
+import org.gudy.azureus2.core3.util.AEThread2;
+import org.gudy.azureus2.core3.util.AddressUtils;
+import org.gudy.azureus2.core3.util.AsyncDispatcher;
+import org.gudy.azureus2.core3.util.Base32;
+import org.gudy.azureus2.core3.util.Constants;
+import org.gudy.azureus2.core3.util.Debug;
+import org.gudy.azureus2.core3.util.IndentWriter;
+import org.gudy.azureus2.core3.util.SimpleTimer;
+import org.gudy.azureus2.core3.util.SystemTime;
+import org.gudy.azureus2.core3.util.TimerEvent;
+import org.gudy.azureus2.core3.util.TimerEventPerformer;
 import org.gudy.azureus2.platform.PlatformManager;
 import org.gudy.azureus2.platform.PlatformManagerCapabilities;
 import org.gudy.azureus2.platform.PlatformManagerFactory;
@@ -60,7 +94,21 @@ import com.aelitis.azureus.core.networkmanager.NetworkManager;
 import com.aelitis.azureus.core.networkmanager.Transport;
 import com.aelitis.azureus.core.networkmanager.TransportBase;
 import com.aelitis.azureus.core.networkmanager.TransportStartpoint;
-import com.aelitis.azureus.core.networkmanager.admin.*;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdmin;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminASN;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminASNListener;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminException;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminHTTPProxy;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminNATDevice;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminNetworkInterface;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminNetworkInterfaceAddress;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminNode;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminPropertyChangeListener;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminProtocol;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminRouteListener;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminRoutesListener;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminSocksProxy;
+import com.aelitis.azureus.core.networkmanager.admin.NetworkAdminSpeedTestScheduler;
 import com.aelitis.azureus.core.networkmanager.impl.http.HTTPNetworkManager;
 import com.aelitis.azureus.core.networkmanager.impl.tcp.TCPNetworkManager;
 import com.aelitis.azureus.core.networkmanager.impl.udp.UDPNetworkManager;
@@ -72,11 +120,15 @@ import com.aelitis.azureus.core.util.NetUtils;
 import com.aelitis.azureus.plugins.upnp.UPnPPlugin;
 import com.aelitis.azureus.plugins.upnp.UPnPPluginService;
 
-public class
-NetworkAdminImpl
+import hello.util.Log;
+import hello.util.SingleCounter2;
+
+public class NetworkAdminImpl
 	extends NetworkAdmin
-	implements AEDiagnosticsEvidenceGenerator
-{
+	implements AEDiagnosticsEvidenceGenerator {
+	
+	private static String TAG = NetworkAdminImpl.class.getSimpleName();
+	
 	private static final LogIDs LOGID = LogIDs.NWMAN;
 
 	private static final boolean	FULL_INTF_PROBE	= false;
@@ -87,8 +139,7 @@ NetworkAdminImpl
 	private static InetAddress localhostV4;
 	private static InetAddress localhostV6;
 
-	static
-	{
+	static {
 		try {
 			anyLocalAddressIPv4 	= InetAddress.getByAddress(new byte[] { 0,0,0,0 });
 			anyLocalAddressIPv6  	= InetAddress.getByAddress(new byte[] {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0});
@@ -110,13 +161,13 @@ NetworkAdminImpl
 	private final Map<String,AddressHistoryRecord>	address_history			= new HashMap<String,AddressHistoryRecord>();
 	private long								address_history_update_time;
 
-	private InetAddress[]				currentBindIPs			= new InetAddress[] { null };
-	private boolean						forceBind				= false;
-	private boolean						supportsIPv6withNIO		= true;
-	private boolean						supportsIPv6 = true;
-	private boolean						supportsIPv4 = true;
+	private InetAddress[]	currentBindIPs			= new InetAddress[] { null };
+	private boolean			forceBind				= false;
+	private boolean			supportsIPv6withNIO		= true;
+	private boolean			supportsIPv6 = true;
+	private boolean			supportsIPv4 = true;
 
-	private boolean						IPv6_enabled;
+	private boolean			ipV6Enabled;
 
 	{
 		COConfigurationManager.addAndFireParameterListener(
@@ -139,47 +190,40 @@ NetworkAdminImpl
 	private int roundRobinCounterV4 = 0;
 	private int roundRobinCounterV6 = 0;
 
-	private boolean logged_bind_force_issue;
+	private boolean loggedBindForceIssue;
 
 	private final CopyOnWriteList	listeners = new CopyOnWriteList();
 
 
 	final NetworkAdminRouteListener
-		trace_route_listener = new NetworkAdminRouteListener() {
-			private int	node_count = 0;
+		traceRouteListener = new NetworkAdminRouteListener() {
+			private int	nodeCount = 0;
 
 			public boolean foundNode(
 				NetworkAdminNode	node,
 				int					distance,
 				int					rtt) {
-				node_count++;
-
+				nodeCount++;
 				return (true);
 			}
 
-			public boolean timeout(
-				int					distance) {
-				if (distance == 3 && node_count == 0) {
-
+			public boolean timeout(int distance) {
+				if (distance == 3 && nodeCount == 0) {
 					return (false);
 				}
-
 				return (true);
 			}
 		};
 
 	private static final int ASN_MIN_CHECK = 30*60*1000;
+	private long lastAsnLookupTime;
+	private final List asnIpsChecked = new ArrayList(0);
+	private final List asHistory = new ArrayList();
 
-	private long last_asn_lookup_time;
-
-	private final List asn_ips_checked = new ArrayList(0);
-
-	private final List as_history = new ArrayList();
-
-	private final AsyncDispatcher		async_asn_dispacher 	= new AsyncDispatcher();
+	private final AsyncDispatcher	asyncAsnDispacher 	= new AsyncDispatcher();
 	private static final int	MAX_ASYNC_ASN_LOOKUPS	= 1024;
 
-	final Map<InetAddress, NetworkAdminASN>	async_asn_history =
+	final Map<InetAddress, NetworkAdminASN>	asyncAsnHistory =
 		new LinkedHashMap<InetAddress, NetworkAdminASN>(256,0.75f,true) {
 			protected boolean removeEldestEntry(
 		   		Map.Entry<InetAddress, NetworkAdminASN> eldest) {
@@ -260,7 +304,7 @@ NetworkAdminImpl
 
 	protected void setIPv6Enabled(
 		boolean enabled) {
-		IPv6_enabled	= enabled;
+		ipV6Enabled	= enabled;
 
 		supportsIPv6withNIO		= enabled;
 		supportsIPv6 			= enabled;
@@ -274,7 +318,7 @@ NetworkAdminImpl
 	}
 
 	public boolean isIPV6Enabled() {
-		return (IPv6_enabled);
+		return (ipV6Enabled);
 	}
 
 	private List<NetworkInterface> 	last_getni_result;
@@ -331,7 +375,7 @@ NetworkAdminImpl
 										continue;
 									}
 									if (ia instanceof Inet6Address && !ia.isLinkLocalAddress()) {
-										if (IPv6_enabled) {
+										if (ipV6Enabled) {
 											newV6 = true;
 										}
 									} else if (ia instanceof Inet4Address) {
@@ -404,8 +448,7 @@ NetworkAdminImpl
 
 		int i = previous;
 
-		do
-		{
+		do {
 			i++;i%= addresses.length;
 			if (target == null || (v6 && addresses[i] instanceof Inet6Address) || (!v6 && addresses[i] instanceof Inet4Address)) {
 				toReturn = addresses[i];
@@ -455,13 +498,24 @@ NetworkAdminImpl
 		throw new UnsupportedAddressTypeException();
 	}
 
-	public InetAddress[] getAllBindAddresses(boolean include_wildcard) {
-		if (include_wildcard) {
+	public InetAddress[] getAllBindAddresses(boolean includeWildcard) {
+		
+		/*int count = SingleCounter2.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format(">>>> getAllBindAddresses() is called... #%d", count));
+		Log.d(TAG, "includeWildcard = " + includeWildcard);*/
+		
+		if (currentBindIPs != null) {
+			for (int i=0;i<currentBindIPs.length;i++) {
+				Log.d(TAG, String.format("currentBindIPs[%d] = %s",i,currentBindIPs[i]));
+			}
+		}
+		
+		if (includeWildcard) {
 			return (currentBindIPs);
 		} else {
 			List<InetAddress> res = new ArrayList<InetAddress>();
-			InetAddress[] bind_ips = currentBindIPs;
-			for (InetAddress ip : bind_ips) {
+			InetAddress[] bindIps = currentBindIPs;
+			for (InetAddress ip : bindIps) {
 				if (!ip.isAnyLocalAddress()) {
 					res.add(ip);
 				}
@@ -542,7 +596,7 @@ addressLoop:
 			}
 		}
 
-		if (!IPv6_enabled) {
+		if (!ipV6Enabled) {
 			Iterator<InetAddress> it = addrs.iterator();
 			while (it.hasNext()) {
 				if (it.next() instanceof Inet6Address) {
@@ -682,27 +736,37 @@ addressLoop:
 		return (null);
 	}
 
-	protected void checkDefaultBindAddress(boolean first_time) {
+	protected void checkDefaultBindAddress(boolean firstTime) {
 		boolean changed = false;
 		String 	bindIp 	= COConfigurationManager.getStringParameter("Bind IP", "").trim();
 		boolean enforceBind = COConfigurationManager.getBooleanParameter("Enforce Bind IP");
+		
+		/*int count = SingleCounter2.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format(">>>> checkDefaultBindAddress() is called... #%d", count));
+		Log.d(TAG, "bindIp = " + bindIp);
+		Log.d(TAG, "enforceBind = " + enforceBind);*/
+		
 		if (enforceBind) {
 			if (bindIp.length() == 0) {
-				if (!logged_bind_force_issue) {
-					logged_bind_force_issue = true;
+				if (!loggedBindForceIssue) {
+					loggedBindForceIssue = true;
 					Debug.out("'Enforce IP Bindings' is selected but no bindings have been specified - ignoring force request!");
 				}
 				enforceBind = false;
 			} else {
-				logged_bind_force_issue = false;
+				loggedBindForceIssue = false;
 			}
 		}
+		
 		forceBind = enforceBind;
 		InetAddress[] addrs = calcBindAddresses(bindIp, enforceBind);
 		changed = !Arrays.equals(currentBindIPs, addrs);
+		
+		//Log.d(TAG, "changed = " + changed);
+		
 		if (changed) {
 			currentBindIPs = addrs;
-			if (!first_time) {
+			if (!firstTime) {
 				String logmsg = "NetworkAdmin: default bind ip has changed to '";
 				for (int i=0;i<addrs.length;i++)
 					logmsg+=(addrs[i] == null ? "none" : addrs[i].getHostAddress()) + (i<addrs.length? ";" : "");
@@ -1627,22 +1691,22 @@ addressLoop:
 			}
 		}
 
-		if (asn_ips_checked.contains( address)) {
+		if (asnIpsChecked.contains( address)) {
 
 			return (current);
 		}
 
 		long now = SystemTime.getCurrentTime();
 
-		if (now < last_asn_lookup_time || now - last_asn_lookup_time > ASN_MIN_CHECK) {
+		if (now < lastAsnLookupTime || now - lastAsnLookupTime > ASN_MIN_CHECK) {
 
-			last_asn_lookup_time	= now;
+			lastAsnLookupTime	= now;
 
 			NetworkAdminASNLookupImpl lookup = new NetworkAdminASNLookupImpl(address);
 
 			NetworkAdminASNImpl x = lookup.lookup();
 
-			asn_ips_checked.add(address);
+			asnIpsChecked.add(address);
 
 			asns.add(0, ASNToMap( x));
 
@@ -1679,9 +1743,9 @@ addressLoop:
 	public void lookupASN(
 		final InetAddress					address,
 		final NetworkAdminASNListener		listener) {
-		synchronized(async_asn_history) {
+		synchronized(asyncAsnHistory) {
 
-			NetworkAdminASN existing = async_asn_history.get(address);
+			NetworkAdminASN existing = asyncAsnHistory.get(address);
 
 			if (existing != null) {
 
@@ -1689,7 +1753,7 @@ addressLoop:
 			}
 		}
 
-		int	queue_size = async_asn_dispacher.getQueueSize();
+		int	queue_size = asyncAsnDispacher.getQueueSize();
 
 		if (queue_size >= MAX_ASYNC_ASN_LOOKUPS) {
 
@@ -1697,12 +1761,12 @@ addressLoop:
 
 		} else {
 
-			async_asn_dispacher.dispatch(
+			asyncAsnDispacher.dispatch(
 				new AERunnable() {
 					public void runSupport() {
-						synchronized(async_asn_history) {
+						synchronized(asyncAsnHistory) {
 
-							NetworkAdminASN existing = async_asn_history.get(address);
+							NetworkAdminASN existing = asyncAsnHistory.get(address);
 
 							if (existing != null) {
 
@@ -1717,9 +1781,9 @@ addressLoop:
 
 							NetworkAdminASNImpl result = lookup.lookup();
 
-							synchronized(async_asn_history) {
+							synchronized(asyncAsnHistory) {
 
-								async_asn_history.put(address, result);
+								asyncAsnHistory.put(address, result);
 							}
 
 							listener.success(result);
@@ -1739,13 +1803,13 @@ addressLoop:
 
 	protected void addToASHistory(
 		NetworkAdminASN	asn) {
-		synchronized(as_history) {
+		synchronized(asHistory) {
 
 			boolean	found = false;
 
-			for (int i=0;i<as_history.size();i++) {
+			for (int i=0;i<asHistory.size();i++) {
 
-				 NetworkAdminASN x = (NetworkAdminASN)as_history.get(i);
+				 NetworkAdminASN x = (NetworkAdminASN)asHistory.get(i);
 
 				 if (asn.getAS().equals( x.getAS())) {
 
@@ -1757,11 +1821,11 @@ addressLoop:
 
 			if (!found) {
 
-				as_history.add(asn);
+				asHistory.add(asn);
 
-				if (as_history.size() > 256) {
+				if (asHistory.size() > 256) {
 
-					as_history.remove(0);
+					asHistory.remove(0);
 				}
 			}
 		}
@@ -1770,11 +1834,11 @@ addressLoop:
 	protected NetworkAdminASN
 	getFromASHistory(
 		InetAddress	address) {
-		synchronized(as_history) {
+		synchronized(asHistory) {
 
-			for (int i=0;i<as_history.size();i++) {
+			for (int i=0;i<asHistory.size();i++) {
 
-				 NetworkAdminASN x = (NetworkAdminASN)as_history.get(i);
+				 NetworkAdminASN x = (NetworkAdminASN)asHistory.get(i);
 
 				 if (x.matchesCIDR( address)) {
 
@@ -1940,7 +2004,7 @@ addressLoop:
 
 						if (address != null) {
 
-							node = new networkNode(address, distance, millis);
+							node = new NetworkNode(address, distance, millis);
 
 							nodes.add(node);
 						}
@@ -1980,8 +2044,7 @@ addressLoop:
 		return (pm.hasCapability( PlatformManagerCapabilities.PingAvailability));
 	}
 
-	public NetworkAdminNode
-	pingTarget(
+	public NetworkAdminNode pingTarget(
 		InetAddress						interface_address,
 		InetAddress						target,
 		final int						max_millis,
@@ -1992,7 +2055,6 @@ addressLoop:
 		PlatformManager	pm = PlatformManagerFactory.getPlatformManager();
 
 		if (!canPing()) {
-
 			throw (new NetworkAdminException("No ping capability on platform"));
 		}
 
@@ -2030,7 +2092,7 @@ addressLoop:
 
 						if (address != null) {
 
-							node = new networkNode(address, distance, millis);
+							node = new NetworkNode(address, distance, millis);
 
 							nodes[0] = node;
 						}
@@ -3054,7 +3116,7 @@ addressLoop:
 
 				writer.println("bindable: " + getString( getBindableAddresses()));
 
-				writer.println("ipv6_enabled=" + IPv6_enabled);
+				writer.println("ipv6_enabled=" + ipV6Enabled);
 
 				writer.println("ipv4_potential=" + hasIPV4Potential());
 				writer.println("ipv6_potential=" + hasIPV6Potential(false) + "/" + hasIPV6Potential(true));
@@ -3290,11 +3352,11 @@ addressLoop:
 						networkInterface.networkAddress address = (networkInterface.networkAddress)interfaces[0].getAddresses()[0];
 
 						try {
-							NetworkAdminNode[] nodes = address.getRoute(InetAddress.getByName("www.google.com"), 30000, trace_route_listener);
+							NetworkAdminNode[] nodes = address.getRoute(InetAddress.getByName("www.google.com"), 30000, traceRouteListener);
 
 							for (int i=0;i<nodes.length;i++) {
 
-								networkNode	node = (networkNode)nodes[i];
+								NetworkNode	node = (NetworkNode)nodes[i];
 
 								iw.println( node.getString());
 							}
@@ -3448,7 +3510,7 @@ addressLoop:
 
 				InetAddress address = (InetAddress)e.nextElement();
 
-				if ((address instanceof Inet6Address) && !IPv6_enabled) {
+				if ((address instanceof Inet6Address) && !ipV6Enabled) {
 
 					continue;
 				}
@@ -3526,135 +3588,90 @@ addressLoop:
 				return ( address.isLoopbackAddress());
 			}
 
-			public NetworkAdminNode[]
-			getRoute(
-				InetAddress						target,
-				final int						max_millis,
-				final NetworkAdminRouteListener	listener )
-
-				throws NetworkAdminException
-			{
-				return ( NetworkAdminImpl.this.getRoute( address, target, max_millis, listener));
+			public NetworkAdminNode[] getRoute(
+					InetAddress						target,
+					final int						maxMillis,
+					final NetworkAdminRouteListener	listener)
+				throws NetworkAdminException {
+				return (NetworkAdminImpl.this.getRoute(address, target, maxMillis, listener));
 			}
 
-			public NetworkAdminNode
-			pingTarget(
-				InetAddress						target,
-				final int						max_millis,
-				final NetworkAdminRouteListener	listener )
-
-				throws NetworkAdminException
-			{
-				return ( NetworkAdminImpl.this.pingTarget( address, target, max_millis, listener));
+			public NetworkAdminNode pingTarget(
+					InetAddress						target,
+					final int						maxMillis,
+					final NetworkAdminRouteListener	listener)
+				throws NetworkAdminException {
+				return (NetworkAdminImpl.this.pingTarget(address, target, maxMillis, listener));
 			}
 
-			public InetAddress
-			testProtocol(
-				NetworkAdminProtocol	protocol )
-
-				throws NetworkAdminException
-			{
-				return (protocol.test( this));
+			public InetAddress testProtocol(NetworkAdminProtocol protocol)
+					throws NetworkAdminException {
+				return (protocol.test(this));
 			}
 
 			public void generateDiagnostics(
 				IndentWriter 	iw,
 				Set				public_addresses) {
 				iw.println("" + getAddress());
-
 				try {
 					iw.println("  Trace route");
-
 					iw.indent();
-
 					if (isLoopback()) {
-
 						iw.println("Loopback - ignoring");
-
 					} else {
-
 						try {
-							NetworkAdminNode[] nodes = getRoute(InetAddress.getByName("www.google.com"), 30000, trace_route_listener);
-
+							NetworkAdminNode[] nodes = getRoute(InetAddress.getByName("www.google.com"), 30000, traceRouteListener);
 							for (int i=0;i<nodes.length;i++) {
-
-								networkNode	node = (networkNode)nodes[i];
-
+								NetworkNode	node = (NetworkNode)nodes[i];
 								iw.println( node.getString());
 							}
 						} catch (Throwable e) {
-
 							iw.println("Can't resolve host for route trace - " + e.getMessage());
 						}
-
 						iw.println("Outbound protocols: bound");
-
 						AzureusCore azureus_core = AzureusCoreFactory.getSingleton();
-
 						NetworkAdminProtocol[]	protocols = getOutboundProtocols(azureus_core);
-
 						for (int i=0;i<protocols.length;i++) {
-
 							NetworkAdminProtocol	protocol = protocols[i];
-
 							try {
 								InetAddress	res = testProtocol(protocol);
-
 								if (res != null) {
-
 									public_addresses.add(res);
 								}
-
 								iw.println("    " + protocol.getName() + " - " + res);
-
 							} catch (NetworkAdminException e) {
-
 								iw.println("    " + protocol.getName() + " - " + Debug.getNestedExceptionMessage(e));
 							}
 						}
-
 						iw.println("Inbound protocols: bound");
-
 						protocols = getInboundProtocols(azureus_core);
-
 						for (int i=0;i<protocols.length;i++) {
-
 							NetworkAdminProtocol	protocol = protocols[i];
-
 							try {
 								InetAddress	res = testProtocol(protocol);
-
 								if (res != null) {
-
 									public_addresses.add(res);
 								}
-
 								iw.println("    " + protocol.getName() + " - " + res);
-
 							} catch (NetworkAdminException e) {
-
 								iw.println("    " + protocol.getName() + " - " + Debug.getNestedExceptionMessage(e));
 							}
 						}
 					}
 				} finally {
-
 					iw.exdent();
 				}
 			}
 		}
 	}
 
-	protected static class
-	networkNode
-		implements NetworkAdminNode
-	{
+	protected static class NetworkNode implements NetworkAdminNode {
+		
 		private final InetAddress	address;
 		private final int			distance;
 		private final int			rtt;
 
-		protected
-		networkNode(
+		protected NetworkNode(
 			InetAddress		_address,
 			int				_distance,
 			int				_millis) {

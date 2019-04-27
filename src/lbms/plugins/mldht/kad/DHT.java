@@ -1093,7 +1093,7 @@ public class DHT implements DHTBase {
 		}
 	}
 
-	public void addStatsListener (DHTStatsListener listener) {
+	public void addStatsListener(DHTStatsListener listener) {
 		statsListeners.add(listener);
 	}
 

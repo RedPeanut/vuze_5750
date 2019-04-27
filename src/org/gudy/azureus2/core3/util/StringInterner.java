@@ -32,9 +32,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import com.aelitis.azureus.core.util.HashCodeUtils;
 
 
-public class
-StringInterner
-{
+public class StringInterner {
+	
 	/**
 	 * Can't be final as set true for a few specific apps
 	 */
@@ -77,22 +76,20 @@ StringInterner
 		"passive",
 	};
 
-	private static final ByteArrayHashMap	byte_map = new ByteArrayHashMap(COMMON_KEYS.length);
+	private static final ByteArrayHashMap	byteMap = new ByteArrayHashMap(COMMON_KEYS.length);
 
-	static{
+	static {
 		try {
 			for (int i=0;i<COMMON_KEYS.length;i++) {
-
-				byte_map.put(COMMON_KEYS[i].getBytes(Constants.BYTE_ENCODING), COMMON_KEYS[i]);
+				byteMap.put(COMMON_KEYS[i].getBytes(Constants.BYTE_ENCODING), COMMON_KEYS[i]);
 				managedInterningSet.add(new WeakStringEntry(COMMON_KEYS[i]));
 			}
 		} catch (Throwable e) {
-
 			e.printStackTrace();
 		}
 
-			// initialisation nightmare - we have to create periodic event async to avoid
-			// circular class loading issues when azureus.config is borkified
+		// initialisation nightmare - we have to create periodic event async to avoid
+		// circular class loading issues when azureus.config is borkified
 
 		new AEThread2("asyncify", true) {
 			public void run() {
@@ -104,8 +101,6 @@ StringInterner
 						} finally {
 							managedSetLock.writeLock().unlock();
 						}
-
-
 						sanitizeLight();
 					}
 				});
@@ -116,12 +111,9 @@ StringInterner
 	// private final static ReferenceQueue queue = new ReferenceQueue();
 
 
-	public static String intern(
-		byte[]	bytes) {
-		String res = (String)byte_map.get(bytes);
-
+	public static String intern(byte[] bytes) {
+		String res = (String) byteMap.get(bytes);
 		// System.out.println(new String( bytes ) + " -> " + res);
-
 		return (res);
 	}
 
@@ -167,38 +159,29 @@ StringInterner
 	}
 
 	public static String intern(String toIntern) {
-
 		if (DISABLE_INTERNING) {
 			return (toIntern);
 		}
-
+		
 		if (toIntern == null)
 			return null;
-
+		
 		String internedString;
-
 		WeakStringEntry checkEntry = new WeakStringEntry(toIntern);
-
 		WeakStringEntry internedEntry = null;
 		boolean hit = false;
-
 		managedSetLock.readLock().lock();
 		try {
-
 			internedEntry = (WeakStringEntry) managedInterningSet.get(checkEntry);
-
 			if (internedEntry != null && (internedString = internedEntry.getString()) != null)
 				hit = true;
-			else
-			{
+			else {
 				managedSetLock.readLock().unlock();
 				managedSetLock.writeLock().lock();
 				try {
 					sanitize(false);
-
 					// get again, weakrefs might have expired and been added by another thread concurrently
 					internedEntry = (WeakStringEntry) managedInterningSet.get(checkEntry);
-
 					if (internedEntry != null && (internedString = internedEntry.getString()) != null)
 						hit = true;
 					else {
@@ -215,14 +198,12 @@ StringInterner
 		} finally {
 			managedSetLock.readLock().unlock();
 		}
-
 		if (hit) {
 			internedEntry.incHits();
 			checkEntry.destroy();
 			if (TRACE_MULTIHITS && internedEntry.hits % 10 == 0)
 				System.out.println("multihit "+internedEntry);
 		}
-
 
 		return internedString;
 	}
@@ -469,12 +450,12 @@ StringInterner
 
 
 	private final static Comparator	savingsComp	= new Comparator() {
-													public int compare(Object o1, Object o2) {
-														WeakWeightedEntry w1 = (WeakWeightedEntry) o1;
-														WeakWeightedEntry w2 = (WeakWeightedEntry) o2;
-														return w1.hits * w1.size - w2.hits * w2.size;
-													}
-												};
+		public int compare(Object o1, Object o2) {
+			WeakWeightedEntry w1 = (WeakWeightedEntry) o1;
+			WeakWeightedEntry w2 = (WeakWeightedEntry) o2;
+			return w1.hits * w1.size - w2.hits * w2.size;
+		}
+	};
 
 	private static void sanitizeLight() {
 		synchronized (unmanagedInterningSet) {
