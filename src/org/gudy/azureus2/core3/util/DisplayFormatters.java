@@ -71,7 +71,7 @@ DisplayFormatters
 	                                                     3 //TB
 	                                                  };
 
-	final private static NumberFormat[]	cached_number_formats = new NumberFormat[20];
+	final private static NumberFormat[]	cachedNumberFormats = new NumberFormat[20];
 
 	private static NumberFormat	percentage_format;
 
@@ -238,7 +238,7 @@ DisplayFormatters
       units_rate[i] = units_rate[i] + per_sec;
     }
 
-	Arrays.fill(cached_number_formats, null);
+	Arrays.fill(cachedNumberFormats, null);
 
 	percentage_format = NumberFormat.getPercentInstance();
 	percentage_format.setMinimumFractionDigits(1);
@@ -362,22 +362,18 @@ DisplayFormatters
 	}
 
 	public static String formatByteCountToKiBEtc(int n) {
-		return ( formatByteCountToKiBEtc((long)n));
+		return (formatByteCountToKiBEtc((long) n));
+	}
+
+	public static String formatByteCountToKiBEtc(long n) {
+		return (formatByteCountToKiBEtc(n, false, TRUNCZEROS_NO));
+	}
+
+	public static String formatByteCountToKiBEtc(long n, boolean bTruncateZeros) {
+		return (formatByteCountToKiBEtc(n, false, bTruncateZeros));
 	}
 
 	public static String formatByteCountToKiBEtc(
-		long n) {
-		return ( formatByteCountToKiBEtc( n, false, TRUNCZEROS_NO));
-	}
-
-	public static
-	String formatByteCountToKiBEtc(
-		long n, boolean bTruncateZeros) {
-		return (formatByteCountToKiBEtc( n, false, bTruncateZeros));
-	}
-
-	public static
-	String formatByteCountToKiBEtc(
 		long	n,
 		boolean	rate,
 		boolean bTruncateZeros) {
@@ -389,36 +385,31 @@ DisplayFormatters
 		return ( force_si_values?1024:(use_si_units?1024:1000));
 	}
 
-	public static
-	String formatByteCountToKiBEtc(
-		long	n,
-		boolean	rate,
-		boolean bTruncateZeros,
-		int precision) {
+	public static String formatByteCountToKiBEtc(
+			long	n,
+			boolean	rate,
+			boolean	bTruncateZeros,
+			int precision) {
+		
 		double dbl = (rate && use_units_rate_bits) ? n * 8 : n;
-
-	  	int unitIndex = UNIT_B;
-
-        long	div = force_si_values?1024:(use_si_units?1024:1000);
-
-	  	while (dbl >= div && unitIndex < unitsStopAt) {
-
-		  dbl /= div;
-		  unitIndex++;
+			int unitIndex = UNIT_B;
+			long div = force_si_values?1024:(use_si_units?1024:1000);
+			while (dbl >= div && unitIndex < unitsStopAt) {
+			dbl /= div;
+			unitIndex++;
 		}
-
-	  if (precision < 0) {
-	  	precision = UNITS_PRECISION[unitIndex];
-	  }
-
-	  // round for rating, because when the user enters something like 7.3kbps
+			
+		if (precision < 0) {
+			precision = UNITS_PRECISION[unitIndex];
+		}
+		
+		// round for rating, because when the user enters something like 7.3kbps
 		// they don't want it truncated and displayed as 7.2
-		// (7.3*1024 = 7475.2; 7475/1024.0 = 7.2998;  trunc(7.2998, 1 prec.) == 7.2
-	  //
+		// (7.3*1024 = 7475.2; 7475/1024.0 = 7.2998;	trunc(7.2998, 1 prec.) == 7.2
+		//
 		// Truncate for rest, otherwise we get complaints like:
 		// "I have a 1.0GB torrent and it says I've downloaded 1.0GB.. why isn't
-		//  it complete? waaah"
-
+		//	it complete? waaah"
 		return formatDecimal(dbl, precision, bTruncateZeros, rate)
 				+ (rate ? units_rate[unitIndex] : units[unitIndex]);
 	}
@@ -1030,6 +1021,7 @@ DisplayFormatters
 			int precision,
 			boolean bTruncateZeros,
 			boolean bRound) {
+		
 		if (Double.isNaN(value) || Double.isInfinite(value)) {
 			return Constants.INFINITY_STRING;
 		}
@@ -1047,13 +1039,13 @@ DisplayFormatters
 			}
 		}
 
-		int cache_index = (precision << 2) + ((bTruncateZeros ? 1 : 0) << 1)
+		int cacheIndex = (precision << 2) + ((bTruncateZeros ? 1 : 0) << 1)
 				+ (bRound ? 1 : 0);
 
 		NumberFormat nf = null;
 
-		if (cache_index < cached_number_formats.length) {
-			nf = cached_number_formats[cache_index];
+		if (cacheIndex < cachedNumberFormats.length) {
+			nf = cachedNumberFormats[cacheIndex];
 		}
 
 		if (nf == null) {
@@ -1066,8 +1058,8 @@ DisplayFormatters
 				nf.setMaximumFractionDigits(precision);
 			}
 
-			if (cache_index < cached_number_formats.length) {
-				cached_number_formats[cache_index] = nf;
+			if (cacheIndex < cachedNumberFormats.length) {
+				cachedNumberFormats[cacheIndex] = nf;
 			}
 		}
 

@@ -22,92 +22,61 @@ import java.util.Map;
 
 import org.gudy.azureus2.core3.util.BEncoder;
 
-public abstract class 
-Token 
-{
-	public abstract Object
-	getValue();
+public abstract class Token {
 	
-	public static class
-	OurToken
-		extends Token
-	{
-		private final byte[]	value;
-		private final int		hash;
-		
-		public 
-		OurToken(
-			byte[] _value) {
-			value 	= _value;			
-			hash 	= Arrays.hashCode((byte[])value);
+	public abstract Object getValue();
+
+	public static class OurToken extends Token {
+		private final byte[] value;
+		private final int hash;
+
+		public OurToken(byte[] _value) {
+			value = _value;
+			hash = Arrays.hashCode((byte[]) value);
 		}
-		
-		public Object
-		getValue() {
-			return(value);
+
+		public Object getValue() {
+			return (value);
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return hash;
 		}
-		
-		@Override
-		public boolean 
-		equals(Object obj) 
-		{
-			if (obj instanceof OurToken) {
-				
-				byte[] other_value = ((OurToken)obj).value;
-				
-				return(Arrays.equals(value, other_value));
 
-			}else{
-				
-				return(false);
-			}	
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof OurToken) {
+				byte[] other_value = ((OurToken) obj).value;
+				return (Arrays.equals(value, other_value));
+			} else {
+				return (false);
+			}
 		}
 	}
 	
-	public static class
-	TheirToken
-		extends Token
-	{
-		private final Object	value;
-		private final int		hash;
-		
-		public 
-		TheirToken(
-			Object _value) {
+	public static class TheirToken extends Token {
+		private final Object value;
+		private final int hash;
+		public TheirToken(Object _value) {
 			value = _value;
-			
 			if (value instanceof byte[]) {
-			
-				hash = Arrays.hashCode((byte[])value);
-				
-			}else{
-				
+				hash = Arrays.hashCode((byte[]) value);
+			} else {
 				Map temp = new HashMap();
-				
 				temp.put("v", value);
-				
 				int _hash;
-				
 				try {
 					_hash = Arrays.hashCode(BEncoder.encode(temp));
-					
 				} catch (Throwable e) {
-					
 					_hash = 0;
 				}
-				
 				hash = _hash;
 			}
 		}
 		
-		public Object
-		getValue() {
-			return(value);
+		public Object getValue() {
+			return (value);
 		}
 		
 		@Override
@@ -116,25 +85,19 @@ Token
 		}
 		
 		@Override
-		public boolean 
-		equals(Object obj) 
-		{
+		public boolean equals(Object obj) {
 			if (obj instanceof TheirToken) {
-				
-				Object other_value = ((TheirToken)obj).value;
-				
-				if (value instanceof byte[] && other_value instanceof byte[]) {
-					
-					return(Arrays.equals((byte[])value, (byte[])other_value));
-					
-				}else{
-					
-					return(BEncoder.objectsAreIdentical(value, other_value));
+				Object otherValue = ((TheirToken) obj).value;
+				if (value instanceof byte[] && otherValue instanceof byte[]) {
+					return (Arrays.equals((byte[]) value, (byte[]) otherValue));
+				} else {
+					return (BEncoder.objectsAreIdentical(value, otherValue));
 				}
-			}else{
-				
-				return(false);
-			}		
+			} else {
+				return (false);
+			}
 		}
 	}
+	
+	
 }

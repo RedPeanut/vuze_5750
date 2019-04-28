@@ -32,20 +32,16 @@ import org.gudy.azureus2.core3.util.Constants;
  * @author parg
  *
  */
-public interface
-Formatters
-{
+public interface Formatters {
+	
 	public String BYTE_ENCODING = Constants.BYTE_ENCODING;
 	public String TEXT_ENCODING = Constants.DEFAULT_ENCODING;
 
-	public String formatByteCountToKiBEtc(
-		long		bytes);
+	public String formatByteCountToKiBEtc(long bytes);
 
-	public String formatByteCountToKiBEtcPerSec(
-		long		bytes);
+	public String formatByteCountToKiBEtcPerSec(long bytes);
 
-	public String formatPercentFromThousands(
-		long		thousands);
+	public String formatPercentFromThousands(long thousands);
 
 	public String formatByteArray(
 		byte[]		data,

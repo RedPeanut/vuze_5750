@@ -539,8 +539,6 @@ public class Node {
 			dht.getEstimator().setInitialRawDistanceEstimate((Double)table.get("log2estimate"));
 			long timestamp = (Long)table.get("timestamp");
 
-
-
 			// integrate loaded objects
 
 			int entriesLoaded = 0;
@@ -582,9 +580,7 @@ public class Node {
 			return;
 		} catch (Throwable e) {
 				// in case table is corrupted in some way
-			
 			DHT.logError("Failed to load from cache: " + Debug.getNestedExceptionMessage(e));
-			
 		} finally {
 			if (!runDeferred && runWhenLoaded != null) {
 				runWhenLoaded.run();

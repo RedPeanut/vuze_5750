@@ -137,12 +137,12 @@ public class DHTView implements UISWTViewEventListener {
 							activeRPCCount.setText(String.valueOf(stats.getNumRpcCalls()));
 
 							RPCStats rpc = stats.getRpcStats();
-
+							
 							receivedBytesTotal.setText(formatters.formatByteCountToKiBEtc(rpc.getReceivedBytes()));
 							sentBytesTotal.setText(formatters.formatByteCountToKiBEtc(rpc.getSentBytes()));
 							receivedBytes.setText(formatters.formatByteCountToKiBEtcPerSec(rpc.getReceivedBytesPerSec()));
 							sentBytes.setText(formatters.formatByteCountToKiBEtcPerSec(rpc.getSentBytesPerSec()));
-
+							
 							long uptimeSec = (System.currentTimeMillis() - stats.getStartedTimestamp()) / 1000;
 							if (uptimeSec == 0) {
 								uptimeSec = 1;
@@ -193,29 +193,29 @@ public class DHTView implements UISWTViewEventListener {
 		final ScrolledComposite scrollComposite = new ScrolledComposite(comp,
 				SWT.V_SCROLL | SWT.H_SCROLL);
 
-		final Composite comp_on_sc = new Composite(scrollComposite, SWT.None);
+		final Composite compOnSC = new Composite(scrollComposite, SWT.None);
 
 		GridLayout gl = new GridLayout(2, false);
-		comp_on_sc.setLayout(gl);
+		compOnSC.setLayout(gl);
 
 		gridData = new GridData(GridData.FILL_BOTH);
-		comp_on_sc.setLayoutData(gridData);
+		compOnSC.setLayoutData(gridData);
 
-		createDHTStatsGroup(comp_on_sc);
-		createControlGroup(comp_on_sc);
-		createRPCGroup(comp_on_sc);
-		createMessageStatsGroup(comp_on_sc);
+		createDHTStatsGroup(compOnSC);
+		createControlGroup(compOnSC);
+		createRPCGroup(compOnSC);
+		createMessageStatsGroup(compOnSC);
 
-		createRoutingTableView(comp_on_sc);
-		createTaskTable(comp_on_sc);
+		createRoutingTableView(compOnSC);
+		createTaskTable(compOnSC);
 
-		scrollComposite.setContent(comp_on_sc);
+		scrollComposite.setContent(compOnSC);
 		scrollComposite.setExpandVertical(true);
 		scrollComposite.setExpandHorizontal(true);
 		scrollComposite.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized (ControlEvent e) {
-				scrollComposite.setMinSize(comp_on_sc.computeSize(SWT.DEFAULT,
+				scrollComposite.setMinSize(compOnSC.computeSize(SWT.DEFAULT,
 						SWT.DEFAULT));
 			}
 		});
@@ -226,7 +226,7 @@ public class DHTView implements UISWTViewEventListener {
 	/**
 	 * @param comp
 	 */
-	private void createControlGroup (Composite comp) {
+	private void createControlGroup(Composite comp) {
 		Group grp = new Group(comp, SWT.None);
 		grp.setText("DHT Control");
 
@@ -251,7 +251,7 @@ public class DHTView implements UISWTViewEventListener {
 
 		dhtRunStatus = new Label(grp, SWT.None);
 
-		Button donation = new Button(grp, SWT.FLAT);
+		/*Button donation = new Button(grp, SWT.FLAT);
 		gd = new GridData();
 		gd.verticalSpan = 3;
 		gd.horizontalAlignment = SWT.CENTER;
@@ -262,14 +262,13 @@ public class DHTView implements UISWTViewEventListener {
 				DHTView.class
 						.getResourceAsStream("/lbms/plugins/mldht/azureus/gui/paypal.gif"));
 		donation.setImage(donationImg);
-		donation
-				.setToolTipText("Developing this plugin takes much time, if you want to help. Click here.");
+		donation.setToolTipText("Developing this plugin takes much time, if you want to help. Click here.");
 		donation.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected (SelectionEvent e) {
 				Program.launch(DONATION_URL);
 			}
-		});
+		});*/
 
 		dhtStartStop = new Button(grp, SWT.PUSH);
 

@@ -86,7 +86,6 @@ public class DHT implements DHTBase {
 		scheduler = new ScheduledThreadPoolExecutor(threads, new ThreadFactory() {
 			public Thread newThread (Runnable r) {
 				Thread t = new Thread(executorGroup, r, "mlDHT Executor");
-
 				t.setDaemon(true);
 				return t;
 			}
@@ -99,10 +98,10 @@ public class DHT implements DHTBase {
 	
 	private static void createLogger() {
 		logger = new DHTLogger() {
-			public void log (String message) {
+			public void log(String message) {
 				System.out.println(message);
 			};
-			public void log (Throwable e) {
+			public void log(Throwable e) {
 				e.printStackTrace();
 			}
 		};
@@ -578,13 +577,11 @@ public class DHT implements DHTBase {
 		
 		bootstrapping = true;
 		node.loadTable(new Runnable() {
-			public void run () {
+			public void run() {
 				started(serverListener);				
 			}
 		});
 
-
-		
 //		// does 10k random lookups and prints them to a file for analysis
 //		scheduler.schedule(new Runnable() {
 //			//PrintWriter		pw;
@@ -1052,18 +1049,18 @@ public class DHT implements DHTBase {
 		return taskManager.getNumTasks() < DHTConstants.MAX_ACTIVE_TASKS * servers.size() && toCheck.getRPC().getNumActiveRPCCalls() + 16 < DHTConstants.MAX_ACTIVE_CALLS;
 	}
 
-	public Key getOurID () {
+	public Key getOurID() {
 		if (running) {
 			return node.getRootID();
 		}
 		return null;
 	}
 
-	private boolean hasStatsListeners () {
+	private boolean hasStatsListeners() {
 		return !statsListeners.isEmpty();
 	}
 
-	private void onStatsUpdate () {
+	private void onStatsUpdate() {
 		stats.setNumTasks(taskManager.getNumTasks() + taskManager.getNumQueuedTasks());
 		stats.setNumPeers(node.getNumEntriesInRoutingTable());
 		int numSent = 0;int numReceived = 0;int activeCalls = 0;
@@ -1081,7 +1078,7 @@ public class DHT implements DHTBase {
 		}
 	}
 
-	private void setStatus (DHTStatus status) {
+	private void setStatus(DHTStatus status) {
 		if (!this.status.equals(status)) {
 			DHTStatus old = this.status;
 			this.status = status;
@@ -1122,21 +1119,21 @@ public class DHT implements DHTBase {
 	/**
 	 * @param logger the logger to set
 	 */
-	public static void setLogger (DHTLogger logger) {
+	public static void setLogger(DHTLogger logger) {
 		DHT.logger = logger;
 	}
 
 	/**
 	 * @return the logLevel
 	 */
-	public static LogLevel getLogLevel () {
+	public static LogLevel getLogLevel() {
 		return logLevel;
 	}
 
 	/**
 	 * @param logLevel the logLevel to set
 	 */
-	public static void setLogLevel (LogLevel logLevel) {
+	public static void setLogLevel(LogLevel logLevel) {
 		DHT.logLevel = logLevel;
 		logger.log("Change LogLevel to: " + logLevel);
 	}
@@ -1144,43 +1141,43 @@ public class DHT implements DHTBase {
 	/**
 	 * @return the scheduler
 	 */
-	public static ScheduledExecutorService getScheduler () {
+	public static ScheduledExecutorService getScheduler() {
 		return scheduler;
 	}
 
-	public static void log (String message, LogLevel level) {
+	public static void log(String message, LogLevel level) {
 		if (level.compareTo(logLevel) < 1) { // <=
 			logger.log(message);
 		}
 	}
 
-	public static void log (Throwable e, LogLevel level) {
+	public static void log(Throwable e, LogLevel level) {
 		if (level.compareTo(logLevel) < 1) { // <=
 			logger.log(e);
 		}
 	}
 
-	public static void logFatal (String message) {
+	public static void logFatal(String message) {
 		log(message, LogLevel.Fatal);
 	}
 
-	public static void logError (String message) {
+	public static void logError(String message) {
 		log(message, LogLevel.Error);
 	}
 
-	public static void logInfo (String message) {
+	public static void logInfo(String message) {
 		log(message, LogLevel.Info);
 	}
 
-	public static void logDebug (String message) {
+	public static void logDebug(String message) {
 		log(message, LogLevel.Debug);
 	}
 
-	public static void logVerbose (String message) {
+	public static void logVerbose(String message) {
 		log(message, LogLevel.Verbose);
 	}
 
-	public static boolean isLogLevelEnabled (LogLevel level) {
+	public static boolean isLogLevelEnabled(LogLevel level) {
 		return level.compareTo(logLevel) < 1;
 	}
 

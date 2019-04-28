@@ -124,11 +124,9 @@ Utilities
 
 		throws IOException;
 
-	public Formatters
-	getFormatters();
+	public Formatters getFormatters();
 
-	public LocaleUtilities
-	getLocaleUtilities();
+	public LocaleUtilities getLocaleUtilities();
 
 	/**
 	 * Creates a <code>UTTimer</code> instance. It will be configured for non-lightweight

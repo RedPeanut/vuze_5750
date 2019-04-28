@@ -221,6 +221,7 @@ public class RPCServer implements Runnable, RPCServerBase {
 	 * @see lbms.plugins.mldht.kad.RPCServerBase#start()
 	 */
 	public void start() {
+		
 		if (!createSocket())
 			return;
 		
