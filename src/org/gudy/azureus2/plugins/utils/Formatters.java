@@ -38,24 +38,12 @@ public interface Formatters {
 	public String TEXT_ENCODING = Constants.DEFAULT_ENCODING;
 
 	public String formatByteCountToKiBEtc(long bytes);
-
 	public String formatByteCountToKiBEtcPerSec(long bytes);
-
 	public String formatPercentFromThousands(long thousands);
-
-	public String formatByteArray(
-		byte[]		data,
-		boolean		no_spaces);
-
-	public String encodeBytesToString(
-		byte[]		bytes);
-
-	public byte[]
-	decodeBytesFromString(
-		String		str);
-
-	public String formatDate(
-		long		millis);
+	public String formatByteArray(byte[] data, boolean noSpaces);
+	public String encodeBytesToString(byte[] bytes);
+	public byte[] decodeBytesFromString(String str);
+	public String formatDate(long millis);
 
 	/**
 	 * @since 3.0.5.3
@@ -71,11 +59,7 @@ public interface Formatters {
 	 * @since 3.0.5.3
 	 */
 	public String formatDateOnly(long millis);
-
-
-	public String formatTimeFromSeconds(
-		long		seconds);
-
+	public String formatTimeFromSeconds(long seconds);
 
 	/**
 	 * Format seconds remaining into an ETA value.
@@ -85,29 +69,10 @@ public interface Formatters {
 	 */
 	public String formatETAFromSeconds(long seconds);
 
-
-
-	public byte[]
-	bEncode(
-		Map	map )
-
-		throws IOException;
-
-	public Map
-	bDecode(
-		byte[]	data )
-
-		throws IOException;
-
-	public String base32Encode(
-		byte[]		data);
-
-	public byte[]
-	base32Decode(
-		String		data);
-
-	public Comparator
-	getAlphanumericComparator(
-		boolean	ignore_case);
+	public byte[] bEncode(Map map) throws IOException;
+	public Map bDecode(byte[] data) throws IOException;
+	public String base32Encode(byte[] data);
+	public byte[] base32Decode(String data);
+	public Comparator getAlphanumericComparator(boolean ignore_case);
 
 }

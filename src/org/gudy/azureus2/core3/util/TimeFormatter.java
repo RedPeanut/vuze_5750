@@ -8,11 +8,11 @@
  * of the License, or (at your option) any later version.
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
  */
 package org.gudy.azureus2.core3.util;
@@ -95,7 +95,7 @@ public class TimeFormatter {
 
 	/**
 	 * Format time into two time sections, the first chunk trimmed, the second
-	 * with always with 2 digits.  Sections are *d, **h, **m, **s.  Section
+	 * with always with 2 digits.	Sections are *d, **h, **m, **s.	Section
 	 * will be skipped if 0.
 	 *
 	 * @param time time in seconds
@@ -228,7 +228,7 @@ public class TimeFormatter {
 
 		long time_secs = time_millis / 1000;
 
-		int  hundredths = (int)(time_millis - time_secs*1000)/10;
+		int	hundredths = (int)(time_millis - time_secs*1000)/10;
 
 		if (time_millis == 0 || time_secs >= 60) {
 
@@ -267,29 +267,27 @@ public class TimeFormatter {
 	 * @param time time in seconds
 	 * @return
 	 */
+	public static String formatColon(long time) {
+		if (time == Constants.CRAPPY_INFINITY_AS_INT || time >= Constants.CRAPPY_INFINITE_AS_LONG) return Constants.INFINITY_STRING;
+		if (time < 0) return "";
 
-    public static String formatColon(long time)
-    {
-      if (time == Constants.CRAPPY_INFINITY_AS_INT || time >= Constants.CRAPPY_INFINITE_AS_LONG) return Constants.INFINITY_STRING;
-      if (time < 0) return "";
+		int secs = (int) time % 60;
+		int mins = (int) (time / 60) % 60;
+		int hours = (int) (time /3600) % 24;
+		int days = (int) (time / 86400) % 365;
+		int years = (int) (time / 31536000);
 
-      int secs = (int) time % 60;
-      int mins = (int) (time / 60) % 60;
-      int hours = (int) (time /3600) % 24;
-      int days = (int) (time / 86400) % 365;
-      int years = (int) (time / 31536000);
+		String result = "";
+		if (years > 0) result += years + "y ";
+		if (years > 0 || days > 0) result += days + "d ";
+		result += twoDigits(hours) + ":" + twoDigits(mins) + ":" + twoDigits(secs);
 
-      String result = "";
-      if (years > 0) result += years + "y ";
-      if (years > 0 || days > 0) result += days + "d ";
-      result += twoDigits(hours) + ":" + twoDigits(mins) + ":" + twoDigits(secs);
+		return result;
+	}
 
-      return result;
-    }
-
-    private static String twoDigits(int i) {
-      return (i < 10) ? "0" + i : String.valueOf(i);
-    }
+	private static String twoDigits(int i) {
+		return (i < 10) ? "0" + i : String.valueOf(i);
+	}
 
 	/**
 	 * parse time in h:m:s format to SECONDS
@@ -321,56 +319,56 @@ public class TimeFormatter {
 		}
 	}
 
-    public static long
-    parseHTTPDate(
-    	String		date )
-    {
-    	try {
-    		synchronized(http_date_format) {
+	public static long
+	parseHTTPDate(
+		String		date )
+	{
+		try {
+			synchronized(http_date_format) {
 
-    			return (http_date_format.parse( date).getTime());
-    		}
-    	} catch (Throwable e) {
+				return (http_date_format.parse( date).getTime());
+			}
+		} catch (Throwable e) {
 
-    		Debug.out("Failed to parse HTTP date '" + date + "'");
+			Debug.out("Failed to parse HTTP date '" + date + "'");
 
-    		return (0);
-    	}
-    }
+			return (0);
+		}
+	}
 
-    public static String
-    getCookieDate(
-    	long		millis )
-    {
+	public static String
+	getCookieDate(
+		long		millis )
+	{
 		synchronized(cookie_date_format) {
 
 			return (cookie_date_format.format(new Date( millis)));
 		}
-    }
+	}
 
-    public static String
-    milliStamp()
-    {
-    	long nanos = SystemTime.getHighPrecisionCounter();
+	public static String
+	milliStamp()
+	{
+		long nanos = SystemTime.getHighPrecisionCounter();
 
-    	final long truncator = 60*1000000000L;
+		final long truncator = 60*1000000000L;
 
-    	nanos = nanos - ((nanos/truncator) * truncator);
+		nanos = nanos - ((nanos/truncator) * truncator);
 
-    	String	str = String.valueOf(nanos/1000000);
+		String	str = String.valueOf(nanos/1000000);
 
-    	while (str.length() < 5) {
+		while (str.length() < 5) {
 
-    		str = "0" + str;
-    	}
+			str = "0" + str;
+		}
 
-    	return (str + ": ");
-    }
+		return (str + ": ");
+	}
 
-    public static void
-    milliTrace(
-    	String	str )
-    {
-    	System.out.println(milliStamp() + str);
-    }
+	public static void
+	milliTrace(
+		String	str )
+	{
+		System.out.println(milliStamp() + str);
+	}
 }

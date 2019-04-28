@@ -42,8 +42,7 @@ public class BEncoder {
 	private static final byte[] MINUS_1_BYTES = "-1".getBytes();
 	private static volatile int non_ascii_logs;
 
-	public static byte[] encode(Map object)
-		throws IOException {
+	public static byte[] encode(Map object) throws IOException {
 		return (encode(object, false));
 	}
 
@@ -68,8 +67,7 @@ public class BEncoder {
 		urlEncode	= _urlEncode;
 	}
 
-	private boolean encodeObject(Object object)
-		throws IOException {
+	private boolean encodeObject(Object object) throws IOException {
 		
 		if (object instanceof BEncodableObject) {
 			object = ((BEncodableObject)object).toBencodeObject();
@@ -139,11 +137,10 @@ public class BEncoder {
 							} catch (UnsupportedEncodingException e) {
 								throw (new IOException("BEncoder: unsupport encoding: " + e.getMessage()));
 							}
-						} else
-						{
-								// if we put non-ascii chars in as keys we can get horrible expanding
-								// config issues as we cycle through decode/encode cycles with certain
-								// characters
+						} else {
+							// if we put non-ascii chars in as keys we can get horrible expanding
+							// config issues as we cycle through decode/encode cycles with certain
+							// characters
 							if (Constants.IS_CVS_VERSION) {
 								char[]	chars = key.toCharArray();
 								for (char c: chars) {
@@ -180,7 +177,7 @@ public class BEncoder {
 			writeChar('i');
 			writeLong(tempLong.longValue());
 			writeChar('e');
-	   } else if (object instanceof byte[]) {
+		} else if (object instanceof byte[]) {
 			byte[] tempByteArray = (byte[])object;
 			writeInt(tempByteArray.length);
 			writeChar(':');
@@ -189,32 +186,30 @@ public class BEncoder {
 			} else {
 				writeBytes(tempByteArray);
 			}
-	   } else if (object instanceof Integer) {
+		} else if (object instanceof Integer) {
 			Integer tempInteger = (Integer)object;
 			//write out the l
 			writeChar('i');
 			writeInt(tempInteger.intValue());
 			writeChar('e');
-	   } else if (object instanceof Byte) {
+		} else if (object instanceof Byte) {
 			byte temp = (Byte)object;
 			writeChar('i');
 			writeInt(temp & 0x000000ff);
 			writeChar('e');
-	   } else if (object instanceof ByteBuffer) {
-	   		ByteBuffer  bb = (ByteBuffer)object;
-	   		writeInt(bb.limit());
-	   		writeChar(':');
+		} else if (object instanceof ByteBuffer) {
+			ByteBuffer  bb = (ByteBuffer)object;
+			writeInt(bb.limit());
+			writeChar(':');
 			writeByteBuffer(bb);
-	   } else if (object == null) {
-		   	// ideally we'd bork here but I don't want to run the risk of breaking existing stuff so just log
-
-		   Debug.out("Attempt to encode a null value: sofar=" + getEncodedSoFar());
-		   return false;
-	   } else {
-
-		   Debug.out("Attempt to encode an unsupported entry type: " + object.getClass() + ";value=" + object);
-		   return false;
-	   }
+		} else if (object == null) {
+			// ideally we'd bork here but I don't want to run the risk of breaking existing stuff so just log
+			Debug.out("Attempt to encode a null value: sofar=" + getEncodedSoFar());
+			return false;
+		} else {
+			Debug.out("Attempt to encode an unsupported entry type: " + object.getClass() + ";value=" + object);
+			return false;
+		}
 		return true;
 	}
 
@@ -296,7 +291,7 @@ public class BEncoder {
 	}
 
 	private String getEncodedSoFar() {
-		return (new String( toByteArray()));
+		return (new String(toByteArray()));
 	}
 	
 	private byte[] toByteArray() {
@@ -464,77 +459,63 @@ public class BEncoder {
 		return (true);
 	}
 
-	public static Map
-	cloneMap(
-		Map		map )
-	{
+	public static Map cloneMap(Map map) {
 		if (map == null) {
 			return (null);
 		}
 		Map res = new TreeMap();
-		Iterator	it = map.entrySet().iterator();
+		Iterator it = map.entrySet().iterator();
 		while (it.hasNext()) {
-			Map.Entry	entry = (Map.Entry)it.next();
-			Object	key 	= entry.getKey();
-			Object	value	= entry.getValue();
-				// keys must be String (or very rarely byte[])
+			Map.Entry entry = (Map.Entry) it.next();
+			Object key = entry.getKey();
+			Object value = entry.getValue();
+			// keys must be String (or very rarely byte[])
 			if (key instanceof byte[]) {
-				key = ((byte[])key).clone();
+				key = ((byte[]) key).clone();
 			}
-			res.put(key, clone( value));
+			res.put(key, clone(value));
 		}
 		return (res);
 	}
 
-	public static List
-	cloneList(
-		List		list )
-	{
+	public static List cloneList(List list) {
 		if (list == null) {
 			return (null);
 		}
-		List	res = new ArrayList(list.size());
-		Iterator	it = list.iterator();
+		List res = new ArrayList(list.size());
+		Iterator it = list.iterator();
 		while (it.hasNext()) {
-			res.add( clone( it.next()));
+			res.add(clone(it.next()));
 		}
 		return (res);
 	}
 
-	public static Object
-	clone(
-		Object	obj )
-	{
+	public static Object clone(Object obj) {
 		if (obj instanceof List) {
-			return ( cloneList((List)obj));
+			return (cloneList((List) obj));
 		} else if (obj instanceof Map) {
-			return ( cloneMap((Map)obj));
+			return (cloneMap((Map) obj));
 		} else if (obj instanceof byte[]) {
-			return (((byte[])obj).clone());
+			return (((byte[]) obj).clone());
 		} else {
-				// assume immutable - String,Long etc
+			// assume immutable - String,Long etc
 			return (obj);
 		}
 	}
 
-	public static StringBuffer
-	encodeToXML(
-		Map			map,
-		boolean		simple )
-	{
-	 	XMLEncoder writer = new XMLEncoder();
-	 	return (writer.encode( map, simple));
+	public static StringBuffer encodeToXML(Map map, boolean simple) {
+		XMLEncoder writer = new XMLEncoder();
+		return (writer.encode(map, simple));
 	}
 
 	// JSON
-
 	private static Object encodeToJSONGeneric(Object obj) {
 		if (obj instanceof Map) {
-			return ( encodeToJSONObject((Map)obj));
+			return (encodeToJSONObject((Map) obj));
 		} else if (obj instanceof List) {
-			return ( encodeToJSONArray((List)obj));
+			return (encodeToJSONArray((List) obj));
 		} else {
-			return (normaliseObject( obj));
+			return (normaliseObject(obj));
 		}
 	}
 

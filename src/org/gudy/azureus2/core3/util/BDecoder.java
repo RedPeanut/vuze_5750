@@ -403,7 +403,7 @@ public class BDecoder {
 	
 		return Long.parseLong(str);
 	}
-	 */
+	*/
 
 	/** only create the array once per decoder instance (no issues with recursion as it's only used in a leaf method)
 	 */
@@ -414,12 +414,8 @@ public class BDecoder {
 	 * {@link Integer#MAX_VALUE}.  This check is intentionally skipped to
 	 * increase performance
 	 */
-	private int getPositiveNumberFromStream(
-			InputStream	dbis,
-			char	parseChar)
-
-	throws IOException
-	{
+	private int getPositiveNumberFromStream(InputStream dbis, char parseChar) throws IOException {
+		
 		int tempByte = dbis.read();
 		if (tempByte < 0) {
 			return -1;
@@ -455,11 +451,8 @@ public class BDecoder {
 		}
 	}
 
-	private long getNumberFromStream(
-		InputStream 	dbis,
-		char 					parseChar)
-		throws IOException
-	{
+	private long getNumberFromStream(InputStream dbis, char parseChar) throws IOException {
+		
 		int tempByte = dbis.read();
 		int pos = 0;
 		while ((tempByte != parseChar) && (tempByte >= 0)) {
@@ -477,7 +470,7 @@ public class BDecoder {
 			return (0);
 		}
 		try {
-			return (parseLong( numberChars, 0, pos));
+			return (parseLong(numberChars, 0, pos));
 		} catch (NumberFormatException e) {
 			String temp = new String(numberChars, 0, pos);
 			try {
@@ -493,172 +486,126 @@ public class BDecoder {
 
 	// This is similar to Long.parseLong(String) source
 	// It is also used in projects external to azureus2/azureus3 hence it is public
-	public static long
-	parseLong(
-		char[]	chars,
-		int		start,
-		int		length) {
+	public static long parseLong(
+			char[]	chars,
+			int		start,
+			int		length) {
 		if (length > 0) {
 			// Short Circuit: We don't support octal parsing, so if it
 			// starts with 0, it's 0
 			if (chars[start] == '0') {
-
 				return 0;
 			}
-
 			long result = 0;
-
 			boolean negative = false;
-
 			int 	i 	= start;
-
 			long limit;
-
 			if (chars[i] == '-') {
-
 				negative = true;
-
 				limit = Long.MIN_VALUE;
-
 				i++;
-
 			} else {
 				// Short Circuit: If we are only processing one char,
 				// and it wasn't a '-', just return that digit instead
 				// of doing the negative junk
 				if (length == 1) {
 					int digit = chars[i] - '0';
-
 					if (digit < 0 || digit > 9) {
-
 						throw new NumberFormatException(new String(chars,start,length));
-
 					} else {
-
 						return digit;
 					}
 				}
-
 				limit = -Long.MAX_VALUE;
 			}
-
 			int	max = start + length;
-
 			if (i < max) {
-
 				int digit = chars[i++] - '0';
-
 				if (digit < 0 || digit > 9) {
-
 					throw new NumberFormatException(new String(chars,start,length));
-
 				} else {
-
 					result = -digit;
 				}
 			}
-
 			long multmin = limit / 10;
-
 			while (i < max) {
-
 				// Accumulating negatively avoids surprises near MAX_VALUE
-
 				int digit = chars[i++] - '0';
-
 				if (digit < 0 || digit > 9) {
-
 					throw new NumberFormatException(new String(chars,start,length));
 				}
-
 				if (result < multmin) {
-
 					throw new NumberFormatException(new String(chars,start,length));
 				}
-
 				result *= 10;
-
 				if (result < limit + digit) {
-
 					throw new NumberFormatException(new String(chars,start,length));
 				}
-
 				result -= digit;
 			}
-
 			if (negative) {
-
 				if (i > start+1) {
-
 					return result;
-
 				} else {	/* Only got "-" */
-
 					throw new NumberFormatException(new String(chars,start,length));
 				}
 			} else {
-
 				return -result;
 			}
 		} else {
-
 			throw new NumberFormatException(new String(chars,start,length));
 		}
-
 	}
 
 
 
 	// This one causes lots of "Query Information" calls to the filesystem
 	/*
-  private long getNumberFromStreamOld(InputStream dbis, char parseChar) throws IOException {
-	int length = 0;
+	private long getNumberFromStreamOld(InputStream dbis, char parseChar) throws IOException {
+		int length = 0;
 
-	//place a mark
-	dbis.mark(???); 1 wouldn't work here ;)
+		// place a mark
+		dbis.mark(???); 1 wouldn't work here ;)
 
-	int tempByte = dbis.read();
-	while ((tempByte != parseChar) && (tempByte >= 0)) {
-	  tempByte = dbis.read();
-	  length++;
+		int tempByte = dbis.read();
+		while ((tempByte != parseChar) && (tempByte >= 0)) {
+			tempByte = dbis.read();
+			length++;
+		}
+
+		// are we at the end of the stream?
+		if (tempByte < 0) {
+			return -1;
+		}
+
+		// reset the mark
+		dbis.reset();
+
+		// get the length
+		byte[] tempArray = new byte[length];
+		int count = 0;
+		int len = 0;
+
+		// get the string
+		while (count != length && (len = dbis.read(tempArray, count, length - count)) > 0) {
+			count += len;
+		}
+
+		// jump ahead in the stream to compensate for the :
+		dbis.skip(1);
+
+		// return the value
+
+		CharBuffer cb = Constants.DEFAULT_CHARSET.decode(ByteBuffer.wrap(tempArray));
+
+		String str_value = new String(cb.array(), 0, cb.limit());
+
+		return Long.parseLong(str_value);
 	}
+	//*/
 
-	//are we at the end of the stream?
-	if (tempByte < 0) {
-	  return -1;
-	}
-
-	//reset the mark
-	dbis.reset();
-
-	//get the length
-	byte[] tempArray = new byte[length];
-	int count = 0;
-	int len = 0;
-
-	//get the string
-	while (count != length && (len = dbis.read(tempArray, count, length - count)) > 0) {
-	  count += len;
-	}
-
-	//jump ahead in the stream to compensate for the :
-	dbis.skip(1);
-
-	//return the value
-
-	CharBuffer	cb = Constants.DEFAULT_CHARSET.decode(ByteBuffer.wrap(tempArray));
-
-	String	str_value = new String(cb.array(),0,cb.limit());
-
-	return Long.parseLong(str_value);
-  }
-	 */
-
-	private byte[] getByteArrayFromStream(
-		InputStream dbis,
-		String		context)
-		throws IOException
-	{
+	private byte[] getByteArrayFromStream(InputStream dbis, String context) throws IOException {
+		
 		int length = (int) getPositiveNumberFromStream(dbis, ':');
 		if (length < 0) {
 			return null;
@@ -704,7 +651,6 @@ public class BDecoder {
 	}
 
 	private void getByteArrayFromStream(InputStream dbis, int length, byte[] targetArray) throws IOException {
-
 		int count = 0;
 		int len = 0;
 		//get the string
@@ -715,32 +661,23 @@ public class BDecoder {
 			throw (new IOException("BDecoder::getByteArrayFromStream: truncated"));
 	}
 
-	public void setVerifyMapOrder(
-		boolean	b) {
+	public void setVerifyMapOrder(boolean b) {
 		verifyMapOrder = b;
 	}
 
-	public void setRecoveryMode(
-		boolean	r) {
-		recoveryMode	= r;
+	public void setRecoveryMode(boolean r) {
+		recoveryMode = r;
 	}
 
-	public static void print(
-		Object		obj) {
-		StringWriter 	sw = new StringWriter();
-
-		PrintWriter		pw = new PrintWriter(sw);
-
+	public static void print(Object obj) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
 		print(pw, obj);
-
 		pw.flush();
-
-		System.out.println( sw.toString());
+		System.out.println(sw.toString());
 	}
 
-	public static void print(
-		PrintWriter	writer,
-		Object		obj) {
+	public static void print(PrintWriter writer, Object obj) {
 		print(writer, obj, "", false);
 	}
 
@@ -750,15 +687,10 @@ public class BDecoder {
 		String		indent,
 		boolean		skip_indent) {
 		String	use_indent = skip_indent?"":indent;
-
 		if (obj instanceof Long) {
-
 			writer.println(use_indent + obj);
-
 		} else if (obj instanceof byte[]) {
-
 			byte[]	b = (byte[])obj;
-
 			if (b.length==20) {
 				writer.println(use_indent + " { "+ ByteFormatter.nicePrint( b )+ " }");
 			} else if (b.length < 64) {
@@ -766,42 +698,26 @@ public class BDecoder {
 			} else {
 				writer.println("[byte array length " + b.length);
 			}
-
 		} else if (obj instanceof String) {
-
 			writer.println(use_indent + obj);
-
 		} else if (obj instanceof List) {
-
 			List	l = (List)obj;
-
 			writer.println(use_indent + "[");
-
 			for (int i=0;i<l.size();i++) {
-
 				writer.print(indent + "  (" + i + ") ");
-
 				print(writer, l.get(i), indent + "	", true);
 			}
-
 			writer.println(indent + "]");
-
 		} else {
-
 			Map	m = (Map)obj;
-
 			Iterator	it = m.keySet().iterator();
-
 			while (it.hasNext()) {
-
 				String	key = (String)it.next();
-
 				if (key.length() > 256) {
 					writer.print(indent + key.substring(0,256) + "... = ");
 				} else {
 					writer.print(indent + key + " = ");
 				}
-
 				print(writer, m.get(key), indent + "  ", true);
 			}
 		}
@@ -819,36 +735,24 @@ public class BDecoder {
 	decodeStrings(
 		Map	map) {
 		if (map == null) {
-
 			return (null);
 		}
-
 		Iterator it = map.entrySet().iterator();
-
 		while (it.hasNext()) {
-
 			Map.Entry	entry = (Map.Entry)it.next();
-
 			Object	value = entry.getValue();
-
 			if (value instanceof byte[]) {
-
 				try {
 					entry.setValue(new String((byte[])value,"UTF-8"));
-
 				} catch (Throwable e) {
-
 					System.err.println(e);
 				}
 			} else if (value instanceof Map) {
-
 				decodeStrings((Map)value);
 			} else if (value instanceof List) {
-
 				decodeStrings((List)value);
 			}
 		}
-
 		return (map);
 	}
 
@@ -863,122 +767,71 @@ public class BDecoder {
 	decodeStrings(
 		List	list) {
 		if (list == null) {
-
 			return (null);
 		}
-
 		for (int i=0;i<list.size();i++) {
-
 			Object value = list.get(i);
-
 			if (value instanceof byte[]) {
-
 				try {
 					String str = new String((byte[])value, "UTF-8");
-
 					list.set(i, str);
-
 				} catch (Throwable e) {
-
 					System.err.println(e);
 				}
 			} else if (value instanceof Map) {
-
 				decodeStrings((Map)value);
-
 			} else if (value instanceof List) {
-
 				decodeStrings((List)value);
 			}
 		}
-
 		return (list);
 	}
 
-	private static void print(
-		File		f,
-		File		output) {
+	private static void print(File f, File output) {
 		try {
-			BDecoder	decoder = new BDecoder();
-
+			BDecoder decoder = new BDecoder();
 			decoder.setRecoveryMode(false);
-
-			PrintWriter	pw = new PrintWriter(new FileWriter( output));
-
-			print(pw, decoder.decodeStream(new BufferedInputStream(new FileInputStream( f))));
-
+			PrintWriter pw = new PrintWriter(new FileWriter(output));
+			print(pw, decoder.decodeStream(new BufferedInputStream(new FileInputStream(f))));
 			pw.flush();
-
 		} catch (Throwable e) {
-
 			e.printStackTrace();
 		}
 	}
 
    	// JSON
-
-	private static Object
-	decodeFromJSONGeneric(
-		Object		obj ) {
+	private static Object decodeFromJSONGeneric(Object obj) {
 		if (obj == null) {
-
 			return (null);
-
 		} else if (obj instanceof Map) {
-
 			return ( decodeFromJSONObject((Map)obj));
-
 		} else if (obj instanceof List) {
-
 			return ( decodeFromJSONArray((List)obj));
-
 	 	} else if (obj instanceof String) {
-
  			String s = (String)obj;
-
 	 		try {
-
 	 			int	len = s.length();
-
 	 			if (len >= 6 && s.startsWith("\\x") && s.endsWith("\\x")) {
-
 	 				byte[]	result = new byte[(len-4)/2];
-
 	 				int	pos = 2;
-
 	 				for ( int i=0;i<result.length;i++) {
-
 	 					result[i] = (byte)Integer.parseInt(s.substring( pos, pos+2 ), 16);
-
 	 					pos += 2;
 	 				}
-
 	 				return (result);
 	 			}
-
 	 			return (s.getBytes("UTF-8"));
-
 	 		} catch (Throwable e) {
-
 	 			return (s.getBytes());
 	 		}
-
 	 	} else if (obj instanceof Long) {
-
 	  		return (obj);
-
 	  	} else if (obj instanceof Boolean) {
-
 			return (new Long(((Boolean)obj)?1:0));
-
 		} else if (obj instanceof Double) {
-
-			return ( String.valueOf((Double)obj));
-
+			return (String.valueOf((Double)obj));
 		} else {
-
 			System.err.println("Unexpected JSON value type: " + obj.getClass());
-
 			return (obj);
 		}
 	}
@@ -996,10 +849,8 @@ public class BDecoder {
 		Map	b_map = new HashMap();
 
 		for (Map.Entry<Object,Object> entry: j_map.entrySet()) {
-
 			Object	key = entry.getKey();
 			Object	val	= entry.getValue();
-
 			b_map.put((String)key, decodeFromJSONGeneric(val));
 		}
 
@@ -1135,7 +986,6 @@ public class BDecoder {
 			pos = markPos;
 		}
 	}
-
 
 	public static void main(String[] args) {
 		print(	new File("C:\\Temp\\tables.config"),
