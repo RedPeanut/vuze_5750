@@ -31,8 +31,7 @@ package org.gudy.azureus2.ui.swt.mainwindow;
  * @author knguyen
  *
  */
-public interface IMenuConstants
-{
+public interface IMenuConstants {
 
 	/**
 	 * The key used to store the enablement bit mask for a menu item

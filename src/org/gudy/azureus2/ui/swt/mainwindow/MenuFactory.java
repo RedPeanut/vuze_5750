@@ -101,9 +101,7 @@ import org.gudy.azureus2.plugins.update.Update;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstance;
 import org.gudy.azureus2.plugins.update.UpdateCheckInstanceListener;
 
-public class MenuFactory
-	implements IMenuConstants
-{
+public class MenuFactory implements IMenuConstants {
 
 	private static boolean isAZ3 = "az3".equalsIgnoreCase(COConfigurationManager.getStringParameter("ui"));
 

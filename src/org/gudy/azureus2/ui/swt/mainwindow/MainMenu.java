@@ -133,11 +133,11 @@ public class MainMenu
 	private void addFileMenu(final Shell parent) {
 		MenuItem fileItem = MenuFactory.createFileMenuItem(menuBar);
 		Menu fileMenu = fileItem.getMenu();
-
+		
 		MenuFactory.addCreateMenuItem(fileMenu);
-
+		
 		MenuItem openMenuItem = MenuFactory.createOpenMenuItem(fileMenu);
-
+		
 		Menu openSubMenu = openMenuItem.getMenu();
 		MenuFactory.addOpenTorrentMenuItem(openSubMenu);
 		MenuFactory.addOpenURIMenuItem(openSubMenu);

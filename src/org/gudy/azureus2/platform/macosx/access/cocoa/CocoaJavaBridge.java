@@ -41,8 +41,7 @@ import java.text.MessageFormat;
  * This is still significantly faster than calling the cmd-line osascript.</p>
  * @version 2.1 Apr 2, 2005
  */
-public final class CocoaJavaBridge extends NativeInvocationBridge
-{
+public final class CocoaJavaBridge extends NativeInvocationBridge {
     /**
      * The path the Cocoa-Java class files are located at
      */
@@ -61,33 +60,20 @@ public final class CocoaJavaBridge extends NativeInvocationBridge
     private AEMonitor scriptMon = new AEMonitor("CocoaJavaBridge:S");
 
     protected boolean isDisposed = false;
-
     protected RunnableDispatcher scriptDispatcher;
+	private Class claNSAppleEventDescriptor;
+	private Class<?> claNSAutoreleasePool;
+	private Method methPush;
+	private Method methPop;
+	private Method methNSAppleEventDescriptor_descriptorWithBoolean;
+	private Class<?> claNSAppleScript;
+	private Class<?> claNSMutableDictionary;
+	private Method methNSAppleScript_execute;
+	private String NSAppleScript_AppleScriptErrorMessage;
+	private Method methNSMutableDictionary_objectForKey;
 
-    private Class claNSAppleEventDescriptor;
-
-		private Class<?> claNSAutoreleasePool;
-
-		private Method methPush;
-
-		private Method methPop;
-
-		private Method methNSAppleEventDescriptor_descriptorWithBoolean;
-
-		private Class<?> claNSAppleScript;
-
-		private Class<?> claNSMutableDictionary;
-
-		private Method methNSAppleScript_execute;
-
-		private String NSAppleScript_AppleScriptErrorMessage;
-
-		private Method methNSMutableDictionary_objectForKey;
-
-    public CocoaJavaBridge() throws Throwable
-    {
-        try
-        {
+    public CocoaJavaBridge() throws Throwable {
+        try {
             classMon.enter();
 
             claNSMutableDictionary = Class.forName("com.apple.cocoa.foundation.NSMutableDictionary");
@@ -109,9 +95,7 @@ public final class CocoaJavaBridge extends NativeInvocationBridge
             mainPool = NSAutoreleasePool_push();
 
             scriptDispatcher = new RunnableDispatcher();
-        }
-        finally
-        {
+        } finally {
             classMon.exit();
         }
     }

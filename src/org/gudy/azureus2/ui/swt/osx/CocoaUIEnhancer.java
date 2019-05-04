@@ -44,6 +44,8 @@ import com.aelitis.azureus.ui.mdi.MultipleDocumentInterface;
 import com.aelitis.azureus.ui.swt.UIFunctionsManagerSWT;
 import com.aelitis.azureus.ui.swt.UIFunctionsSWT;
 
+import hello.util.Log;
+
 /**
  * You can exclude this file (or this whole path) for non OSX builds
  *
@@ -64,66 +66,39 @@ import com.aelitis.azureus.ui.swt.UIFunctionsSWT;
  * <a href="http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.ui.cocoa/src/org/eclipse/ui/internal/cocoa/CocoaUIEnhancer.java">
  * org.eclipse.ui.internal.cocoa.CocoaUIEnhancer</a>
  */
-public class CocoaUIEnhancer
-{
-	private static final boolean DEBUG = false;
-
+public class CocoaUIEnhancer {
+	
+	private static String TAG = CocoaUIEnhancer.class.getSimpleName();
+	
+	private static final boolean DEBUG = true;
 	private static Object /*Callback*/ callBack3;
-
 	private static long callBack3Addr;
-
 	private static Object /*Callback*/ callBack4;
-
 	private static long callBack4Addr;
-
 	private static CocoaUIEnhancer instance;
 
-
 	private static final int kServicesMenuItem = 4;
-
-	// private static final int kHideApplicationMenuItem = 6;
-
-	// private static final int kQuitMenuItem = 10;
-
+	//private static final int kHideApplicationMenuItem = 6;
+	//private static final int kQuitMenuItem = 10;
 	//private static int NSWindowCloseButton = 0;
-
 	//private static int NSWindowDocumentIconButton = 4;
-
 	//private static int NSWindowMiniaturizeButton = 1;
 
 	private static int NSWindowToolbarButton = 3;
-
 	//private static int NSWindowZoomButton = 2;
 
 	private static long sel_application_openFile_;
-
 	private static long sel_application_openFiles_;
 
 	/** SWT v4331b supports this already */
 	private static long sel_applicationShouldHandleReopen_;
-
 	private static long sel_toolbarButtonClicked_;
-
 	private static boolean alreadyHaveOpenDoc;
 
-	static final byte[] SWT_OBJECT = {
-		'S',
-		'W',
-		'T',
-		'_',
-		'O',
-		'B',
-		'J',
-		'E',
-		'C',
-		'T',
-		'\0'
-	};
+	static final byte[] SWT_OBJECT = {'S','W','T','_','O','B','J','E','C','T','\0'};
 
 	private long delegateIdSWTApplication;
-
 	private long delegateJniRef;
-
 	private Object delegate;
 
 	private static boolean initialized = false;
@@ -142,7 +117,7 @@ public class CocoaUIEnhancer
 	private static Class<?> nsscreenCls = classForName("org.eclipse.swt.internal.cocoa.NSScreen");
 
 	static {
-
+		
 		Class<CocoaUIEnhancer> clazz = CocoaUIEnhancer.class;
 		Class<?> callbackCls = classForName("org.eclipse.swt.internal.Callback");
 
@@ -193,8 +168,8 @@ public class CocoaUIEnhancer
 		return (int)actionProc((long)id, (long)sel, (long)arg0);
 	}
 
-	static long actionProc(long id, long sel,
-			long arg0) {
+	static long actionProc(long id, long sel, long arg0) {
+		
 		if (DEBUG) {
 			System.err.println("id=" + id + ";sel=" + sel);
 		}
@@ -411,9 +386,15 @@ public class CocoaUIEnhancer
 			return new Integer((int) value);
 	}
 
-	private CocoaUIEnhancer()
-			throws Throwable {
+	private CocoaUIEnhancer() throws Throwable {
 
+		Log.d(TAG, "osCls = " + osCls);
+		
+		Log.d(TAG, "<init>() is called...");
+		new Throwable().printStackTrace();
+		
+		Log.d(TAG, ">>> 1");
+		
 		// Instead of creating a new delegate class in objective-c,
 		// just use the current SWTApplicationDelegate. An instance of this
 		// is a field of the Cocoa Display object and is already the target
@@ -444,6 +425,9 @@ public class CocoaUIEnhancer
 			SWT_OBJECT,
 			wrapPointer(delegateJniRef)
 		});
+		
+		Log.d(TAG, ">>> 2");
+		
 	}
 
 	/**
@@ -751,7 +735,7 @@ public class CocoaUIEnhancer
 	}
 
 	// from Program.getImageData, except returns bigger images
-	public static Image getFileIcon (String path, int imageWidthHeight) {
+	public static Image getFileIcon(String path, int imageWidthHeight) {
 		Object pool = null;
 		try {
 			//NSAutoreleasePool pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();

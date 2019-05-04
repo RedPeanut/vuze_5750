@@ -453,8 +453,8 @@ public class MainWindowImpl
 	 */
 	private void createWindow(IUIIntializer uiInitializer) {
 		
-		Log.d(TAG, "createWindow() is called...");
-		new Throwable().printStackTrace();
+		//Log.d(TAG, "createWindow() is called...");
+		//new Throwable().printStackTrace();
 		
 		//System.out.println("MainWindow: createWindow)");
 		long startTime = SystemTime.getCurrentTime();
