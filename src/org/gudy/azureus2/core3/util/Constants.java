@@ -103,9 +103,9 @@ public class Constants {
 		}
 	}
 
-	public static final String INFINITY_STRING	= "\u221E"; // "oo";pa
+	public static final String 	INFINITY_STRING	= "\u221E"; // "oo";pa
 	public static final int		CRAPPY_INFINITY_AS_INT	= 365*24*3600; // seconds (365days)
-	public static final long	 CRAPPY_INFINITE_AS_LONG = 10000*365*24*3600; // seconds (10k years)
+	public static final long	CRAPPY_INFINITE_AS_LONG = 10000*365*24*3600; // seconds (10k years)
 
 	/**
 	 *	Can't be final as accesed from client speed measurer plugin
