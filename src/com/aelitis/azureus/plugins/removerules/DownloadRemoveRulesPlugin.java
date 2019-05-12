@@ -105,65 +105,43 @@ DownloadRemoveRulesPlugin
 				});
 	}
 
-	public void downloadAdded(
-		final Download	download) {
-			// we don't auto-remove non-persistent downloads as these are managed
-			// elsewhere (e.g. shares)
-
+	public void downloadAdded(final Download download) {
+		// we don't auto-remove non-persistent downloads as these are managed
+		// elsewhere (e.g. shares)
 		if (!download.isPersistent()) {
-
 			return;
 		}
-
-			// auto remove low noise torrents if their data is missing
-
-		if (download.getFlag( Download.FLAG_LOW_NOISE)) {
-
+		
+		// auto remove low noise torrents if their data is missing
+		if (download.getFlag(Download.FLAG_LOW_NOISE)) {
 			DiskManagerFileInfo[] files = download.getDiskManagerFileInfo();
-
 			if (files.length == 1) {
-
 				DiskManagerFileInfo file = files[0];
-
-					// completed only
-
-				if (	file.getDownloaded() == file.getLength() &&
-						!file.getFile().exists()) {
-
+				// completed only
+				if (file.getDownloaded() == file.getLength() && !file.getFile().exists()) {
 					log.log("Removing low-noise download '" + download.getName() + " as data missing");
-
 					removeDownload(download, false);
 				}
 			}
 		}
-
-		DownloadTrackerListener	listener =
-			new DownloadTrackerListener() {
-				public void scrapeResult(
-					DownloadScrapeResult	response) {
-					if (closing) {
-
-						return;
-					}
-
-					handleScrape(download, response);
+		
+		DownloadTrackerListener listener = new DownloadTrackerListener() {
+			public void scrapeResult(DownloadScrapeResult response) {
+				if (closing) {
+					return;
 				}
+				handleScrape(download, response);
+			}
 
-				public void announceResult(
-					DownloadAnnounceResult			response) {
-					if (closing) {
-
-						return;
-					}
-
-					handleAnnounce(download, response);
+			public void announceResult(DownloadAnnounceResult response) {
+				if (closing) {
+					return;
 				}
-			};
-
+				handleAnnounce(download, response);
+			}
+		};
 		monitored_downloads.add(download);
-
 		dm_listener_map.put(download, listener);
-
 		download.addTrackerListener(listener);
 	}
 

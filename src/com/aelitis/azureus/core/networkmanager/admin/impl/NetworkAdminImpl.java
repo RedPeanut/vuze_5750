@@ -504,11 +504,11 @@ public class NetworkAdminImpl
 		Log.d(TAG, String.format(">>>> getAllBindAddresses() is called... #%d", count));
 		Log.d(TAG, "includeWildcard = " + includeWildcard);*/
 		
-		if (currentBindIPs != null) {
+		/*if (currentBindIPs != null) {
 			for (int i=0;i<currentBindIPs.length;i++) {
 				Log.d(TAG, String.format("currentBindIPs[%d] = %s",i,currentBindIPs[i]));
 			}
-		}
+		}*/
 		
 		if (includeWildcard) {
 			return (currentBindIPs);

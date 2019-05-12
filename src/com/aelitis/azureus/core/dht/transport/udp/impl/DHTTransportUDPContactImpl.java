@@ -313,9 +313,11 @@ public class DHTTransportUDPContactImpl implements DHTTransportUDPContact {
 	public void	sendFindValue(
 		DHTTransportReplyHandler	handler,
 		byte[]						key,
-		int							max_values,
+		int							maxValues,
 		short						flags) {
-		transport.sendFindValue(this, handler, key, max_values, flags);
+		//Log.d(TAG, "sendFindValue() is called...");
+		//Log.d(TAG, "key = " + Util.toHexString(key));
+		transport.sendFindValue(this, handler, key, maxValues, flags);
 	}
 
 	public void	sendKeyBlock(

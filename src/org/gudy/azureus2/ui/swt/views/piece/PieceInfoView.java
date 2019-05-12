@@ -239,8 +239,10 @@ public class PieceInfoView
 		pieceInfoCanvas.setLayoutData(gridData);
 		pieceInfoCanvas.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
+				
 				if (e.width <= 0 || e.height <= 0)
 					return;
+				
 				try {
 					Rectangle bounds = (img == null) ? null : img.getBounds();
 					if (bounds == null || dlm == null || dlm.getPeerManager() == null) {
@@ -284,8 +286,7 @@ public class PieceInfoView
 					public void runSupport() {
 						if (img != null) {
 							int iOldColCount = img.getBounds().width / BLOCK_SIZE;
-							int iNewColCount = pieceInfoCanvas.getClientArea().width
-									/ BLOCK_SIZE;
+							int iNewColCount = pieceInfoCanvas.getClientArea().width / BLOCK_SIZE;
 							if (iOldColCount != iNewColCount)
 								refreshInfoCanvas();
 						}
@@ -668,8 +669,7 @@ public class PieceInfoView
 				}
 
 				gcImg.setBackground(pieceInfoCanvas.getBackground());
-				gcImg.fillRectangle(iCol * BLOCK_SIZE, iRow * BLOCK_SIZE, BLOCK_SIZE,
-						BLOCK_SIZE);
+				gcImg.fillRectangle(iCol * BLOCK_SIZE, iRow * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 
 				colorIndex = BLOCKCOLOR_HAVE;
 				gcImg.setBackground(blockColors[colorIndex]);
@@ -711,7 +711,6 @@ public class PieceInfoView
 						gcImg.drawText(sNumber, x, y, true);
 					}
 				}
-
 
 				iCol++;
 			}

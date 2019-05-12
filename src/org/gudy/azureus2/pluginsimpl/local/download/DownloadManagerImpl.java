@@ -30,7 +30,17 @@ package org.gudy.azureus2.pluginsimpl.local.download;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.gudy.azureus2.core3.config.COConfigurationManager;
 import org.gudy.azureus2.core3.disk.DiskManager;
@@ -47,8 +57,27 @@ import org.gudy.azureus2.core3.internat.MessageText;
 import org.gudy.azureus2.core3.torrent.TOTorrent;
 import org.gudy.azureus2.core3.torrent.TOTorrentException;
 import org.gudy.azureus2.core3.torrent.TOTorrentFactory;
-import org.gudy.azureus2.core3.util.*;
-import org.gudy.azureus2.plugins.download.*;
+import org.gudy.azureus2.core3.util.AEMonitor;
+import org.gudy.azureus2.core3.util.AERunnable;
+import org.gudy.azureus2.core3.util.BDecoder;
+import org.gudy.azureus2.core3.util.BEncoder;
+import org.gudy.azureus2.core3.util.ByteArrayHashMap;
+import org.gudy.azureus2.core3.util.ByteFormatter;
+import org.gudy.azureus2.core3.util.Debug;
+import org.gudy.azureus2.core3.util.FileUtil;
+import org.gudy.azureus2.core3.util.FrequencyLimitedDispatcher;
+import org.gudy.azureus2.core3.util.HashWrapper;
+import org.gudy.azureus2.core3.util.SystemTime;
+import org.gudy.azureus2.plugins.download.Download;
+import org.gudy.azureus2.plugins.download.DownloadEventNotifier;
+import org.gudy.azureus2.plugins.download.DownloadException;
+import org.gudy.azureus2.plugins.download.DownloadManagerListener;
+import org.gudy.azureus2.plugins.download.DownloadManagerStats;
+import org.gudy.azureus2.plugins.download.DownloadRemovalVetoException;
+import org.gudy.azureus2.plugins.download.DownloadStub;
+import org.gudy.azureus2.plugins.download.DownloadStubEvent;
+import org.gudy.azureus2.plugins.download.DownloadStubListener;
+import org.gudy.azureus2.plugins.download.DownloadWillBeAddedListener;
 import org.gudy.azureus2.plugins.download.savelocation.DefaultSaveLocationManager;
 import org.gudy.azureus2.plugins.download.savelocation.SaveLocationManager;
 import org.gudy.azureus2.plugins.torrent.Torrent;
@@ -65,9 +94,14 @@ import com.aelitis.azureus.core.tag.TagManagerFactory;
 import com.aelitis.azureus.core.tag.TagType;
 import com.aelitis.azureus.core.util.CopyOnWriteList;
 
+import hello.util.Log;
+import hello.util.SingleCounter9;
+
 
 public class DownloadManagerImpl
 	implements org.gudy.azureus2.plugins.download.DownloadManager, DownloadManagerInitialisationAdapter {
+	
+	private static String TAG = DownloadManagerImpl.class.getSimpleName();
 	
 	protected static DownloadManagerImpl singleton;
 	protected static AEMonitor classMonitor = new AEMonitor("DownloadManager:class");
@@ -607,50 +641,64 @@ public class DownloadManagerImpl
 		return (globalManager.isSeedingOnly());
 	}
 	
-	public void addListener(DownloadManagerListener l) {addListener(l, true);}
-	public void addListener(DownloadManagerListener l, boolean notify_of_current_downloads) {
-		List<Download> downloads_copy = null;
+	public void addListener(DownloadManagerListener l) {
+		addListener(l, true);
+	}
+	
+	public void addListener(DownloadManagerListener l, boolean notifyOfCurrentDownloads) {
+		
+		int count = SingleCounter9.getInstance().getAndIncreaseCount();
+		Log.d(TAG, String.format("addListener() is called... #%d", count));
+		new Throwable().printStackTrace();
+		
+		List<Download> downloadsCopy = null;
 		try {
 			listenersMonitor.enter();
-			List<DownloadManagerListener> new_listeners = new ArrayList<DownloadManagerListener>(listeners);
-			new_listeners.add(l);
-			listeners = new_listeners;
-			if (notify_of_current_downloads) {
-				downloads_copy = new ArrayList<Download>(downloads);
+			List<DownloadManagerListener> newListeners = new ArrayList<DownloadManagerListener>(listeners);
+			newListeners.add(l);
+			listeners = newListeners;
+			if (notifyOfCurrentDownloads) {
+				downloadsCopy = new ArrayList<Download>(downloads);
 				// randomize list so that plugins triggering dlm-state fixups don't lock each other by doing everything in the same order
-				Collections.shuffle(downloads_copy);
+				Collections.shuffle(downloadsCopy);
 			}
 		} finally {
 			listenersMonitor.exit();
 		}
 		
-		if (downloads_copy != null) {
-			for (int i = 0; i < downloads_copy.size(); i++) {
-				try {l.downloadAdded( downloads_copy.get(i));}
-				catch (Throwable e) {Debug.printStackTrace(e);}
+		if (downloadsCopy != null) {
+			for (int i = 0; i < downloadsCopy.size(); i++) {
+				try {
+					l.downloadAdded(downloadsCopy.get(i));
+				} catch (Throwable e) {
+					Debug.printStackTrace(e);
+				}
 			}
 		}
 	}
 	
 	public void removeListener(DownloadManagerListener l) {removeListener(l, false);}
-	public void removeListener(DownloadManagerListener l, boolean notify_of_current_downloads) {
-		List<Download> downloads_copy = null;
+	public void removeListener(DownloadManagerListener l, boolean notifyOfCurrentDownloads) {
+		List<Download> downloadsCopy = null;
 		try {
 			listenersMonitor.enter();
-			List<DownloadManagerListener> new_listeners = new ArrayList<DownloadManagerListener>(listeners);
-			new_listeners.remove(l);
-			listeners = new_listeners;
-			if (notify_of_current_downloads) {
-				downloads_copy = new ArrayList<Download>(downloads);
+			List<DownloadManagerListener> newListeners = new ArrayList<DownloadManagerListener>(listeners);
+			newListeners.remove(l);
+			listeners = newListeners;
+			if (notifyOfCurrentDownloads) {
+				downloadsCopy = new ArrayList<Download>(downloads);
 			}
 		}
 		finally {
 			listenersMonitor.exit();
 		}
-		if (downloads_copy != null) {
-			for (int i = 0; i < downloads_copy.size(); i++) {
-				try {l.downloadRemoved( downloads_copy.get(i));}
-				catch (Throwable e) {Debug.printStackTrace(e);}
+		if (downloadsCopy != null) {
+			for (int i = 0; i < downloadsCopy.size(); i++) {
+				try {
+					l.downloadRemoved(downloadsCopy.get(i));
+				} catch (Throwable e) {
+					Debug.printStackTrace(e);
+				}
 			}
 		}
 	}
@@ -682,8 +730,8 @@ public class DownloadManagerImpl
 		}
 		return (ACT_NONE);
 	}
-	public void addDownloadWillBeAddedListener(
-		DownloadWillBeAddedListener		listener) {
+
+	public void addDownloadWillBeAddedListener(DownloadWillBeAddedListener listener) {
 		try {
 			listenersMonitor.enter();
 			dwba_listeners.add(listener);
@@ -695,8 +743,7 @@ public class DownloadManagerImpl
 		}
 	}
 
-	public void removeDownloadWillBeAddedListener(
-		DownloadWillBeAddedListener		listener) {
+	public void removeDownloadWillBeAddedListener(DownloadWillBeAddedListener listener) {
 		try {
 			listenersMonitor.enter();
 			dwba_listeners.remove(listener);
@@ -708,12 +755,11 @@ public class DownloadManagerImpl
 		}
 	}
 
-	public void addExternalDownload(
-		Download	download) {
-		List<DownloadManagerListener>			listeners_ref 	= null;
+	public void addExternalDownload(Download download) {
+		List<DownloadManagerListener> listeners_ref = null;
 		try {
 			listenersMonitor.enter();
-			if (downloads.contains( download)) {
+			if (downloads.contains(download)) {
 				return;
 			}
 			downloads.add(download);
@@ -721,7 +767,7 @@ public class DownloadManagerImpl
 		} finally {
 			listenersMonitor.exit();
 		}
-		for (int i=0;i<listeners_ref.size();i++) {
+		for (int i = 0; i < listeners_ref.size(); i++) {
 			try {
 				listeners_ref.get(i).downloadAdded(download);
 			} catch (Throwable e) {
@@ -730,12 +776,11 @@ public class DownloadManagerImpl
 		}
 	}
 
-	public void removeExternalDownload(
-		Download	download) {
-		List<DownloadManagerListener>			listeners_ref 	= null;
+	public void removeExternalDownload(Download download) {
+		List<DownloadManagerListener> listeners_ref = null;
 		try {
 			listenersMonitor.enter();
-			if (!downloads.contains( download)) {
+			if (!downloads.contains(download)) {
 				return;
 			}
 			downloads.remove(download);
@@ -743,7 +788,7 @@ public class DownloadManagerImpl
 		} finally {
 			listenersMonitor.exit();
 		}
-		for (int i=0;i<listeners_ref.size();i++) {
+		for (int i = 0; i < listeners_ref.size(); i++) {
 			try {
 				listeners_ref.get(i).downloadRemoved(download);
 			} catch (Throwable e) {

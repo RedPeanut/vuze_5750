@@ -47,7 +47,7 @@ public class PRUDPTrackerCodecs {
 
 	public static void registerCodecs() {
 		
-		Log.d(TAG, "registerCodecs() is called...");
+		//Log.d(TAG, "registerCodecs() is called...");
 		
 		if (registered)
 			return;

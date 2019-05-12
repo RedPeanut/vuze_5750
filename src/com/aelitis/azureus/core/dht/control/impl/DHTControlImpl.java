@@ -20,6 +20,7 @@ package com.aelitis.azureus.core.dht.control.impl;
 
 import hello.util.Log;
 import hello.util.SingleCounter2;
+import hello.util.Util;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -43,6 +44,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.aspectj.weaver.Utils;
 import org.gudy.azureus2.core3.util.AEMonitor;
 import org.gudy.azureus2.core3.util.AESemaphore;
 import org.gudy.azureus2.core3.util.AEThread2;
@@ -1844,7 +1846,10 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final LookupResultHandler	handler) {
 		
 		/*int count = SingleCounter2.getInstance().getAndIncreaseCount();
-		Log.d(TAG, String.format("how many times lookup() is called... #%d", count));*/
+		Log.d(TAG, String.format("how many times lookup() is called... #%d", count));
+		Log.d(TAG, "_lookupId = " + Util.toHexString(_lookupId));*/
+		
+		//new Throwable().printStackTrace();
 		
 		/*if ( 
 				   (flags & DHT.FLAG_LOOKUP_FOR_STORE) == 1
@@ -2414,10 +2419,10 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 									}
 								}
 
-								public void keyBlockRequest(DHTTransportContact contact, byte[] request, byte[] key_signature) {
+								public void keyBlockRequest(DHTTransportContact contact, byte[] request, byte[] keySignature) {
 									// we don't want to kill the contact due to this so indicate that
 									// it is ok by setting the flag
-									if (database.keyBlockRequest(null, request, key_signature) != null)
+									if (database.keyBlockRequest(null, request, keySignature) != null)
 										keyBlocked = true;
 								}
 							};
@@ -2520,14 +2525,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 									parent = local;
 								}
 
-								ANImpl p_node = node_map.get(parent);
+								ANImpl pNode = node_map.get(parent);
 
-								if (p_node == null) {
+								if (pNode == null) {
 									Debug.out("eh");
 								} else {
 									ANImpl new_node = new ANImpl(contact);
 									node_map.put(contact, new_node);
-									p_node.add(new_node);
+									pNode.add(new_node);
 								}
 							}
 						}

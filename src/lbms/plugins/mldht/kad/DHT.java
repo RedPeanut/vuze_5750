@@ -300,13 +300,13 @@ public class DHT implements DHTBase {
 			return;
 		}
 
-		Log.d(TAG, "announce() is called...");
+		/*Log.d(TAG, "announce() is called...");
 		//Util.printRequest(TAG, r);
 		InetSocketAddress isa = r.getOrigin();
 		String hash = Util.toHexString(r.getTarget().getHash());
 		//if (hash.length() > 10)
 			//hash = hash.substring(0, 10)+"...";
-		Log.d(TAG, "addr="+isa+",hash="+hash);
+		Log.d(TAG, "addr="+isa+",hash="+hash);*/
 		
 		node.recieved(this, r);
 		// first check if the token is OK

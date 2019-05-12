@@ -662,8 +662,7 @@ public class StartStopRulesDefaultPlugin
 
 	/** Update SeedingRank when a new scrape result comes in.
 	 */
-	private class StartStopDMTrackerListener implements DownloadTrackerListener
-	{
+	private class StartStopDMTrackerListener implements DownloadTrackerListener	{
 		public void scrapeResult(DownloadScrapeResult result) {
 			Download dl = result.getDownload();
 			if (dl == null) {

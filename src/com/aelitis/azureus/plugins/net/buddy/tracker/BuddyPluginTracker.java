@@ -711,67 +711,41 @@ outer:
 		}
 	}
 
-	public void downloadAdded(
-		final Download	download) {
+	public void downloadAdded(final Download download) {
 		Torrent t = download.getTorrent();
-
 		if (t == null) {
-
 			return;
 		}
-
 		if (t.isPrivate()) {
+			download.addTrackerListener(new DownloadTrackerListener() {
+				public void scrapeResult(DownloadScrapeResult result) {
+				}
 
-			download.addTrackerListener(
-				new DownloadTrackerListener() {
-					public void scrapeResult(
-						DownloadScrapeResult result) {
-					}
-
-					public void announceResult(
-						DownloadAnnounceResult result) {
-						if (okToTrack( download)) {
-
-							trackDownload(download);
-
-						} else {
-
-							untrackDownload(download);
-						}
-					}
-				},
-				false);
-		}
-
-		if (okToTrack( download)) {
-
-			trackDownload(download);
-		}
-
-		download.addListener(
-			new DownloadListener() {
-				public void
-				stateChanged(
-					Download		download,
-					int				old_state,
-					int				new_state) {
-					if (okToTrack( download)) {
-
+				public void announceResult(DownloadAnnounceResult result) {
+					if (okToTrack(download)) {
 						trackDownload(download);
-
 					} else {
-
 						untrackDownload(download);
 					}
 				}
-
-				public void
-				positionChanged(
-					Download	download,
-					int 		oldPosition,
-					int 		newPosition) {
+			}, false);
+		}
+		if (okToTrack(download)) {
+			trackDownload(download);
+		}
+		
+		download.addListener(new DownloadListener() {
+			public void stateChanged(Download download, int old_state, int new_state) {
+				if (okToTrack(download)) {
+					trackDownload(download);
+				} else {
+					untrackDownload(download);
 				}
-			});
+			}
+
+			public void positionChanged(Download download, int oldPosition, int newPosition) {
+			}
+		});
 	}
 
 	public void downloadRemoved(

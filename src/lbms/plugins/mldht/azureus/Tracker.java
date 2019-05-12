@@ -42,8 +42,6 @@ import org.gudy.azureus2.plugins.download.DownloadTrackerListener;
 import org.gudy.azureus2.plugins.torrent.TorrentAttribute;
 
 import hello.util.Log;
-import hello.util.SingleCounter0;
-import hello.util.SingleCounter9;
 import lbms.plugins.mldht.kad.AnnounceResponseHandler;
 import lbms.plugins.mldht.kad.DHT;
 import lbms.plugins.mldht.kad.DHT.DHTtype;
@@ -102,8 +100,8 @@ public class Tracker {
 		this.plugin = plugin;
 		taNetworks = plugin.getPluginInterface().getTorrentManager().getAttribute(TorrentAttribute.TA_NETWORKS);
 		taPeerSources = plugin.getPluginInterface().getTorrentManager().getAttribute(TorrentAttribute.TA_PEER_SOURCES);
-		Log.d(TAG, "taNetworks = " + taNetworks);
-		Log.d(TAG, "taPeerSources = " + taPeerSources);
+		//Log.d(TAG, "taNetworks = " + taNetworks);
+		//Log.d(TAG, "taPeerSources = " + taPeerSources);
 	}
 
 	protected void start() {
@@ -142,9 +140,9 @@ public class Tracker {
 	}
 
 	protected void announceDownload(final Download dl) {
-		int count = SingleCounter9.getInstance().getAndIncreaseCount();
+		/*int count = SingleCounter9.getInstance().getAndIncreaseCount();
 		Log.d(TAG, String.format("announceDownload() is called... #%d", count));
-		/*if (count == 1) {
+		if (count == 1) {
 			new Throwable().printStackTrace();
 		}*/
 		
@@ -232,9 +230,9 @@ public class Tracker {
 					if (t instanceof PeerLookupTask) {
 						PeerLookupTask peerLookup = (PeerLookupTask) t;
 						
-						int count = SingleCounter0.getInstance().getAndIncreaseCount();
+						/*int count = SingleCounter0.getInstance().getAndIncreaseCount();
 						int size = peerLookup.getReturnedItems().size();
-						Log.d(TAG, String.format("[#%d] size = %d", count, size));
+						Log.d(TAG, String.format("[#%d] size = %d", count, size));*/
 						
 						synchronized (items) {
 							items.addAll(peerLookup.getReturnedItems());
@@ -508,7 +506,6 @@ public class Tracker {
 			download.removeTrackerListener(this);
 		}
 		
-		
 		//---------------------[DownloadListener]---------------------------------
 		/* (non-Javadoc)
 		 * @see org.gudy.azureus2.plugins.download.DownloadListener#positionChanged(org.gudy.azureus2.plugins.download.Download, int, int)
@@ -546,7 +543,7 @@ public class Tracker {
 		/* (non-Javadoc)
 		 * @see org.gudy.azureus2.plugins.download.DownloadTrackerListener#scrapeResult(org.gudy.azureus2.plugins.download.DownloadScrapeResult)
 		 */
-		public void scrapeResult (DownloadScrapeResult result) {
+		public void scrapeResult(DownloadScrapeResult result) {
 			checkDownload(result.getDownload());
 		}
 
@@ -555,6 +552,9 @@ public class Tracker {
 		 * @see org.gudy.azureus2.plugins.download.DownloadManagerListener#downloadAdded(org.gudy.azureus2.plugins.download.Download)
 		 */
 		public void downloadAdded(Download download) {
+			
+			
+			
 			download.addAttributeListener(this, taNetworks, DownloadAttributeListener.WRITTEN);
 			download.addAttributeListener(this, taPeerSources, DownloadAttributeListener.WRITTEN);
 			download.addListener(this);

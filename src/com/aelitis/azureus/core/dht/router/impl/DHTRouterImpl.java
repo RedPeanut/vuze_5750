@@ -628,7 +628,7 @@ public class DHTRouterImpl implements DHTRouter {
 		
 		List<DHTRouterContactImpl> buckets = currentNode.getBuckets();
 		
-		if (contains && SingleCounter1.getInstance().getAndIncreaseCount() <= 2) {
+		/*if (contains && SingleCounter1.getInstance().getAndIncreaseCount() <= 2) {
 			String indent = "";
 			for (int i = 0; i < depth; i++)
 				indent += "  ";
@@ -636,7 +636,7 @@ public class DHTRouterImpl implements DHTRouter {
 				Log.d(TAG, String.format("%s%d%s", indent, buckets.size(), buckets));
 			else
 				Log.d(TAG, String.format("%snull", indent));
-		}
+		}*/
 		
 		if (buckets != null) {
 			// add everything from the buckets - caller will sort and select
@@ -820,7 +820,7 @@ public class DHTRouterImpl implements DHTRouter {
 			print();*/
 		
 		// this function called once
-		Log.d(TAG, String.format("seedSupport() is called..."));
+		//Log.d(TAG, String.format("seedSupport() is called..."));
 		
 		//Log.d(TAG, ">>> before...");
 		//print();
@@ -915,8 +915,8 @@ public class DHTRouterImpl implements DHTRouter {
 
 	public void	refreshIdleLeaves(long	idle_max) {
 		
-		Log.d(TAG, "refreshIdleLeaves() is called...");
-		new Throwable().printStackTrace();
+		//Log.d(TAG, "refreshIdleLeaves() is called...");
+		//new Throwable().printStackTrace();
 		
 		// while we are synchronously refreshing the smallest subtree the tree can mutate underneath us
 		// as new contacts are discovered. We NEVER merge things back together

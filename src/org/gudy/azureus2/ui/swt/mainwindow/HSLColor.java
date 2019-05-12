@@ -17,71 +17,72 @@ package org.gudy.azureus2.ui.swt.mainwindow;
 
 
 public class HSLColor {
-  private final static int HSLMAX = 255;
-  private final static int RGBMAX = 255;
-  private final static int UNDEFINED = 170;
+	
+	private final static int HSLMAX = 255;
+	private final static int RGBMAX = 255;
+	private final static int UNDEFINED = 170;
 
-  private int pHue;
-  private int pSat;
-  private int pLum;
-  private int pRed;
-  private int pGreen;
-  private int pBlue;
+	private int pHue;
+	private int pSat;
+	private int pLum;
+	private int pRed;
+	private int pGreen;
+	private int pBlue;
 
-  public void initHSLbyRGB(int R, int G, int B) {
-    // sets Hue, Sat, Lum
-    int cMax;
-    int cMin;
-    int RDelta;
-    int GDelta;
-    int BDelta;
-    int cMinus;
-    int cPlus;
+	public void initHSLbyRGB(int R, int G, int B) {
+		// sets Hue, Sat, Lum
+		int cMax;
+		int cMin;
+		int RDelta;
+		int GDelta;
+		int BDelta;
+		int cMinus;
+		int cPlus;
 
-    pRed = R;
-    pGreen = G;
-    pBlue = B;
+		pRed = R;
+		pGreen = G;
+		pBlue = B;
 
-    //Set Max & MinColor Values
-    cMax = iMax(iMax(R, G), B);
-    cMin = iMin(iMin(R, G), B);
+		// Set Max & MinColor Values
+		cMax = iMax(iMax(R, G), B);
+		cMin = iMin(iMin(R, G), B);
 
-    cMinus = cMax - cMin;
-    cPlus = cMax + cMin;
+		cMinus = cMax - cMin;
+		cPlus = cMax + cMin;
 
-    // Calculate luminescence (lightness)
-    pLum = ((cPlus * HSLMAX) + RGBMAX) / (2 * RGBMAX);
+		// Calculate luminescence (lightness)
+		pLum = ((cPlus * HSLMAX) + RGBMAX) / (2 * RGBMAX);
 
-    if (cMax == cMin) {
-      // greyscale
-      pSat = 0;
-      pHue = UNDEFINED;
-    } else {
-      // Calculate color saturation
-      if (pLum <= (HSLMAX / 2)) {
-        pSat = (int)(((cMinus * HSLMAX) + 0.5) / cPlus);
-      } else {
-        pSat = (int)(((cMinus * HSLMAX) + 0.5) / (2 * RGBMAX - cPlus));
-      }
+		if (cMax == cMin) {
+			// greyscale
+			pSat = 0;
+			pHue = UNDEFINED;
+		} else {
+			// Calculate color saturation
+			if (pLum <= (HSLMAX / 2)) {
+				pSat = (int) (((cMinus * HSLMAX) + 0.5) / cPlus);
+			} else {
+				pSat = (int) (((cMinus * HSLMAX) + 0.5) / (2 * RGBMAX - cPlus));
+			}
 
-      //Calculate hue
-      RDelta = (int)((((cMax - R) * (HSLMAX / 6)) + 0.5) / cMinus);
-      GDelta = (int)((((cMax - G) * (HSLMAX / 6)) + 0.5) / cMinus);
-      BDelta = (int)((((cMax - B) * (HSLMAX / 6)) + 0.5) / cMinus);
+			// Calculate hue
+			RDelta = (int) ((((cMax - R) * (HSLMAX / 6)) + 0.5) / cMinus);
+			GDelta = (int) ((((cMax - G) * (HSLMAX / 6)) + 0.5) / cMinus);
+			BDelta = (int) ((((cMax - B) * (HSLMAX / 6)) + 0.5) / cMinus);
 
-      if (cMax == R) {
-        pHue = BDelta - GDelta;
-      } else if (cMax == G) {
-        pHue = (HSLMAX / 3) + RDelta - BDelta;
-      } else if (cMax == B) {
-        pHue = ((2 * HSLMAX) / 3) + GDelta - RDelta;
-      }
+			if (cMax == R) {
+				pHue = BDelta - GDelta;
+			} else if (cMax == G) {
+				pHue = (HSLMAX / 3) + RDelta - BDelta;
+			} else if (cMax == B) {
+				pHue = ((2 * HSLMAX) / 3) + GDelta - RDelta;
+			}
 
-      if (pHue < 0) {
-        pHue = pHue + HSLMAX;
-      }
-    }
-  }
+			if (pHue < 0) {
+				pHue = pHue + HSLMAX;
+			}
+		}
+	}
 
   public void initRGBbyHSL(int H, int S, int L) {
     int Magic1;
