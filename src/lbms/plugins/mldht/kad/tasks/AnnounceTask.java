@@ -16,18 +16,9 @@
  */
 package lbms.plugins.mldht.kad.tasks;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import lbms.plugins.mldht.kad.*;
-import lbms.plugins.mldht.kad.DHT.DHTtype;
-import lbms.plugins.mldht.kad.KBucketEntry.DistanceOrder;
 import lbms.plugins.mldht.kad.messages.AnnounceRequest;
-import lbms.plugins.mldht.kad.messages.GetPeersRequest;
-import lbms.plugins.mldht.kad.messages.GetPeersResponse;
 import lbms.plugins.mldht.kad.messages.MessageBase;
-import lbms.plugins.mldht.kad.messages.MessageBase.Method;
-import lbms.plugins.mldht.kad.utils.PackUtil;
 
 /**
  * @author Damokles

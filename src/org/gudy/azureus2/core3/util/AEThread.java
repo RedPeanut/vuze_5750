@@ -29,17 +29,17 @@ import java.util.WeakHashMap;
 
 public abstract class AEThread extends Thread {
 	
-	private static final WeakHashMap	our_thread_map = new WeakHashMap();
+	private static final WeakHashMap our_thread_map = new WeakHashMap();
 
-	public AEThread(
-		String	name) {
+	public AEThread(String name) {
 		super(name);
 		setDaemon(false);
 	}
 
 	public AEThread(
-		String	name,
-		boolean	daemon) {
+		String name,
+		boolean daemon
+	) {
 		super(name);
 		setDaemon(daemon);
 	}
@@ -49,11 +49,9 @@ public abstract class AEThread extends Thread {
 			System.out.println(TimeFormatter.milliStamp() + ": AEThread:start: " + this);
 		}
 		try {
-			/*
-			if (!isDaemon()) {
+			/* if (!isDaemon()) {
 				System.out.println("non-daemon thread:" + this);
-			}
-			*/
+			} */
 			runSupport();
 		} catch (Throwable e) {
 			DebugLight.printStackTrace(e);

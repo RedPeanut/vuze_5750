@@ -587,14 +587,14 @@ public class DHTPlugin implements Plugin, DHTPluginInterface {
 											
 											// adapter only added to first DHTPluginImpl we create
 											DHTPluginImplAdapter adapter =
-									        		new DHTPluginImplAdapter() {
-									        			public void localContactChanged(DHTPluginContact localContact) {
-									        				for (int i=0;i<listeners.size();i++) {
-									        					((DHTPluginListener)listeners.get(i)).localAddressChanged(localContact);
-									        				}
-									        			}
-									        		};
-									        		
+													new DHTPluginImplAdapter() {
+														public void localContactChanged(DHTPluginContact localContact) {
+															for (int i=0;i<listeners.size();i++) {
+																((DHTPluginListener)listeners.get(i)).localAddressChanged(localContact);
+															}
+														}
+													};
+													
 											if (MAIN_DHT_ENABLE) {
 												mainDht = new DHTPluginImpl(
 														pluginInterface,

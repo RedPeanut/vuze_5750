@@ -81,6 +81,9 @@ public class PeerLookupTask extends Task {
 
 		DHT.logDebug("PeerLookupTask started: " + getTaskID());
 		//new Throwable().printStackTrace();
+		
+		System.out.println("### PeerLookupTask ctor() is called...");
+		new Throwable().printStackTrace();
 	}
 
 	public void setScrapeHandler(ScrapeResponseHandler scrapeHandler) {

@@ -670,8 +670,8 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 			// header for requests and replies) we enforce a rule. All connection ids
 			// must have their MSB set. As requests always start with the action, which
 			// always has the MSB clear, we can use this to differentiate.
-			byte[]	packetData	= dgPacket.getData();
-			int		packetLen	= dgPacket.getLength();
+			byte[] packetData = dgPacket.getData();
+			int packetLen = dgPacket.getLength();
 			// System.out.println("received:" + packet_len);
 			PRUDPPacket packet;
 			boolean	requestPacket;
@@ -733,7 +733,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 							}
 						} else {
 							recvQueue.add(new Object[]{ packet, new Integer(dgPacket.getLength()) });
-							recvQueueDataSize	+= dgPacket.getLength();
+							recvQueueDataSize += dgPacket.getLength();
 							recvQueueSemaphore.release();
 							if (recvThread == null) {
 								recvThread =
@@ -742,7 +742,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 											while (true) {
 												try {
 													recvQueueSemaphore.reserve();
-													Object[]	data;
+													Object[] data;
 													try {
 														recvQueueMonitor.enter();
 														data = (Object[])recvQueue.remove(0);
@@ -758,8 +758,8 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 													if (handler != null) {
 														handler.process(p);
 														if (receiveDelay > 0) {
-															int 	maxReqPerSec = 1000/receiveDelay;
-															long	requestPerSec = requestReceiveAverage.getAverage();
+															int maxReqPerSec = 1000/receiveDelay;
+															long requestPerSec = requestReceiveAverage.getAverage();
 															//System.out.println(requestPerSec + "/" + maxReqPerSec + " - " + recvQueueDataSize);
 															if (requestPerSec > maxReqPerSec) {
 																Thread.sleep(receiveDelay);
@@ -885,8 +885,11 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 		InetSocketAddress			destinationAddress,
 		PRUDPPacketReceiver			receiver,
 		long						timeout,
-		int							priority)
-		throws PRUDPPacketHandlerException {
+		int							priority
+	) throws PRUDPPacketHandlerException {
+		
+		//System.out.println("sendAndReceive() is called...");
+		//new Throwable().printStackTrace();
 		
 		/*if (SingleCounter0.getInstance().getAndIncreaseCount() <= 5)
 			new Throwable().printStackTrace();*/
@@ -923,17 +926,17 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 			requestPacket.serialise(os);
 			//Log.d(TAG, "requestPacket.getString() = " + requestPacket.getString());
 			
-			byte[]	_buffer = baos.getBuffer();
-			int		_length	= baos.size();
+			byte[] _buffer = baos.getBuffer();
+			int _length	= baos.size();
 			requestPacket.setSerialisedSize(_length);
 			if (auth != null) {
 				//<parg_home> so <new_packet> = <old_packet> + <user_padded_to_8_bytes> + <hash>
 				//<parg_home> where <hash> = first 8 bytes of sha1(<old_packet> + <user_padded_to_8> + sha1(pass))
 				//<XTF> Yes
 				SHA1Hasher hasher = new SHA1Hasher();
-				String	userName 	= auth.getUserName();
-				String	password	= new String(auth.getPassword());
-				byte[]	sha1Password;
+				String userName = auth.getUserName();
+				String password = new String(auth.getPassword());
+				byte[] sha1Password;
 				if (userName.equals("<internal>")) {
 					sha1Password = Base64.decode(password);
 				} else {
@@ -1004,8 +1007,8 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 											while (true) {
 												try {
 													sendQueueSemaphore.reserve();
-													Object[]	data;
-													int			selectedPriority	= 0;
+													Object[] data;
+													int selectedPriority	= 0;
 													try {
 														sendQueueMonitor.enter();
 														

@@ -80,24 +80,17 @@ AEThreadMonitor
 						try {
 							try {
 								Class.forName("java.lang.management.ManagementFactory");
-
 								monitor15();
-
 							} catch (Throwable e) {
-
 								//monitor14();
 							}
-
 						} catch (Throwable e) {
-
 						}
 					}
 				};
 
 			thread.setPriority(Thread.MAX_PRIORITY);
-
 			thread.setDaemon(true);
-
 			thread.start();
 
 			/*

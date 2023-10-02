@@ -370,8 +370,7 @@ public class DHTTransportUDPImpl
 		return (this);
 	}
 
-	public DHTUDPPacketHandler
-	getPacketHandler() {
+	public DHTUDPPacketHandler getPacketHandler() {
 		return (packetHandler);
 	}
 
@@ -391,9 +390,8 @@ public class DHTTransportUDPImpl
 		}
 	}
 
-	protected void updateStats(
-		int	tick_count) {
-			// pick up latest value
+	protected void updateStats(int tick_count) {
+		// pick up latest value
 		generic_flags2	= VersionCheckClient.getSingleton().getDHTFlags();
 		long	alien_count	= 0;
 		long[]	aliens = stats.getAliens();
@@ -405,7 +403,7 @@ public class DHTTransportUDPImpl
 		alienFvAverage.addValue( (alien_fv_count-lastAlienFvCount)*STATS_PERIOD/1000);
 		lastAlienCount	= alien_count;
 		lastAlienFvCount	= alien_fv_count;
-		long	now = SystemTime.getCurrentTime();
+		long now = SystemTime.getCurrentTime();
 		if (now < 	statsStartTime) {
 			statsStartTime	= now;
 		} else {
@@ -447,7 +445,8 @@ public class DHTTransportUDPImpl
 
 	protected void recordSkew(
 		InetSocketAddress	originator_address,
-		long				skew) {
+		long				skew
+	) {
 		if (stats != null) {
 			stats.recordSkew(originator_address, skew);
 		}
@@ -470,8 +469,7 @@ public class DHTTransportUDPImpl
 		return (reachable);
 	}
 
-	public byte
-	getProtocolVersion() {
+	public byte getProtocolVersion() {
 		return (protocolVersion);
 	}
 
@@ -1773,8 +1771,7 @@ outer:
 
 			final long connectionId = getConnectionID();
 
-			final DHTUDPPacketRequestFindNode request =
-				new DHTUDPPacketRequestFindNode(this, connectionId, localContact, contact);
+			final DHTUDPPacketRequestFindNode request = new DHTUDPPacketRequestFindNode(this, connectionId, localContact, contact);
 
 			stats.findNodeSent(request);
 
@@ -2052,12 +2049,16 @@ outer:
 	public void	process(
 		DHTUDPPacketHandlerStub		packetHandlerStub,
 		DHTUDPPacketRequest			request,
-		boolean						alien) {
+		boolean						alien
+	) {
 		
 		if (requestHandler == null) {
 			logger.log("Ignoring packet as not yet ready to process");
 			return;
 		}
+		
+		//System.out.println("process() is called...");
+		//new Throwable().printStackTrace();
 		
 		try {
 			stats.incomingRequestReceived(request, alien);
@@ -2138,7 +2139,7 @@ outer:
 								originatingContact,
 								kb_request.getKeyBlockRequest(),
 								kb_request.getKeyBlockSignature());
-						DHTUDPPacketReplyKeyBlock	reply =
+						DHTUDPPacketReplyKeyBlock reply =
 							new DHTUDPPacketReplyKeyBlock(
 									this,
 									kb_request,

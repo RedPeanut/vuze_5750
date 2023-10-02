@@ -206,7 +206,8 @@ public class MessageDecoder {
 	 * @param map
 	 * @return
 	 */
-	private static MessageBase parseRequest (Map<String, Object> map, RPCServerBase srv) {
+	private static MessageBase parseRequest(Map<String, Object> map, RPCServerBase srv) {
+		
 		Object rawRequestMethod = map.get(Type.REQ_MSG.getRPCTypeName());
 		Map<String, Object> args = (Map<String, Object>) map.get(Type.REQ_MSG.innerKey());
 		
@@ -224,6 +225,10 @@ public class MessageDecoder {
 		MessageBase msg = null;
 
 		String requestMethod = getStringFromBytes((byte[]) rawRequestMethod);
+		
+		System.out.println("### parseRequest() is called... requestMethod = " + requestMethod);
+		new Throwable().printStackTrace();
+		
 		if (Method.PING.getRPCName().equals(requestMethod)) {
 			msg = new PingRequest();
 		} else if (Method.FIND_NODE.getRPCName().equals(requestMethod) || Method.GET_PEERS.getRPCName().equals(requestMethod)) {

@@ -40,32 +40,26 @@ import com.aelitis.azureus.core.util.CopyOnWriteList;
 import com.aelitis.azureus.core.util.bloom.BloomFilter;
 import com.aelitis.azureus.core.util.bloom.BloomFilterFactory;
 
-public class
-DHTSpeedTesterImpl
-	implements DHTSpeedTester
-{
+public class DHTSpeedTesterImpl implements DHTSpeedTester {
+	
 	private static final long PING_TIMEOUT	= 5000;
 
-	private final PluginInterface		plugin_interface;
-	private final DHT					dht;
-	private int					contact_num;
+	private final PluginInterface plugin_interface;
+	private final DHT dht;
+	private int contact_num;
 
 	private BloomFilter			tried_bloom;
 
-	private final LinkedList			pending_contacts 	= new LinkedList();
-	private final List				active_pings		= new ArrayList();
+	private final LinkedList	pending_contacts 	= new LinkedList();
+	private final List			active_pings		= new ArrayList();
 
-	private final List<DHTSpeedTesterListener>			new_listeners	= new ArrayList<DHTSpeedTesterListener>();
-	private final CopyOnWriteList<DHTSpeedTesterListener>	listeners 		= new CopyOnWriteList<DHTSpeedTesterListener>();
+	private final List<DHTSpeedTesterListener> new_listeners = new ArrayList<DHTSpeedTesterListener>();
+	private final CopyOnWriteList<DHTSpeedTesterListener> listeners = new CopyOnWriteList<DHTSpeedTesterListener>();
 
-	public DHTSpeedTesterImpl(
-		DHT		_dht) {
-		dht			= _dht;
-
-		plugin_interface	= dht.getLogger().getPluginInterface();
-
-		UTTimer	timer = plugin_interface.getUtilities().createTimer(
-				"DHTSpeedTester:finder", true);
+	public DHTSpeedTesterImpl(DHT _dht) {
+		dht = _dht;
+		plugin_interface = dht.getLogger().getPluginInterface();
+		UTTimer	timer = plugin_interface.getUtilities().createTimer("DHTSpeedTester:finder", true);
 
 		timer.addPeriodicEvent(
 				5000,
@@ -80,14 +74,11 @@ DHTSpeedTesterImpl
 				1000,
 				new UTTimerEventPerformer() {
 					int	tick_count;
-
 					public void perform(
 						UTTimerEvent event) {
 						try {
 							pingContacts(tick_count);
-
 						} finally {
-
 							tick_count++;
 						}
 					}

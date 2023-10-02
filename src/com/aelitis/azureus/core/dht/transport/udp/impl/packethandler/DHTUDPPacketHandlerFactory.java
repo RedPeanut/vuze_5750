@@ -50,14 +50,14 @@ public class DHTUDPPacketHandlerFactory {
 	}
 
 	protected DHTUDPPacketHandler getHandlerSupport(
-		DHTTransportUDPImpl		transport,
-		DHTUDPRequestHandler	requestHandler)
-		throws DHTUDPPacketHandlerException {
+		DHTTransportUDPImpl transport,
+		DHTUDPRequestHandler requestHandler
+	) throws DHTUDPPacketHandlerException {
 		
 		try {
 			thisMon.enter();
-			int	port	= transport.getPort();
-			int	network = transport.getNetwork();
+			int port = transport.getPort();
+			int network = transport.getNetwork();
 			Object[] portDetails = (Object[])portMap.get(new Integer(port));
 			if (portDetails == null) {
 				PRUDPPacketHandler packetHandler =

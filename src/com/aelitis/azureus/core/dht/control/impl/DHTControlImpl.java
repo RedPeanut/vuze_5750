@@ -399,7 +399,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		Set<DHTTransportContact> contactsToQuery = getClosestContactsSet(routerNodeId, K, false);
 		Log.d(TAG, "contactsToQuery.size() = " + contactsToQuery.size());
 		Iterator<DHTTransportContact> it = contactsToQuery.iterator();
-		for (int i=0;it.hasNext();i++) {
+		for (int i = 0; it.hasNext(); i++) {
 			DHTTransportContact contact = it.next();
 			Log.d(TAG, String.format("contact[%d].getAddress() = %s", i, contact.getAddress()));
 		}
@@ -548,7 +548,6 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					/*Log.d(TAG, "requestAdd() is called...");
 					Throwable t = new Throwable();
 					t.printStackTrace();*/
-					
 					nodeAddedToRouter(contact);
 				}
 				
@@ -2189,7 +2188,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 							
 							/*Log.d(TAG, "_lookupId = " + Util.toHexString(_lookupId));
 							Log.d(TAG, "closest.getID() = " + Util.toHexString(closest.getID()));*/
-														
+							
 							contactsToQuery.remove(closest);
 							contactsQueried.put(closest.getID(), closest);
 							// never search ourselves!

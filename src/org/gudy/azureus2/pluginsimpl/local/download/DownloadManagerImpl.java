@@ -647,9 +647,9 @@ public class DownloadManagerImpl
 	
 	public void addListener(DownloadManagerListener l, boolean notifyOfCurrentDownloads) {
 		
-		int count = SingleCounter9.getInstance().getAndIncreaseCount();
-		Log.d(TAG, String.format("addListener() is called... #%d", count));
-		new Throwable().printStackTrace();
+		//int count = SingleCounter9.getInstance().getAndIncreaseCount();
+		//Log.d(TAG, String.format("addListener() is called... #%d", count));
+		//new Throwable().printStackTrace();
 		
 		List<Download> downloadsCopy = null;
 		try {

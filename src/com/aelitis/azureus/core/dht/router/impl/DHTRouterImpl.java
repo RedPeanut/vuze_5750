@@ -110,9 +110,9 @@ public class DHTRouterImpl implements DHTRouter {
 
 	private volatile int seedInTicks;
 
-	private static final int	TICK_PERIOD 		= 10*1000;
-	private static final int	SEED_DELAY_PERIOD	= 60*1000;
-	private static final int	SEED_DELAY_TICKS	= SEED_DELAY_PERIOD/TICK_PERIOD;
+	private static final int TICK_PERIOD 		= 10*1000;
+	private static final int SEED_DELAY_PERIOD	= 60*1000;
+	private static final int SEED_DELAY_TICKS	= SEED_DELAY_PERIOD/TICK_PERIOD;
 
 
 	public DHTRouterImpl(
@@ -641,7 +641,7 @@ public class DHTRouterImpl implements DHTRouter {
 		if (buckets != null) {
 			// add everything from the buckets - caller will sort and select
 			// the best ones as required
-			for (int i=0;i<buckets.size();i++) {
+			for (int i=0; i<buckets.size(); i++) {
 				DHTRouterContactImpl contact = (DHTRouterContactImpl)buckets.get(i);
 				// use !failing at the moment to include unknown ones
 				if (! (liveOnly && contact.isFailing())) {
@@ -649,7 +649,7 @@ public class DHTRouterImpl implements DHTRouter {
 				}
 			}
 		} else {
-			boolean bit = ((nodeId[depth/8]>>(7-(depth%8)))&0x01) == 1;
+			boolean bit = ((nodeId[depth/8] >> (7-(depth%8))) & 0x01) == 1;
 			DHTRouterNodeImpl bestNode;
 			DHTRouterNodeImpl worseNode;
 			if (bit) {

@@ -525,7 +525,7 @@ outer:
 	}
 
 	protected InetSocketAddress	getSeedAddress() {
-		return (checkResolve(new InetSocketAddress(v6?SEED_ADDRESS_V6:SEED_ADDRESS_V4, SEED_PORT)));
+		return (checkResolve(new InetSocketAddress(v6 ? SEED_ADDRESS_V6 : SEED_ADDRESS_V4, SEED_PORT)));
 	}
 
 	private InetSocketAddress checkResolve(InetSocketAddress isa) {

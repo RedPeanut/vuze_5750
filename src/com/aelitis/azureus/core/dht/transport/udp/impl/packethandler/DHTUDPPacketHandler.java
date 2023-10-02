@@ -126,6 +126,8 @@ public class DHTUDPPacketHandler implements DHTUDPPacketHandlerStub {
 		throws DHTUDPPacketHandlerException {
 		
 		//Log.d(TAG, "count = " + SingleCounter1.getInstance().getAndIncreaseCount());
+		//System.out.println("sendAndReceive() is called...");
+		//new Throwable().printStackTrace();
 		
 		if (destroyed) {
 			throw (new DHTUDPPacketHandlerException("packet handler is destroyed"));
