@@ -28,15 +28,18 @@ public class Util {
 	
 	private static char[] hexArray = "0123456789ABCDEF".toCharArray();
 	public static String toHexString(byte[] bytes) {
-		char[] chars = new char[bytes.length * 2];
-		for (int i = 0; i < bytes.length; i++) {
+		return toHexString(bytes, bytes.length);
+	}
+	public static String toHexString(byte[] bytes, int len) {
+		char[] chars = new char[len * 2];
+		for (int i = 0; i < len; i++) {
 			int v = bytes[i] & 0xFF;
 			chars[i*2] = hexArray[v >>> 4];
 			chars[i*2+1] = hexArray[v & 0x0F];
 		}
 		return new String(chars);
 	}
-
+	
 	public static String INDENT = "    ";
 	
 	public static <K, V> void printMap(String key, Map<K, V> map, String indent) {

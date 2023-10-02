@@ -95,12 +95,12 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 	
 	private static String TAG = PRUDPPacketHandlerImpl.class.getSimpleName();
 	
-	private static boolean LOG_SEND_RECV = false;
+	private static boolean LOG_SEND_RECV = true;
 	private static boolean BLOCK_SEND = false;
 	
 	private static final LogIDs LOGID = LogIDs.NET;
 
-	private boolean		TRACE_REQUESTS	= false;
+	private boolean TRACE_REQUESTS = true;
 
 	private static int 	MAX_PACKET_SIZE;
 
@@ -678,7 +678,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 			stats.packetReceived(packetLen);
 			InetSocketAddress originator = (InetSocketAddress)dgPacket.getSocketAddress();
 			
-			if (LOG_SEND_RECV) Log.d(TAG, String.format("recv[%s] = %s", originator, Util.toHexString(dgPacket.getData())));
+			if (LOG_SEND_RECV) Log.d(TAG, String.format("recv[%s] = %s", originator, Util.toHexString(dgPacket.getData(), packetLen)));
 			//if (DBG) Log.d(TAG, "originator = " + originator);
 			
 			if ((packetData[0]&0x80) == 0) {
@@ -850,8 +850,8 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 		PasswordAuthentication	auth,
 		PRUDPPacket				requestPacket,
 		InetSocketAddress		destinationAddress,
-		long					timeout)
-		throws PRUDPPacketHandlerException {
+		long					timeout
+	) throws PRUDPPacketHandlerException {
 		PRUDPPacketHandlerRequestImpl request =
 			sendAndReceive(auth, requestPacket, destinationAddress, null, timeout, PRUDPPacketHandler.PRIORITY_MEDIUM);
 		return (request.getReply());
@@ -889,7 +889,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 	) throws PRUDPPacketHandlerException {
 		
 		//System.out.println("sendAndReceive() is called...");
-		//new Throwable().printStackTrace();
+		new Throwable().printStackTrace();
 		
 		/*if (SingleCounter0.getInstance().getAndIncreaseCount() <= 5)
 			new Throwable().printStackTrace();*/
@@ -942,7 +942,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 				} else {
 					sha1Password = hasher.calculateHash(password.getBytes());
 				}
-				byte[]	userBytes = new byte[8];
+				byte[] userBytes = new byte[8];
 				Arrays.fill( userBytes, (byte)0);
 				for (int i=0;i<userBytes.length&&i<userName.length();i++) {
 					userBytes[i] = (byte)userName.charAt(i);
@@ -987,7 +987,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 							}
 							Thread.sleep(sendDelay * 4);
 						} else {
-							sendQueueDataSize	+= dgPacket.getLength();
+							sendQueueDataSize += dgPacket.getLength();
 							sendQueues[priority].add(new Object[]{ dgPacket, request });
 							if (TRACE_REQUESTS) {
 								String	str = "";
@@ -1000,7 +1000,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 							if (sendThread == null) {
 								sendThread =
 									new AEThread("PRUDPPacketHandler:sender") {
-									
+										
 										public void runSupport() {
 											
 											int[] consecutiveSends = new int[sendQueues.length];
@@ -1008,16 +1008,16 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 												try {
 													sendQueueSemaphore.reserve();
 													Object[] data;
-													int selectedPriority	= 0;
+													int selectedPriority = 0;
 													try {
 														sendQueueMonitor.enter();
 														
 														// invariant: at least one queue must have an entry
 														for (int i=0;i<sendQueues.length;i++) {
-															List	queue = sendQueues[i];
+															List queue = sendQueues[i];
 															int	queueSize = queue.size();
 															if (queueSize > 0) {
-																selectedPriority	= i;
+																selectedPriority = i;
 																if (consecutiveSends[i] >= 4 ||
 																		(i < sendQueues.length - 1 &&
 																			sendQueues[i+1].size() - queueSize > 500)
@@ -1042,12 +1042,12 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 														sendQueueMonitor.exit();
 													}
 													
-													DatagramPacket					p	= (DatagramPacket)data[0];
-													PRUDPPacketHandlerRequestImpl	r	= (PRUDPPacketHandlerRequestImpl)data[1];
+													DatagramPacket					p = (DatagramPacket)data[0];
+													PRUDPPacketHandlerRequestImpl	r = (PRUDPPacketHandlerRequestImpl)data[1];
 													r.sent();
 													sendToSocket(p);
 													
-													if (LOG_SEND_RECV) Log.d(TAG, String.format("send[%s] = %s", f_destinationAddress, Util.toHexString(p.getData())));
+													if (LOG_SEND_RECV) Log.d(TAG, String.format("send[%s] = %s", f_destinationAddress, Util.toHexString(p.getData(), p.getLength())));
 													
 													stats.packetSent(p.getLength());
 													if (TRACE_REQUESTS) {
@@ -1057,7 +1057,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 													}
 													long delay = sendDelay;
 													if (selectedPriority == PRIORITY_HIGH) {
-														delay	= delay/2;
+														delay = delay/2;
 													}
 													Thread.sleep(delay);
 												} catch (Throwable e) {

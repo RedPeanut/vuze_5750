@@ -444,7 +444,7 @@ public class SystemProperties {
 		}
 		if (fDocPath == null) {
 			System.err.println("This is BAD - fix me!");
-			new Throwable().printStackTrace();
+			//new Throwable().printStackTrace();
 			// should never happen.. but if we are missing a dll..
 			fDocPath = new File(getUserPath(), "Documents");
 		}

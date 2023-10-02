@@ -347,94 +347,51 @@ DDBaseImpl
 		}
 	}
 
-	protected DHTPluginInterface
-	getDHT()
-
-		throws DistributedDatabaseException
-	{
+	protected DHTPluginInterface getDHT() throws DistributedDatabaseException {
 		throwIfNotAvailable();
-
-		return ( grabDHT());
+		return (grabDHT());
 	}
 
-	protected void log(
-		String	str) {
+	protected void log(String str) {
 		DHTPluginInterface	dht = grabDHT();
-
 		if (dht != null) {
-
 			dht.log(str);
 		}
 	}
 
-	public DistributedDatabaseKey
-	createKey(
-		Object			key )
-
-		throws DistributedDatabaseException
-	{
+	public DistributedDatabaseKey createKey(Object key) throws DistributedDatabaseException {
 		throwIfNotAvailable();
-
 		return (new DDBaseKeyImpl( key));
 	}
 
-	public DistributedDatabaseKey
-	createKey(
-		Object			key,
-		String			description )
-
-		throws DistributedDatabaseException
-	{
+	public DistributedDatabaseKey createKey(Object key, String description) throws DistributedDatabaseException {
 		throwIfNotAvailable();
-
 		return (new DDBaseKeyImpl( key, description));
 	}
 
-	public DistributedDatabaseValue
-	createValue(
-		Object			value )
-
-		throws DistributedDatabaseException
-	{
+	public DistributedDatabaseValue createValue(Object value ) throws DistributedDatabaseException {
 		throwIfNotAvailable();
-
 		return (new DDBaseValueImpl(new DDBaseContactImpl( this, getDHT().getLocalAddress()), value, SystemTime.getCurrentTime(), -1));
 	}
 
-	public DistributedDatabaseContact
-	importContact(
-		InetSocketAddress				address )
-
-		throws DistributedDatabaseException
-	{
+	public DistributedDatabaseContact importContact(InetSocketAddress address) throws DistributedDatabaseException {
 		throwIfNotAvailable();
-
 		DHTPluginContact	contact = getDHT().importContact(address);
-
 		if (contact == null) {
-
 			throw (new DistributedDatabaseException("import of '" + address + "' failed"));
 		}
-
 		return (new DDBaseContactImpl( this, contact));
 	}
 
-	public DistributedDatabaseContact
-	importContact(
+	public DistributedDatabaseContact importContact(
 		InetSocketAddress				address,
-		byte							version )
-
-		throws DistributedDatabaseException
-	{
+		byte							version
+	) throws DistributedDatabaseException {
 		throwIfNotAvailable();
-
 		DHTPluginContact	contact = getDHT().importContact(address, version);
-
 		if (contact == null) {
-
 			throw (new DistributedDatabaseException("import of '" + address + "' failed"));
 		}
-
 		return (new DDBaseContactImpl( this, contact));
 	}
 
@@ -510,25 +467,19 @@ DDBaseImpl
 		}
 
 		byte	extra_flags = 0;
-
 		int key_flags = key.getFlags();
 
 		if ((key_flags & DistributedDatabaseKey.FL_ANON ) != 0) {
-
 			extra_flags |= DHT.FLAG_ANON;
 		}
 
 		if ((key_flags & DistributedDatabaseKey.FL_BRIDGED ) != 0) {
-
 			extra_flags |= DHT.FLAG_BRIDGED;
 		}
 
 		if (values.length == 0) {
-
 			delete(listener, key);
-
 		} else if (values.length == 1) {
-
 			getDHT().put(
 					((DDBaseKeyImpl)key).getBytes(),
 					key.getDescription(),
@@ -543,83 +494,53 @@ DDBaseImpl
 			DHTPluginValue	old_value = dht.getLocalValue( ((DDBaseKeyImpl)key).getBytes());
 
 			List	old_values = new ArrayList();
-
 			if (old_value != null) {
-
 				if ((old_value.getFlags() & DHTPlugin.FLAG_MULTI_VALUE ) == 0) {
-
 					old_values.add( old_value.getValue());
-
 				} else {
-
 					byte[]	encoded = old_value.getValue();
-
-
 				}
 			}
 			*/
 
 			byte[]	current_key = ((DDBaseKeyImpl)key).getBytes();
-
-				// format is: <continuation> <len><len><data>
-
+			// format is: <continuation> <len><len><data>
 			byte[]	payload			= new byte[DHTPluginInterface.MAX_VALUE_SIZE];
 			int		payload_length	= 1;
 
 			int	pos = 0;
 
 			while (pos < values.length) {
-
 				DDBaseValueImpl	value = (DDBaseValueImpl)values[pos];
-
 				byte[]	bytes = value.getBytes();
-
 				int		len = bytes.length;
-
 				if (payload_length + len < payload.length - 2) {
-
 					payload[payload_length++] = (byte)((len & 0x0000ff00) >> 8);
 					payload[payload_length++] = (byte) (len & 0x000000ff);
-
 					System.arraycopy(bytes, 0, payload, payload_length, len);
-
 					payload_length	+= len;
-
 					pos++;
-
 				} else {
-
 					payload[0]	= 1;
-
 					final byte[]	copy = new byte[payload_length];
-
 					System.arraycopy(payload, 0, copy, 0, copy.length);
-
 					final byte[]					f_current_key	= current_key;
-
 					getDHT().put(
 							f_current_key,
 							key.getDescription(),
 							copy,
 							(byte)(DHTPluginInterface.FLAG_MULTI_VALUE | extra_flags),
 							new listenerMapper(listener, DistributedDatabaseEvent.ET_VALUE_WRITTEN, key, 0, false, false));
-
 					payload_length	= 1;
-
 					current_key = new SHA1Simple().calculateHash(current_key);
 				}
 			}
 
 			if (payload_length > 1) {
-
 				payload[0]	= 0;
-
 				final byte[]	copy = new byte[payload_length];
-
 				System.arraycopy(payload, 0, copy, 0, copy.length);
-
 				final byte[]					f_current_key	= current_key;
-
 				getDHT().put(
 						f_current_key,
 						key.getDescription(),
@@ -687,25 +608,16 @@ DDBaseImpl
 
 	}
 
-	public List<DistributedDatabaseValue>
-	getValues(
-		DistributedDatabaseKey			key )
-
+	public List<DistributedDatabaseValue> getValues(DistributedDatabaseKey			key )
 		throws DistributedDatabaseException
 	{
 		List<DHTPluginValue> values = getDHT().getValues(((DDBaseKeyImpl)key).getBytes());
-
 		List<DistributedDatabaseValue>	result = new ArrayList<DistributedDatabaseValue>( values.size());
-
 		for (DHTPluginValue v: values) {
-
 			DDBaseContactImpl originator = null;	// currently don't have access to this...
-
 			DDBaseValueImpl value	= new DDBaseValueImpl( originator, v.getValue(), v.getCreationTime(), v.getVersion());
-
 			result.add(value);
 		}
-
 		return (result);
 	}
 
@@ -754,42 +666,25 @@ DDBaseImpl
 		throws DistributedDatabaseException
 	{
 		throwIfNotAvailable();
-
 		final HashWrapper	type_key = DDBaseHelpers.getKey( type.getClass());
-
 		if (transfer_map.get(type_key) != null) {
-
 			throw (new DistributedDatabaseException("Handler for class '" + type.getClass().getName() + "' already defined"));
 		}
-
 		transfer_map.put(type_key, handler);
-
 		final String	handler_name;
-
 		if (type == torrent_transfer) {
-
 			handler_name = "Torrent Transfer";
-
 		} else {
-
 			String class_name = type.getClass().getName();
-
 			int	pos = class_name.indexOf('$');
-
 			if (pos != -1) {
-
 				class_name = class_name.substring(pos+1);
-
 			} else {
-
 				pos = class_name.lastIndexOf('.');
-
 				if (pos != -1) {
-
 					class_name = class_name.substring(pos+1);
 				}
 			}
-
 			handler_name = "Plugin Defined (" + class_name + ")";
 		}
 
@@ -932,8 +827,7 @@ DDBaseImpl
 			timeout);
 	}
 
-	protected DistributedDatabaseValue
-	call(
+	protected DistributedDatabaseValue call(
 		DDBaseContactImpl							contact,
 		final DistributedDatabaseProgressListener	listener,
 		DistributedDatabaseTransferType				type,
@@ -945,32 +839,31 @@ DDBaseImpl
 		DHTPluginContact plugin_contact = contact.getContact();
 
 		byte[]	data = plugin_contact.call(
-				listener == null ? null :
-							new DHTPluginProgressListener() {
-								public void reportSize(
-									long	size) {
-									listener.reportSize(size);
-								}
+			listener == null ? null :
+				new DHTPluginProgressListener() {
+					public void reportSize(
+						long	size) {
+						listener.reportSize(size);
+					}
 
-								public void reportActivity(
-									String	str) {
-									listener.reportActivity(str);
-								}
+					public void reportActivity(
+						String	str) {
+						listener.reportActivity(str);
+					}
 
-								public void reportCompleteness(
-									int		percent) {
-									listener.reportCompleteness(percent);
-								}
-							},
-							DDBaseHelpers.getKey(type.getClass()).getHash(),
-							((DDBaseValueImpl)value).getBytes(),
-							timeout);
+					public void reportCompleteness(
+						int		percent) {
+						listener.reportCompleteness(percent);
+					}
+				},
+			DDBaseHelpers.getKey(type.getClass()).getHash(),
+			((DDBaseValueImpl)value).getBytes(),
+			timeout
+		);
 
 		if (data == null) {
-
 			return (null);
 		}
-
 		return (new DDBaseValueImpl( contact, data, SystemTime.getCurrentTime(), -1));
 	}
 
@@ -984,10 +877,7 @@ DDBaseImpl
 		listeners.remove(l);
 	}
 
-	protected class
-	listenerMapper
-		implements DHTPluginOperationListener
-	{
+	protected class listenerMapper implements DHTPluginOperationListener {
 		private DistributedDatabaseListener	listener;
 		private int							type;
 		private DistributedDatabaseKey		key;
@@ -1018,8 +908,7 @@ DDBaseImpl
 			continuation_num	= 1;
 		}
 
-		private
-		listenerMapper(
+		private listenerMapper(
 			DistributedDatabaseListener	_listener,
 			int							_type,
 			DistributedDatabaseKey		_key,
@@ -1039,8 +928,7 @@ DDBaseImpl
 			return (true);
 		}
 
-		public void starts(
-			byte[] 	_key ) {
+		public void starts(byte[] 	_key ) {
 			listener.event(new dbEvent( DistributedDatabaseEvent.ET_OPERATION_STARTS, key));
 		}
 
@@ -1048,11 +936,8 @@ DDBaseImpl
 			DHTPluginContact	originator,
 			DHTPluginValue		_value) {
 			if (type == DistributedDatabaseEvent.ET_KEY_STATS_READ) {
-
 				if ((_value.getFlags() & DHTPluginInterface.FLAG_STATS ) == 0) {
-
-						// skip, old impl
-
+					// skip, old impl
 					return;
 				}
 
@@ -1089,40 +974,26 @@ DDBaseImpl
 				}
 			} else {
 				byte[]	value = _value.getValue();
-
 				if (_value.getFlags() == DHTPluginInterface.FLAG_MULTI_VALUE) {
-
 					int	pos = 1;
-
 					while (pos < value.length) {
-
 						int	len = (	(value[pos++]<<8 ) & 0x0000ff00)+
 								 	(value[pos++] & 0x000000ff);
-
 						if (len > value.length - pos) {
-
 							Debug.out("Invalid length: len = " + len + ", remaining = " + (value.length - pos));
-
 							break;
 						}
 
 						byte[]	d = new byte[len];
-
 						System.arraycopy(value, pos, d, 0, len);
-
 						listener.event(new dbEvent( type, key, originator, d, _value.getCreationTime(), _value.getVersion()));
-
 						pos += len;
 					}
 
 					if (value[0] == 1) {
-
-							// continuation exists
-
+						// continuation exists
 						final	byte[]	next_key_bytes = new SHA1Simple().calculateHash(key_bytes);
-
 						complete_disabled	= true;
-
 						grabDHT().get(
 							next_key_bytes,
 							key.getDescription() + " [continuation " + continuation_num + "]",
@@ -1134,7 +1005,6 @@ DDBaseImpl
 							new listenerMapper(listener, DistributedDatabaseEvent.ET_VALUE_READ, key, next_key_bytes, timeout, continuation_num+1));
 					}
 				} else {
-
 					listener.event(new dbEvent( type, key, originator, _value));
 				}
 			}
@@ -1159,10 +1029,7 @@ DDBaseImpl
 		}
 	}
 
-	protected class
-	dbEvent
-		implements DistributedDatabaseEvent
-	{
+	protected class dbEvent implements DistributedDatabaseEvent {
 		private int							type;
 		private DistributedDatabaseKey		key;
 		private DistributedDatabaseKeyStats	key_stats;

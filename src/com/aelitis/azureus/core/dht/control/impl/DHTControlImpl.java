@@ -114,7 +114,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	
 	private static final boolean DISABLE_REPLICATE_ON_JOIN	= true;
 
-	@SuppressWarnings("CanBeFinal")		// accessed from plugin
+	@SuppressWarnings("CanBeFinal") // accessed from plugin
 
 	public  static int EXTERNAL_LOOKUP_CONCURRENCY					= 16;
 
@@ -264,9 +264,9 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		enableRandomPoking			= _enableRandomPoking;
 
 		//Log.d(TAG, ">>> K = " + _K);
-		Log.d(TAG, ">>> lookupConcurrency = " + lookupConcurrency);
-		new Throwable().printStackTrace();
-				
+		//Log.d(TAG, ">>> lookupConcurrency = " + lookupConcurrency);
+		//new Throwable().printStackTrace();
+		
 		// set this so we don't do initial calculation until reasonably populated
 		lastDhtEstimateTime	= SystemTime.getCurrentTime();
 
@@ -298,14 +298,11 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		if (transport.supportsStorage()) {
 
 			try {
-				/*
-				spoof_cipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
+				/* spoof_cipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
 				KeyGenerator keyGen = KeyGenerator.getInstance("DESede");
-				spoof_key = keyGen.generateKey();
-				*/
-
-				spoofDigest 	= MessageDigest.getInstance("MD5");
-				spoofKey		= new byte[16];
+				spoof_key = keyGen.generateKey(); */
+				spoofDigest = MessageDigest.getInstance("MD5");
+				spoofKey = new byte[16];
 				RandomUtils.nextSecureBytes(spoofKey);
 			} catch (Throwable e) {
 				Debug.printStackTrace(e);
@@ -320,21 +317,16 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 			new DHTTransportListener() {
 				
 				public void localContactChanged(DHTTransportContact	newLocalContact) {
-
 					logger.log("Transport ID changed, recreating router");
-
-					List	oldContacts = router.findBestContacts(0);
-					byte[]	oldRouterId = router.getID();
-
+					List oldContacts = router.findBestContacts(0);
+					byte[] oldRouterId = router.getID();
 					createRouter(newLocalContact);
 
 					// sort for closeness to new router id
 					Set	sortedContacts = new SortedTransportContactSet(router.getID(), true).getSet();
 
 					for (int i = 0; i < oldContacts.size(); i++) {
-
 						DHTRouterContact contact = (DHTRouterContact) oldContacts.get(i);
-
 						if (!Arrays.equals(oldRouterId, contact.getID())) {
 							if (contact.isAlive()) {
 								DHTTransportContact	t_contact = ((DHTControlContact)contact.getAttachment()).getTransportContact();
@@ -345,11 +337,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 					// fill up with non-alive ones to lower limit in case this is a start-of-day
 					// router change and we only have imported contacts in limbo state
-
 					for (int i=0;sortedContacts.size() < 32 && i<oldContacts.size();i++) {
-
 						DHTRouterContact contact = (DHTRouterContact)oldContacts.get(i);
-
 						if (!Arrays.equals( oldRouterId, contact.getID())) {
 							if (!contact.isAlive()) {
 								DHTTransportContact	t_contact = ((DHTControlContact)contact.getAttachment()).getTransportContact();
@@ -359,7 +348,6 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 					}
 
 					Iterator it = sortedContacts.iterator();
-
 					int	added = 0;
 
 					// don't add them all otherwise we can skew the smallest-subtree. better
@@ -466,33 +454,28 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		stats = new DHTControlStatsImpl(this);
 
 		// don't bother computing anti-spoof stuff if we don't support value storage
-
 		if (transport.supportsStorage()) {
 
 			try {
-				/*
-				spoof_cipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
+				/* spoof_cipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
 				KeyGenerator keyGen = KeyGenerator.getInstance("DESede");
-				spoof_key = keyGen.generateKey();
-				*/
-
-				spoofDigest 	= MessageDigest.getInstance("MD5");
-				spoofKey		= new byte[16];
+				spoof_key = keyGen.generateKey(); */
+				spoofDigest = MessageDigest.getInstance("MD5");
+				spoofKey = new byte[16];
 				RandomUtils.nextSecureBytes(spoofKey);
 			} catch (Throwable e) {
 				Debug.printStackTrace(e);
 				logger.log(e);
 			}
 		}
-
 		transport.setRequestHandler(this);
 	}
 
 	protected void createRouter(DHTTransportContact _localContact) {
 		
-		/*Log.d(TAG, "createRouter() is called...");
+		Log.d(TAG, "createRouter() is called...");
 		Throwable t = new Throwable();
-		t.printStackTrace();*/
+		t.printStackTrace();
 		
 		routerStartTime	= SystemTime.getCurrentTime();
 		routerCount++;
@@ -768,14 +751,14 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 				});
 		
 		// we always wait at least a minimum amount of time before returning
-		long	start = SystemTime.getCurrentTime();
+		long start = SystemTime.getCurrentTime();
 		sem.reserve(INTEGRATION_TIME_MAX);
-		long	now = SystemTime.getCurrentTime();
+		long now = SystemTime.getCurrentTime();
 		if (now < start) {
-			start	= now;
+			start = now;
 		}
 		
-		long	remaining = INTEGRATION_TIME_MAX - (now - start);
+		long remaining = INTEGRATION_TIME_MAX - (now - start);
 		if (remaining > 500 && !fullWait) {
 			logger.log("Initial integration completed, waiting " + remaining + " ms for second phase to start");
 			try {
@@ -798,7 +781,6 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 	protected void poke() {
 		if (!enableRandomPoking) {
-
 			return;
 		}
 
@@ -809,7 +791,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 
 			lastLookup	= now;
 
-				// we don't want this to be blocking as it'll stuff the stats
+			// we don't want this to be blocking as it'll stuff the stats
 
 			externalLookupPool.run(
 				new DhtTask(externalLookupPool) {
@@ -1557,19 +1539,19 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 	}
 
 	public boolean lookup(
-   		byte[]							unencodedKey,
-   		String							description,
-   		long							timeout,
-   		final DHTOperationListener		lookupListener) {
+		byte[]							unencodedKey,
+		String							description,
+		long							timeout,
+		final DHTOperationListener		lookupListener) {
 		return (lookupEncoded(encodeKey(unencodedKey), description, timeout, false, lookupListener));
 	}
 
 	public boolean lookupEncoded(
-   		byte[]							encodedKey,
-   		String							description,
-   		long							timeout,
-   		boolean							highPriority,
-   		final DHTOperationListener		lookupListener) {
+		byte[]							encodedKey,
+		String							description,
+		long							timeout,
+		boolean							highPriority,
+		final DHTOperationListener		lookupListener) {
 		
 		if (DHTLog.isOn()) {
 			DHTLog.log("lookup for " + DHTLog.getString(encodedKey));
@@ -1652,7 +1634,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		final DHTOperationListenerDemuxer	getListener) {
 		final DhtTaskSet result = new DhtTaskSet();
 		// get the initial starting point for the get - may have previously been diversified
-		byte[][]	encoded_keys = adapter.diversify(description, null, false, true, initial_encoded_key, DHT.DT_NONE, exhaustive, getMaxDivDepth());
+		byte[][] encoded_keys = adapter.diversify(description, null, false, true, initial_encoded_key, DHT.DT_NONE, exhaustive, getMaxDivDepth());
 		if  (encoded_keys.length == 0) {
 			// over-diversified
 			getListener.diversified("Over-diversification of [" + description + "]");
@@ -1719,7 +1701,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 							super.read(contact, value);
 						}
 						
-						public void closest(List	closest) {
+						public void closest(List closest) {
 							/* we don't use teh cache-at-closest kad feature
 							if (found_values.size() > 0) {
 								DHTTransportValue[]	values = new DHTTransportValue[found_values.size()];
@@ -2112,7 +2094,7 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 							contactsToQueryMon.enter();
 							
 							// for stats queries the values returned are unique to target so don't assume 2 replies sufficient
-							if (valuesFound >= maxValues || ((flags & DHT.FLAG_STATS) == 0 &&  valueReplies >= 2)) {
+							if (valuesFound >= maxValues || ((flags & DHT.FLAG_STATS) == 0 && valueReplies >= 2)) {
 								// all hits should have the same values anyway...
 								terminate = true;
 								break;
@@ -2152,7 +2134,6 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 									if (DHTLog.isOn()) {
 										DHTLog.log("lookup: terminates - we've searched the closest " + searchAccuracy + " contacts");
 									}
-									//Log.d(TAG, "lookup: terminates - we've searched the closest " + searchAccuracy + " contacts");
 									terminate = true;
 									break;
 								}

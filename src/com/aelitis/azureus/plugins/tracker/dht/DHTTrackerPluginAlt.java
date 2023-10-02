@@ -426,8 +426,8 @@ public class DHTTrackerPluginAlt {
 
 		private void search(InetSocketAddress address) throws IOException {
 			
-			System.out.println("### search() is called...");
-			new Throwable().printStackTrace();
+			//System.out.println("### search() is called...");
+			//new Throwable().printStackTrace();
 			
 			if (queried_nodes.contains(address)) {
 				return;
