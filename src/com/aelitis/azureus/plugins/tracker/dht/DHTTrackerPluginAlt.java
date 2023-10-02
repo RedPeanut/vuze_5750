@@ -534,45 +534,31 @@ DHTTrackerPluginAlt
 			tryQuery();
 		}
 
-		private void
-		search(
-			InetSocketAddress	address )
-
-			throws IOException
-		{
+		private void search(InetSocketAddress address) throws IOException {
 			if (queried_nodes.contains( address)) {
-
 				return;
 			}
 
 			queried_nodes.add(address);
-
 			Map<String,Object> map = new HashMap<String,Object>();
 
 			map.put("q", "get_peers");
 			map.put("y", "q");
 
 			Map<String,Object> args = new HashMap<String,Object>();
-
 			map.put("a", args);
 
 			args.put("id", NID);
-
 			args.put("info_hash", torrent_hash);
-
 			args.put("noseed", new Long( no_seeds?1:0));
 
 			byte[]	tid = send(this, server, address, map);
-
 			query_count++;
-
 			active_queries.put(tid, address);
 		}
 
-		private void
-		tryQuery() {
+		private void tryQuery() {
 			if (listener.isComplete()) {
-
 				return;
 			}
 
@@ -580,30 +566,23 @@ DHTTrackerPluginAlt
 				synchronized(this) {
 
 					if (failed || active_queries.size() >= CONC_LOOKUPS) {
-
 						return;
 					}
 
 					long	now = SystemTime.getMonotonousTime();
 
 					if (now - start_time > LOOKUP_TIMEOUT) {
-
 						return;
 					}
 
 					if (found_peer_time > 0) {
-
 						if (found_peers.size() > NUM_WANT) {
-
 							setCompleted();
-
 							return;
 						}
 
 						if (now - found_peer_time > LOOKUP_LINGER) {
-
 							setCompleted();
-
 							return;
 						}
 					}
@@ -612,9 +591,7 @@ DHTTrackerPluginAlt
 						byte[]	limit_nid;
 
 						if (heard_from.size() >= NID_CLOSENESS_LIMIT) {
-
 							limit_nid = heard_from.keySet().iterator().next();
-
 						} else {
 
 							limit_nid = null;

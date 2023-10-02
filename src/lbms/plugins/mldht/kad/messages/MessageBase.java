@@ -193,7 +193,7 @@ public abstract class MessageBase {
 		PING, FIND_NODE, GET_PEERS, ANNOUNCE_PEER, NONE;
 		
 		String getRPCName()	{
-			return name().toLowerCase();						
+			return name().toLowerCase();
 		}
 	};
 }
