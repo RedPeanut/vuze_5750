@@ -250,7 +250,8 @@ public class DHTControlImpl implements DHTControl, DHTTransportRequestHandler {
 		int					_cacheAtClosestN,
 		boolean				_encodeKeys,
 		boolean				_enableRandomPoking,
-		DHTLogger 			_logger) {
+		DHTLogger 			_logger
+	) {
 		
 		adapter		= _adapter;
 		transport	= _transport;

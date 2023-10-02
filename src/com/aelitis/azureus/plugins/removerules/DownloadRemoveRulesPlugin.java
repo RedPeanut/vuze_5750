@@ -70,8 +70,7 @@ DownloadRemoveRulesPlugin
 		plugin_interface.getPluginProperties().setProperty("plugin.name", "Download Remove Rules");
 	}
 
-	public void initialize(
-		PluginInterface 	_plugin_interface) {
+	public void initialize(PluginInterface _plugin_interface) {
 		plugin_interface	= _plugin_interface;
 
 		log = plugin_interface.getLogger().getChannel("DLRemRules");
@@ -80,20 +79,14 @@ DownloadRemoveRulesPlugin
 
 		config.addLabelParameter2("download.removerules.unauthorised.info");
 
-		remove_unauthorised =
-			config.addBooleanParameter2("download.removerules.unauthorised", "download.removerules.unauthorised", false);
-
-		remove_unauthorised_seeding_only =
-			config.addBooleanParameter2("download.removerules.unauthorised.seedingonly", "download.removerules.unauthorised.seedingonly", true);
-
-		remove_unauthorised_data =
-			config.addBooleanParameter2("download.removerules.unauthorised.data", "download.removerules.unauthorised.data", false);
+		remove_unauthorised = config.addBooleanParameter2("download.removerules.unauthorised", "download.removerules.unauthorised", false);
+		remove_unauthorised_seeding_only = config.addBooleanParameter2("download.removerules.unauthorised.seedingonly", "download.removerules.unauthorised.seedingonly", true);
+		remove_unauthorised_data = config.addBooleanParameter2("download.removerules.unauthorised.data", "download.removerules.unauthorised.data", false);
 
 		remove_unauthorised.addEnabledOnSelection(remove_unauthorised_seeding_only);
 		remove_unauthorised.addEnabledOnSelection(remove_unauthorised_data);
 
-		remove_update_torrents =
-			config.addBooleanParameter2("download.removerules.updatetorrents", "download.removerules.updatetorrents", true);
+		remove_update_torrents = config.addBooleanParameter2("download.removerules.updatetorrents", "download.removerules.updatetorrents", true);
 
 		new DelayedEvent(
 				"DownloadRemovalRules",

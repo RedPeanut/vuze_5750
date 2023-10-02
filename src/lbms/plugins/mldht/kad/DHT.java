@@ -65,11 +65,11 @@ public class DHT implements DHTBase {
 	}
 
 
-	private static DHTLogger				logger;
-	private static LogLevel					logLevel	= LogLevel.Info;
+	private static DHTLogger logger;
+	private static LogLevel logLevel = LogLevel.Info;
 
-	private static ScheduledThreadPoolExecutor	scheduler;
-	private static ThreadGroup					executorGroup;
+	private static ScheduledThreadPoolExecutor scheduler;
+	private static ThreadGroup executorGroup;
 	
 	static {
 		executorGroup = new ThreadGroup("mlDHT");
@@ -146,7 +146,6 @@ public class DHT implements DHTBase {
 			dhts.put(DHTtype.IPV4_DHT, new DHT(DHTtype.IPV4_DHT));
 			dhts.put(DHTtype.IPV6_DHT, new DHT(DHTtype.IPV6_DHT));
 		}
-		
 		return dhts;
 	}
 	
@@ -243,6 +242,9 @@ public class DHT implements DHTBase {
 		if (node.allLocalIDs().contains(r.getID())) {
 			return;
 		}
+		
+		System.out.println(">>> getPeers() is called...");
+		new Throwable().printStackTrace();
 		
 		//Log.d(TAG, "getPeers() is called...");
 		//Util.printRequest(TAG, r);

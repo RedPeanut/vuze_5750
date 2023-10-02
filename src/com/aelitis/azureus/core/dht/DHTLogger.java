@@ -21,25 +21,13 @@ package com.aelitis.azureus.core.dht;
 
 import org.gudy.azureus2.plugins.PluginInterface;
 
-public interface
-DHTLogger
-{
+public interface DHTLogger {
 	public static final int	LT_GENERAL		= 1;
 	public static final int	LT_IP_FILTER	= 2;
 
-	public void log(
-		String	str);
-
-	public void log(
-		Throwable	e);
-
-	public void log(
-		int		log_type,
-		String	str);
-
-	public boolean isEnabled(
-		int	log_type);
-
-	public PluginInterface
-	getPluginInterface();
+	public void log(String str);
+	public void log(Throwable e);
+	public void log(int log_type, String str);
+	public boolean isEnabled(int log_type);
+	public PluginInterface getPluginInterface();
 }

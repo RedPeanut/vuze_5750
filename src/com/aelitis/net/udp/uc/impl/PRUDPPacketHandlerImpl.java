@@ -200,7 +200,7 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 		//int count = SingleCounter0.getInstance().getAndIncreaseCount();
 		//Log.d(TAG, String.format("how many times is this called... #%d", count));
 		//Log.d(TAG, "and where -->");
-		new Throwable().printStackTrace();
+		//new Throwable().printStackTrace();
 		/*Log.d(TAG, "<init>() is called...");
 		new Throwable().printStackTrace();*/
 
@@ -209,9 +209,9 @@ public class PRUDPPacketHandlerImpl implements PRUDPPacketHandler {
 		packetTransformer	= _packetTransformer;
 		defaultBindIp		= NetworkAdmin.getSingleton().getSingleHomedServiceBindAddress();
 		
-		Log.d(TAG, "port = " + port);
-		Log.d(TAG, "explicitBindIp = " + explicitBindIp);
-		Log.d(TAG, "defaultBindIp = " + defaultBindIp);
+		//Log.d(TAG, "port = " + port);
+		//Log.d(TAG, "explicitBindIp = " + explicitBindIp);
+		//Log.d(TAG, "defaultBindIp = " + defaultBindIp);
 		
 		calcBind();
 		

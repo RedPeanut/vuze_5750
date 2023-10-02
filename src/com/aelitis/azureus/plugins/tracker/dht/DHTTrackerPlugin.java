@@ -378,7 +378,7 @@ public class DHTTrackerPlugin
 
 		pluginInterface.getDownloadManager().addListener(
 			new DownloadManagerListener() {
-				public void  downloadAdded(Download download) {
+				public void downloadAdded(Download download) {
 					addDownload(download);
 				}
 

@@ -16,15 +16,32 @@
  */
 package lbms.plugins.mldht.kad.tasks;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import hello.util.Log;
-import hello.util.SingleCounter0;
-import lbms.plugins.mldht.kad.*;
+import lbms.plugins.mldht.kad.AnnounceNodeCache;
+import lbms.plugins.mldht.kad.AnnounceResponseHandler;
+import lbms.plugins.mldht.kad.DBItem;
+import lbms.plugins.mldht.kad.DHT;
 import lbms.plugins.mldht.kad.DHT.DHTtype;
-import lbms.plugins.mldht.kad.KBucketEntry.DistanceOrder;
-import lbms.plugins.mldht.kad.messages.*;
+import lbms.plugins.mldht.kad.DHTConstants;
+import lbms.plugins.mldht.kad.KBucketEntry;
+import lbms.plugins.mldht.kad.KBucketEntryAndToken;
+import lbms.plugins.mldht.kad.KClosestNodesSearch;
+import lbms.plugins.mldht.kad.Key;
+import lbms.plugins.mldht.kad.Node;
+import lbms.plugins.mldht.kad.PeerAddressDBItem;
+import lbms.plugins.mldht.kad.RPCCallBase;
+import lbms.plugins.mldht.kad.RPCServerBase;
+import lbms.plugins.mldht.kad.ScrapeResponseHandler;
+import lbms.plugins.mldht.kad.messages.GetPeersRequest;
+import lbms.plugins.mldht.kad.messages.GetPeersResponse;
+import lbms.plugins.mldht.kad.messages.MessageBase;
 import lbms.plugins.mldht.kad.messages.MessageBase.Method;
 import lbms.plugins.mldht.kad.utils.AddressUtils;
 import lbms.plugins.mldht.kad.utils.PackUtil;
@@ -37,21 +54,20 @@ public class PeerLookupTask extends Task {
 
 	private static String TAG = PeerLookupTask.class.getSimpleName();
 	
-	private boolean							scrapeOnly;
-	private boolean							noSeeds;
-	private boolean							fastLookup;
+	private boolean scrapeOnly;
+	private boolean noSeeds;
+	private boolean fastLookup;
 	
 	// nodes which have answered with tokens
-	private List<KBucketEntryAndToken>		announceCanidates;
-	private AnnounceResponseHandler			announceHandler;
-	private ScrapeResponseHandler			scrapeHandler;
+	private List<KBucketEntryAndToken> announceCanidates;
+	private AnnounceResponseHandler announceHandler;
+	private ScrapeResponseHandler scrapeHandler;
 
-	private Set<PeerAddressDBItem>			returnedItems;
-	private SortedSet<KBucketEntryAndToken>	closestSet;
+	private Set<PeerAddressDBItem> returnedItems;
+	private SortedSet<KBucketEntryAndToken> closestSet;
 	
-	private int								validReponsesSinceLastClosestSetModification;
-	AnnounceNodeCache						cache;
-
+	private int validReponsesSinceLastClosestSetModification;
+	AnnounceNodeCache cache;
 
 	public PeerLookupTask(RPCServerBase rpc, Node node, Key infoHash) {
 		super(infoHash, rpc, node);
@@ -64,6 +80,7 @@ public class PeerLookupTask extends Task {
 		cache.register(targetKey);
 
 		DHT.logDebug("PeerLookupTask started: " + getTaskID());
+		//new Throwable().printStackTrace();
 	}
 
 	public void setScrapeHandler(ScrapeResponseHandler scrapeHandler) {
@@ -213,6 +230,9 @@ public class PeerLookupTask extends Task {
 	 * @see lbms.plugins.mldht.kad.Task#update()
 	 */
 	void update() {
+		
+		//new Throwable().printStackTrace();
+		
 		synchronized (todo) {
 			// check if the cache has any closer nodes after the initial query
 			todo.addAll(cache.get(targetKey, 3, visited));
@@ -231,7 +251,7 @@ public class PeerLookupTask extends Task {
 					gpr.setDestination(e.getAddress());
 					gpr.setScrape(true);
 					gpr.setNoSeeds(noSeeds);
-					rpcCall(gpr,e.getID());
+					rpcCall(gpr, e.getID());
 					visited.add(e);
 				}
 			}

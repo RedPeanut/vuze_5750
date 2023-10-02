@@ -50,12 +50,10 @@ public final class ShellFactory
 		UIFunctionsSWT uiFunctions = UIFunctionsManagerSWT.getUIFunctionsSWT();
 
 		if (uiFunctions != null) {
-
 			parent = uiFunctions.getMainShell();
 		}
 
 		if (parent == null) {
-
 			return createShell(SWTThread.getInstance().getDisplay());
 		}
 
